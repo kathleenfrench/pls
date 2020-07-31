@@ -3,25 +3,23 @@ package pls
 import (
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
-// completionCmd represents the completion command
-var completionCmd = &cobra.Command{
-	Use:   "completion [bash|zsh|fish|powershell]",
-	Short: "A brief description of your command",
-	Long: `To load completions:
-
+const bashHelp = `
 Bash:
 
-$ source <(pls completion bash)
+$ source <(pls add completion bash)
 
 # To load completions for each session, execute once:
 Linux:
-  $ pls completion bash > /etc/bash_completion.d/pls
+  $ pls add completion bash > /etc/bash_completion.d/pls
 MacOS:
-  $ pls completion bash > /usr/local/etc/bash_completion.d/pls
+  $ pls add completion bash > /usr/local/etc/bash_completion.d/pls
+`
 
+const zshHelp = `
 Zsh:
 
 # If shell completion is not already enabled in your environment you will need
@@ -30,30 +28,51 @@ Zsh:
 $ echo "autoload -U compinit; compinit" >> ~/.zshrc
 
 # To load completions for each session, execute once:
-$ pls completion zsh > "${fpath[1]}/_pls"
+$ pls add completion zsh > "${fpath[1]}/_pls"
 
 # You will need to start a new shell for this setup to take effect.
+`
 
+const fishHelp = `
 Fish:
 
-$ pls completion fish | source
+$ pls add completion fish | source
 
 # To load completions for each session, execute once:
-$ pls completion fish > ~/.config/fish/completions/pls.fish
-`,
+$ pls add completion fish > ~/.config/fish/completions/pls.fish
+`
+
+var printOutput bool
+
+// completionCmd represents the completion command
+var completionCmd = &cobra.Command{
+	Use:                   "completion [bash|zsh|fish|powershell]",
+	Short:                 "add shell completion for pls",
 	DisableFlagsInUseLine: true,
 	ValidArgs:             []string{"bash", "zsh", "fish", "powershell"},
 	Args:                  cobra.ExactValidArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		writer := os.Stdout
+		if !printOutput {
+			writer = nil
+		}
 		switch args[0] {
 		case "bash":
-			cmd.Root().GenBashCompletion(os.Stdout)
+			color.HiGreen(bashHelp)
+			cmd.Root().GenBashCompletion(writer)
 		case "zsh":
-			cmd.Root().GenZshCompletion(os.Stdout)
+			color.HiGreen(zshHelp)
+			cmd.Root().GenZshCompletion(writer)
 		case "fish":
-			cmd.Root().GenFishCompletion(os.Stdout, true)
+			color.HiGreen(fishHelp)
+			cmd.Root().GenFishCompletion(writer, true)
 		case "powershell":
-			cmd.Root().GenPowerShellCompletion(os.Stdout)
+			cmd.Root().GenPowerShellCompletion(writer)
 		}
 	},
+}
+
+// completion flags
+func init() {
+	completionCmd.Flags().BoolVar(&printOutput, "print", false, "print the output of the generate completion script that will be copied to the correct path based off of your shell selection")
 }

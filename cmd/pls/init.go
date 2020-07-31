@@ -31,7 +31,7 @@ func addTopLevelSubcommands() {
 	rootCmd.AddCommand(checkCmd)
 	rootCmd.AddCommand(makeCmd)
 	rootCmd.AddCommand(updateCmd)
-	rootCmd.AddCommand(completionCmd)
+	rootCmd.AddCommand(addSubCmd)
 }
 
 func setPlsStyling() {
