@@ -2,8 +2,10 @@ package pls
 
 import (
 	"fmt"
+	"io"
 	"os"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/spf13/cobra"
@@ -12,13 +14,13 @@ import (
 const bashHelp = `
 Bash:
 
-$ source <(pls add completion bash)
+$ source <(pls add complete bash)
 
 # To load completions for each session, execute once:
 Linux:
-  $ pls add completion bash > /etc/bash_completion.d/pls
+  $ pls add complete bash > /etc/bash_completion.d/pls
 MacOS:
-  $ pls add completion bash > /usr/local/etc/bash_completion.d/pls
+  $ pls add complete bash > /usr/local/etc/bash_completion.d/pls
 `
 
 const zshHelp = `
@@ -30,7 +32,7 @@ Zsh:
 $ echo "autoload -U compinit; compinit" >> ~/.zshrc
 
 # To load completions for each session, execute once:
-$ pls add completion zsh > "${fpath[1]}/_pls"
+$ pls add complete zsh > "${fpath[1]}/_pls"
 
 # You will need to start a new shell for this setup to take effect.
 `
@@ -38,10 +40,10 @@ $ pls add completion zsh > "${fpath[1]}/_pls"
 const fishHelp = `
 Fish:
 
-$ pls add completion fish | source
+$ pls add complete fish | source
 
 # To load completions for each session, execute once:
-$ pls add completion fish > ~/.config/fish/completions/pls.fish
+$ pls add complete fish > ~/.config/fish/completions/pls.fish
 `
 
 // flags
@@ -83,22 +85,66 @@ func configPath(shellType string) (string, error) {
 	return "", fmt.Errorf("%s is not currently supported", shellType)
 }
 
-// completionCmd represents the completion command
-var completionCmd = &cobra.Command{
-	Use:                   "completion [bash|zsh|fish]",
-	Short:                 "add shell completion for pls",
+var completeMethodCmd = &cobra.Command{
+	Use:                   "complete [bash|zsh|fish]",
+	Hidden:                true,
 	DisableFlagsInUseLine: true,
 	ValidArgs:             []string{"bash", "zsh", "fish"},
-	Args:                  cobra.ExactValidArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		shellChoice := args[0]
+		switch shellChoice {
+		case "bash":
+			cmd.Root().GenBashCompletion(os.Stdout)
+		case "zsh":
+			cmd.Root().GenZshCompletion(os.Stdout)
+		case "fish":
+			cmd.Root().GenFishCompletion(os.Stdout, true)
+		}
+	},
+}
+
+// completionCmd represents the completion command
+var completionCmd = &cobra.Command{
+	Use:       "completion [bash|zsh|fish]",
+	Short:     "add shell completion for pls",
+	ValidArgs: []string{"bash", "zsh", "fish"},
+	Args:      cobra.ExactValidArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		shellChoice := args[0]
 		color.HiYellow(fmt.Sprintf("pls will try to install completion for %s...", shellChoice))
 
-		writer := os.Stdout
-		if !printOutput {
-			writer = nil
+		var writer io.Writer
+
+		shellChoiceCfgPath, err := configPath(shellChoice)
+		if err != nil {
+			panic(err)
 		}
 
+		correctPath := false
+		prompt := &survey.Confirm{
+			Message: fmt.Sprintf("is %s the correct path for your %s configs?", shellChoiceCfgPath, shellChoice),
+		}
+
+		survey.AskOne(prompt, &correctPath)
+
+		if !correctPath {
+			color.HiRed("oops, then let's not do it!")
+			os.Exit(1)
+		}
+
+		installItForYou := false
+		prompt = &survey.Confirm{
+			Message: fmt.Sprintf("do you want me to add the completion script commands to %s for you?", shellChoiceCfgPath),
+		}
+
+		survey.AskOne(prompt, &installItForYou)
+
+		if !installItForYou {
+			printInstallationInstructionsToStdout(cmd, shellChoice)
+			os.Exit(1)
+		}
+
+		writer = nil
 		switch shellChoice {
 		case "bash":
 			color.HiGreen(bashHelp)
@@ -111,6 +157,30 @@ var completionCmd = &cobra.Command{
 			cmd.Root().GenFishCompletion(writer, true)
 		}
 	},
+}
+
+func darwinInstall(shellType string) error {
+	return nil
+}
+
+func linuxInstall(shellType string) error {
+	return nil
+}
+
+func printInstallationInstructionsToStdout(cmd *cobra.Command, shellChoice string) {
+	color.HiYellow("\nINSTALLATION:\n")
+
+	switch shellChoice {
+	case "bash":
+		cmd.Root().GenBashCompletion(os.Stdout)
+		color.HiGreen(fmt.Sprintf("\n%s\n", bashHelp))
+	case "zsh":
+		cmd.Root().GenZshCompletion(os.Stdout)
+		color.HiGreen(fmt.Sprintf("\n%s\n", zshHelp))
+	case "fish":
+		cmd.Root().GenFishCompletion(os.Stdout, true)
+		color.HiGreen(fmt.Sprintf("\n%s\n", fishHelp))
+	}
 }
 
 // completion flags
