@@ -14,5 +14,6 @@
 - sys cleanup
 - sys info
 - writing interface
+- run simple server to perform various local tasks - cli GUI
 
 
