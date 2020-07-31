@@ -1,10 +1,11 @@
-package cmd
+package pls
 
 import (
 	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -16,6 +17,11 @@ var (
 	Date = "unknown"
 	// Builder is the user who compiled the pls binary
 	Builder = "unknown"
+	// Verbose is whether to return a verbose output
+	Verbose bool
+
+	// flags
+	cfgFile string
 )
 
 var rootCmd = &cobra.Command{
@@ -33,6 +39,16 @@ var versionCmd = &cobra.Command{
 }
 
 func init() {
+	cobra.OnInitialize(initConfig)
+
+	// config flags
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.pls.yaml)")
+	rootCmd.PersistentFlags().Bool("viper", true, "use viper for configuration")
+	viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
+
+	// persistent flags
+	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
+
 	rootCmd.AddCommand(versionCmd)
 }
 
