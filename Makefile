@@ -1,6 +1,6 @@
 WHOAMI ?= $(shell whoami)
 CWD := $(shell pwd)
-PROJECT_NAME := pls
+NAME := pls
 BIN_NAME := pls
 INSTALL_LOCATION := /usr/local/bin
 COMMIT := $(shell git rev-parse --short HEAD)
@@ -10,6 +10,7 @@ VERSION := $(COMMIT)-$(TODAY)
 BUILD_OUTPUT_DIR := $(CWD)/build
 BINARY_LOCATION := $(BUILD_OUTPUT_DIR)/$(BIN_NAME)
 MODULE := $(shell go list -m)
+CMD_MODULE := $(MODULE)/cmd/$(BIN_NAME)
 
 ${BUILD_OUTPUT_DIR}:
 	@mkdir -p $(BUILD_OUTPUT_DIR)
@@ -28,7 +29,7 @@ GOOS = $(PLATFORM)
 GOARCH ?= amd64
 
 GO := $(shell command -v go 2>/dev/null)
-GO_LINKER_FLAGS = -X $(MODULE)/cmd/pls.Builder=$(WHOAMI) -X $(MODULE)/cmd/pls.Version=$(VERSION) -X $(MODULE)/cmd/pls.Commit=$(COMMIT) -X $(MODULE)/cmd/pls.Date=$(TODAY)
+GO_LINKER_FLAGS = -X $(CMD_MODULE).Builder=$(WHOAMI) -X $(CMD_MODULE).Version=$(VERSION) -X $(CMD_MODULE).Commit=$(COMMIT) -X $(CMD_MODULE).Date=$(TODAY)
 GO_BUILD_FLAGS = -mod=vendor -a --installsuffix cgo -ldflags "$(GO_LINKER_FLAGS)" -o $(BINARY_LOCATION)
 
 vendor: go.sum
@@ -36,12 +37,12 @@ vendor: go.sum
 
 .PHONY: build
 build: ${BUILD_OUTPUT_DIR} vendor ## build the pls binary
-	@echo "building pls with build flags: $(GO_BUILD_FLAGS)..."
+	@echo "compiling ${NAME}..."
 	@export GOOS=$(GOOS) GOARCH=$(GOARCH) && \
 		export GO111MODULE=on && \
 		export CGO_ENABLED=0 && \
 		$(GO) build $(GO_BUILD_FLAGS)
-	@echo "pls bin compiled!"
+	@echo "${NAME} bin compiled!"
 
 .PHONY: install
 install: build ## install the pls binary to /usr/local/bin
