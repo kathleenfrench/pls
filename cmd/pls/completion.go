@@ -3,20 +3,12 @@ package pls
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
-	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
 	"github.com/kathleenfrench/pls/internal/completion"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/spf13/cobra"
 )
-
-// flags
-var printOutput bool
-
-// install scripts
-var fishInit = exec.Command("pls", "add", "complete", "fish", "|", "source")
 
 var completeMethodCmd = &cobra.Command{
 	Use:                   "complete [bash|zsh|fish]",
@@ -52,17 +44,20 @@ var completionCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		// determine the correct path for installing completion scripts based off of shell selection
 		shellChoiceCfgPath, err := completion.GetShellConfigPath(shellChoice)
 		if err != nil {
 			panic(err)
 		}
 
+		// confirm that this is the right path
 		correctPath := completion.ConfirmInstallationPath(shellChoiceCfgPath, shellChoice)
 		if !correctPath {
 			utils.PrintError("hmm, i'll need to add support for custom paths then...")
 			os.Exit(1)
 		}
 
+		// install the completion scripts on the host machine
 		err = install(shellChoice, shellChoiceCfgPath)
 		if err != nil {
 			utils.PrintError(err)
@@ -76,60 +71,23 @@ var completionCmd = &cobra.Command{
 func install(shellType string, configPath string) error {
 	switch shellType {
 	case "bash":
-		bashInstall := exec.Command("pls", "add", "complete", "bash", ">", configPath)
-		bash := utils.ExecuteCommand(bashInstall)
-		color.HiBlue(bash)
-		break
-	case "zsh":
-		zshAutoEnabled := false
-		prompt := &survey.Confirm{
-			Message: "is zsh shell completion enabled?",
-		}
-
-		survey.AskOne(prompt, &zshAutoEnabled)
-		if !zshAutoEnabled {
-			enableAutoload := false
-			prompt = &survey.Confirm{
-				Message: "can i enable it for you?",
-			}
-
-			survey.AskOne(prompt, &enableAutoload)
-			if enableAutoload {
-				_, err := utils.BashExec(`echo "autoload -U compinit; compinit" >> ~/.zshrc`)
-				if err != nil {
-					utils.PrintError(err)
-					os.Exit(1)
-				}
-			} else {
-				color.HiYellow(fmt.Sprintf(`Ok, run: echo "autoload -U compinit; compinit" >> ~/.zshrc"\nafter you've reloaded your shell, come back and re-run the completion command`))
-				os.Exit(1)
-			}
-		}
-
-		zshCmd := fmt.Sprintf("pls add complete zsh > %s", fmt.Sprintf("%s/_pls", configPath))
-		color.HiYellow(fmt.Sprintf("[RUNNING]: %s", zshCmd))
-		_, err := utils.BashExec(zshCmd)
+		err := completion.BashInstall(configPath)
 		if err != nil {
-			utils.PrintError(err)
 			os.Exit(1)
 		}
-
-		break
+	case "zsh":
+		err := completion.ZshInstall(configPath)
+		if err != nil {
+			os.Exit(1)
+		}
 	case "fish":
-		resInit := utils.ExecuteCommand(fishInit)
-		color.HiYellow(resInit)
-		fishInstall := exec.Command("pls", "add", "complete", "fish", ">", configPath)
-		fish := utils.ExecuteCommand(fishInstall)
-		color.HiBlue(fish)
-		break
+		err := completion.FishInstall(configPath)
+		if err != nil {
+			os.Exit(1)
+		}
 	default:
 		return fmt.Errorf("%s is not supported", shellType)
 	}
 
 	return nil
-}
-
-// completion flags
-func init() {
-	completionCmd.Flags().BoolVar(&printOutput, "print", false, "print the output of the generate completion script that will be copied to the correct path based off of your shell selection")
 }
