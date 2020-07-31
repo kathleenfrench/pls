@@ -24,15 +24,6 @@ var rootCmd = &cobra.Command{
 	Short: "a helpful little CLI for the lazy ones...",
 }
 
-var versionCmd = &cobra.Command{
-	Use:     "version",
-	Aliases: []string{"v"},
-	Short:   "print the current version of pls",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("pls version: %s\n", Version)
-	},
-}
-
 // Execute adds all child commands to the root command set sets flags appropriately
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {

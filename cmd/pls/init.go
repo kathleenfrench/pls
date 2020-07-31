@@ -24,5 +24,6 @@ func init() {
 	// persistent flags
 	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
 
+	// add commands
 	rootCmd.AddCommand(versionCmd)
 }
