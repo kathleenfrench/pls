@@ -10,4 +10,5 @@ var addSubCmd = &cobra.Command{
 
 func init() {
 	addSubCmd.AddCommand(completionCmd)
+	addSubCmd.AddCommand(completeMethodCmd)
 }

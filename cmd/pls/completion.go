@@ -7,86 +7,16 @@ import (
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
+	"github.com/kathleenfrench/pls/internal/completion"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
-const bashHelp = `
-Bash:
-
-$ source <(pls add complete bash)
-
-# To load completions for each session, execute once:
-Linux:
-  $ pls add complete bash > /etc/bash_completion.d/pls
-MacOS:
-  $ pls add complete bash > /usr/local/etc/bash_completion.d/pls
-`
-
-const zshHelp = `
-Zsh:
-
-# If shell completion is not already enabled in your environment you will need
-# to enable it.  You can execute the following once:
-
-$ echo "autoload -U compinit; compinit" >> ~/.zshrc
-
-# To load completions for each session, execute once:
-$ pls add complete zsh > "${fpath[1]}/_pls"
-
-# You will need to start a new shell for this setup to take effect.
-`
-
-const fishHelp = `
-Fish:
-
-$ pls add complete fish | source
-
-# To load completions for each session, execute once:
-$ pls add complete fish > ~/.config/fish/completions/pls.fish
-`
-
-var fishInit = exec.Command("pls", "add", "complete", "fish", "|", "source")
-var zshInstall = exec.Command("pls", "add", "complete", "zsh", ">", zshSessionCompletionPath)
-
 // flags
 var printOutput bool
 
-// file locations
-var (
-	fishConfigPath           = "~/.config/fish/completions/pls.fish"
-	linuxBashPath            = "/etc/bash_completion.d/pls"
-	macBashPath              = "/usr/local/etc/bash_completion.d/pls"
-	zshConfigPath            = "~/.zshrc"
-	zshSessionCompletionPath = "${fpath[1]}/_pls"
-)
-
-func configPath(shellType string) (string, error) {
-	currentOS := utils.GetPlatform()
-
-	switch currentOS {
-	case "darwin", "linux":
-		break
-	default:
-		return "", fmt.Errorf("%s is not currently supported for shell completion", currentOS)
-	}
-
-	switch shellType {
-	case "fish":
-		return fishConfigPath, nil
-	case "bash":
-		switch currentOS {
-		case "darwin":
-			return macBashPath, nil
-		case "linux":
-			return linuxBashPath, nil
-		}
-	case "zsh":
-		return zshConfigPath, nil
-	}
-
-	return "", fmt.Errorf("%s is not currently supported", shellType)
-}
+// install scripts
+var fishInit = exec.Command("pls", "add", "complete", "fish", "|", "source")
 
 var completeMethodCmd = &cobra.Command{
 	Use:                   "complete [bash|zsh|fish]",
@@ -114,40 +44,28 @@ var completionCmd = &cobra.Command{
 	Args:      cobra.ExactValidArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		shellChoice := args[0]
-		color.HiYellow(fmt.Sprintf("pls will try to install completion for %s...", shellChoice))
 
-		shellChoiceCfgPath, err := configPath(shellChoice)
+		// check if it's ok for pls to install the scripts
+		canInstall := completion.PermissionToInstallPrompt(shellChoice)
+		if !canInstall {
+			completion.PrintInstallationInstructionsToStdout(cmd, shellChoice)
+			os.Exit(1)
+		}
+
+		shellChoiceCfgPath, err := completion.GetShellConfigPath(shellChoice)
 		if err != nil {
 			panic(err)
 		}
 
-		correctPath := false
-		prompt := &survey.Confirm{
-			Message: fmt.Sprintf("is %s the correct path for your %s configs?", shellChoiceCfgPath, shellChoice),
-		}
-
-		survey.AskOne(prompt, &correctPath)
-
+		correctPath := completion.ConfirmInstallationPath(shellChoiceCfgPath, shellChoice)
 		if !correctPath {
-			color.HiRed("oops, then let's not do it!")
-			os.Exit(1)
-		}
-
-		installItForYou := false
-		prompt = &survey.Confirm{
-			Message: fmt.Sprintf("do you want me to add the completion script commands to %s for you?", shellChoiceCfgPath),
-		}
-
-		survey.AskOne(prompt, &installItForYou)
-
-		if !installItForYou {
-			printInstallationInstructionsToStdout(cmd, shellChoice)
+			utils.PrintError("hmm, i'll need to add support for custom paths then...")
 			os.Exit(1)
 		}
 
 		err = install(shellChoice, shellChoiceCfgPath)
 		if err != nil {
-			color.HiRed(fmt.Sprintf("[ERROR]: %s", err))
+			utils.PrintError(err)
 			os.Exit(1)
 		}
 
@@ -177,17 +95,25 @@ func install(shellType string, configPath string) error {
 
 			survey.AskOne(prompt, &enableAutoload)
 			if enableAutoload {
-				autoLoadCmd := exec.Command("echo", `"autoload -U compinit; compinit"`, ">>", "~/.zshrc")
-				autoRes := utils.ExecuteCommand(autoLoadCmd)
-				color.HiBlue(autoRes)
+				_, err := utils.BashExec(`echo "autoload -U compinit; compinit" >> ~/.zshrc`)
+				if err != nil {
+					utils.PrintError(err)
+					os.Exit(1)
+				}
 			} else {
 				color.HiYellow(fmt.Sprintf(`Ok, run: echo "autoload -U compinit; compinit" >> ~/.zshrc"\nafter you've reloaded your shell, come back and re-run the completion command`))
 				os.Exit(1)
 			}
 		}
 
-		zsh := utils.ExecuteCommand(zshInstall)
-		color.HiBlue(zsh)
+		zshCmd := fmt.Sprintf("pls add complete zsh > %s", fmt.Sprintf("%s/_pls", configPath))
+		color.HiYellow(fmt.Sprintf("[RUNNING]: %s", zshCmd))
+		_, err := utils.BashExec(zshCmd)
+		if err != nil {
+			utils.PrintError(err)
+			os.Exit(1)
+		}
+
 		break
 	case "fish":
 		resInit := utils.ExecuteCommand(fishInit)
@@ -201,22 +127,6 @@ func install(shellType string, configPath string) error {
 	}
 
 	return nil
-}
-
-func printInstallationInstructionsToStdout(cmd *cobra.Command, shellChoice string) {
-	color.HiYellow("\nINSTALLATION:\n")
-
-	switch shellChoice {
-	case "bash":
-		cmd.Root().GenBashCompletion(os.Stdout)
-		color.HiGreen(fmt.Sprintf("\n%s\n", bashHelp))
-	case "zsh":
-		cmd.Root().GenZshCompletion(os.Stdout)
-		color.HiGreen(fmt.Sprintf("\n%s\n", zshHelp))
-	case "fish":
-		cmd.Root().GenFishCompletion(os.Stdout, true)
-		color.HiGreen(fmt.Sprintf("\n%s\n", fishHelp))
-	}
 }
 
 // completion flags

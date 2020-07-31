@@ -44,3 +44,13 @@ func ExecuteCommand(cmd *exec.Cmd) string {
 
 	return out
 }
+
+// BashExec executes a command appended to a 'bash -c' command
+func BashExec(cmd string) (string, error) {
+	r, err := exec.Command("bash", "-c", cmd).Output()
+	if err != nil {
+		return "", err
+	}
+
+	return string(r), nil
+}
