@@ -64,7 +64,7 @@ var completionCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		color.HiGreen("installation complete!")
+		color.HiGreen("installation complete! reload your shell for the settings to take effect!")
 	},
 }
 
