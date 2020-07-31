@@ -8,20 +8,37 @@ import (
 )
 
 var (
-	version = "master"
-	commit  = "none"
-	date    = "unknown"
-	builder = "unknown"
+	// Version is the current version of pls
+	Version = "master"
+	// Commit is the current commit of pls
+	Commit = "none"
+	// Date is the date at compile
+	Date = "unknown"
+	// Builder is the user who compiled the pls binary
+	Builder = "unknown"
 )
 
-var root = &cobra.Command{
+var rootCmd = &cobra.Command{
 	Use:   "pls",
 	Short: "pls is a helpful little cli",
 }
 
+var versionCmd = &cobra.Command{
+	Use:     "version",
+	Aliases: []string{"v"},
+	Short:   "print the current version of pls",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Printf("pls version: %s\n", Version)
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(versionCmd)
+}
+
 // Execute adds all child commands to the root command set sets flags appropriately
 func Execute() {
-	if err := root.Execute(); err != nil {
+	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
