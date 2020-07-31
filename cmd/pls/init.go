@@ -33,8 +33,13 @@ func addTopLevelSubcommands() {
 	rootCmd.AddCommand(updateCmd)
 }
 
+func setPlsStyling() {
+	rootCmd.SetUsageTemplate(stylizePls())
+}
+
 func init() {
 	cobra.OnInitialize(initConfig)
 	initGlobalFlags()
 	addTopLevelSubcommands()
+	setPlsStyling()
 }
