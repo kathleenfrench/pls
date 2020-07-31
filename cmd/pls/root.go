@@ -1,6 +1,9 @@
 package cmd
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/spf13/cobra"
+)
 
 var (
 	version = "master"
@@ -9,12 +12,12 @@ var (
 	builder = "unknown"
 )
 
-func root = &cobra.Command{
+var root = &cobra.Command{
 	Use: "pls",
 	Short: "pls is a helpful little cli",
 }
 
-
+// Execute adds all child commands to the root command set sets flags appropriately
 func Execute() {
 	if err := root.Execute(); err != nil {
 		fmt.Println(err)
