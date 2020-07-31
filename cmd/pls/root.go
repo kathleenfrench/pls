@@ -20,7 +20,7 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:   "pls",
-	Short: "pls is a helpful little cli",
+	Short: "a helpful little CLI for the lazy ones...",
 }
 
 var versionCmd = &cobra.Command{
