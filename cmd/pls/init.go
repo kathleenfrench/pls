@@ -26,4 +26,9 @@ func init() {
 
 	// add commands
 	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(tryCmd)
+	rootCmd.AddCommand(cleanCmd)
+	rootCmd.AddCommand(openCmd)
+	rootCmd.AddCommand(checkCmd)
+	rootCmd.AddCommand(makeCmd)
 }
