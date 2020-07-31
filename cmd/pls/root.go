@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
+// variables injected during build
 var (
 	// Version is the current version of pls
 	Version = "master"
@@ -17,11 +17,6 @@ var (
 	Date = "unknown"
 	// Builder is the user who compiled the pls binary
 	Builder = "unknown"
-	// Verbose is whether to return a verbose output
-	Verbose bool
-
-	// flags
-	cfgFile string
 )
 
 var rootCmd = &cobra.Command{
@@ -36,20 +31,6 @@ var versionCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("pls version: %s\n", Version)
 	},
-}
-
-func init() {
-	cobra.OnInitialize(initConfig)
-
-	// config flags
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.pls.yaml)")
-	rootCmd.PersistentFlags().Bool("viper", true, "use viper for configuration")
-	viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
-
-	// persistent flags
-	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
-
-	rootCmd.AddCommand(versionCmd)
 }
 
 // Execute adds all child commands to the root command set sets flags appropriately
