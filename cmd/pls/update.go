@@ -20,6 +20,15 @@ var updateCfgSubCmd = &cobra.Command{
 	},
 }
 
+var updateSelfSubCmd = &cobra.Command{
+	Use:   "yourself",
+	Short: "check if pls has an available update and install it if so",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("checking if i have any updates...")
+	},
+}
+
 func init() {
 	updateCmd.AddCommand(updateCfgSubCmd)
+	updateCmd.AddCommand(updateSelfSubCmd)
 }
