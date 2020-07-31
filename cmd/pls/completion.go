@@ -2,8 +2,8 @@ package pls
 
 import (
 	"fmt"
-	"io"
 	"os"
+	"os/exec"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
@@ -45,6 +45,9 @@ $ pls add complete fish | source
 # To load completions for each session, execute once:
 $ pls add complete fish > ~/.config/fish/completions/pls.fish
 `
+
+var fishInit = exec.Command("pls", "add", "complete", "fish", "|", "source")
+var zshInstall = exec.Command("pls", "add", "complete", "zsh", ">", zshSessionCompletionPath)
 
 // flags
 var printOutput bool
@@ -113,8 +116,6 @@ var completionCmd = &cobra.Command{
 		shellChoice := args[0]
 		color.HiYellow(fmt.Sprintf("pls will try to install completion for %s...", shellChoice))
 
-		var writer io.Writer
-
 		shellChoiceCfgPath, err := configPath(shellChoice)
 		if err != nil {
 			panic(err)
@@ -144,26 +145,61 @@ var completionCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		writer = nil
-		switch shellChoice {
-		case "bash":
-			color.HiGreen(bashHelp)
-			cmd.Root().GenBashCompletion(writer)
-		case "zsh":
-			color.HiGreen(zshHelp)
-			cmd.Root().GenZshCompletion(writer)
-		case "fish":
-			color.HiGreen(fishHelp)
-			cmd.Root().GenFishCompletion(writer, true)
+		err = install(shellChoice, shellChoiceCfgPath)
+		if err != nil {
+			color.HiRed(fmt.Sprintf("[ERROR]: %s", err))
+			os.Exit(1)
 		}
+
+		color.HiGreen("installation complete!")
 	},
 }
 
-func darwinInstall(shellType string) error {
-	return nil
-}
+func install(shellType string, configPath string) error {
+	switch shellType {
+	case "bash":
+		bashInstall := exec.Command("pls", "add", "complete", "bash", ">", configPath)
+		bash := utils.ExecuteCommand(bashInstall)
+		color.HiBlue(bash)
+		break
+	case "zsh":
+		zshAutoEnabled := false
+		prompt := &survey.Confirm{
+			Message: "is zsh shell completion enabled?",
+		}
 
-func linuxInstall(shellType string) error {
+		survey.AskOne(prompt, &zshAutoEnabled)
+		if !zshAutoEnabled {
+			enableAutoload := false
+			prompt = &survey.Confirm{
+				Message: "can i enable it for you?",
+			}
+
+			survey.AskOne(prompt, &enableAutoload)
+			if enableAutoload {
+				autoLoadCmd := exec.Command("echo", `"autoload -U compinit; compinit"`, ">>", "~/.zshrc")
+				autoRes := utils.ExecuteCommand(autoLoadCmd)
+				color.HiBlue(autoRes)
+			} else {
+				color.HiYellow(fmt.Sprintf(`Ok, run: echo "autoload -U compinit; compinit" >> ~/.zshrc"\nafter you've reloaded your shell, come back and re-run the completion command`))
+				os.Exit(1)
+			}
+		}
+
+		zsh := utils.ExecuteCommand(zshInstall)
+		color.HiBlue(zsh)
+		break
+	case "fish":
+		resInit := utils.ExecuteCommand(fishInit)
+		color.HiYellow(resInit)
+		fishInstall := exec.Command("pls", "add", "complete", "fish", ">", configPath)
+		fish := utils.ExecuteCommand(fishInstall)
+		color.HiBlue(fish)
+		break
+	default:
+		return fmt.Errorf("%s is not supported", shellType)
+	}
+
 	return nil
 }
 
