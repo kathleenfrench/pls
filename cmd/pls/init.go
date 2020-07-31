@@ -31,4 +31,5 @@ func init() {
 	rootCmd.AddCommand(openCmd)
 	rootCmd.AddCommand(checkCmd)
 	rootCmd.AddCommand(makeCmd)
+	rootCmd.AddCommand(updateCmd)
 }
