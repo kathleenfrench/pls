@@ -13,9 +13,7 @@ var (
 	cfgFile string
 )
 
-func init() {
-	cobra.OnInitialize(initConfig)
-
+func initGlobalFlags() {
 	// config flags
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/pls/config.yaml)")
 	rootCmd.PersistentFlags().Bool("viper", true, "use viper for configuration")
@@ -23,8 +21,9 @@ func init() {
 
 	// persistent flags
 	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
+}
 
-	// add commands
+func addTopLevelSubcommands() {
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(tryCmd)
 	rootCmd.AddCommand(cleanCmd)
@@ -32,4 +31,10 @@ func init() {
 	rootCmd.AddCommand(checkCmd)
 	rootCmd.AddCommand(makeCmd)
 	rootCmd.AddCommand(updateCmd)
+}
+
+func init() {
+	cobra.OnInitialize(initConfig)
+	initGlobalFlags()
+	addTopLevelSubcommands()
 }
