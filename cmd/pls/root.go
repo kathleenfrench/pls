@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +15,7 @@ var (
 )
 
 var root = &cobra.Command{
-	Use: "pls",
+	Use:   "pls",
 	Short: "pls is a helpful little cli",
 }
 
