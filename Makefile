@@ -5,7 +5,7 @@ BIN_NAME := pls
 INSTALL_LOCATION := /usr/local/bin
 COMMIT := $(shell git rev-parse --short HEAD)
 TODAY = $(shell date +%Y-%m-%d)
-VERSION := $(TODAY)-$(COMMIT)
+VERSION := $(COMMIT)-$(TODAY)
 
 BUILD_OUTPUT_DIR := $(CWD)/build
 BINARY_LOCATION := $(BUILD_OUTPUT_DIR)/$(BIN_NAME)
@@ -27,7 +27,7 @@ GOOS = $(PLATFORM)
 GOARCH ?= amd64
 
 GO := $(shell command -v go 2>/dev/null)
-GO_LINK_VARS = -X 'main.builder=$(WHOAMI)' -X 'main.version=$(VERSION)'
+GO_LINK_VARS = -X 'main.builder=$(WHOAMI)' -X 'main.version=$(VERSION)' -X 'main.commit=$(COMMIT)' -X 'main.date=$(TODAY)'
 GO_LINKER_FLAGS = "$(GO_LINK_VARS)"
 GO_BUILD_FLAGS = -mod=vendor -a --installsuffix cgo -ldflags $(GO_LINKER_FLAGS) -o $(BINARY_LOCATION)
 
@@ -40,7 +40,7 @@ build: ${BUILD_OUTPUT_DIR} vendor ## build the pls binary
 	@export GOOS=$(GOOS) GOARCH=$(GOARCH) && \
 		export GO111MODULE=on && \
 		export CGO_ENABLED=0 && \
-		$(GO) build $(GO_BUILD_FLAGS) $(CWD)/cmd/$(BIN_NAME)
+		$(GO) build $(GO_BUILD_FLAGS)
 	@echo "pls build complete!"
 
 .PHONY: install
