@@ -21,7 +21,7 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:   "pls",
-	Short: "a helpful little CLI for the lazy ones...",
+	Short: "a helpful little CLI that does things for you when you ask nice...",
 }
 
 // Execute adds all child commands to the root command set sets flags appropriately
