@@ -1,6 +1,7 @@
 package pls
 
 import (
+	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -40,7 +41,7 @@ func setPlsStyling() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(config.Initialize)
 	initGlobalFlags()
 	addTopLevelSubcommands()
 	setPlsStyling()
