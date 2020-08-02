@@ -20,6 +20,8 @@ var tryCmd = &cobra.Command{
 			utils.ExitWithError(err)
 		}
 
+		s.UpdateSettings(viper.GetViper())
+
 		color.HiGreen(fmt.Sprintf("parsed config: %v", s))
 	},
 }
