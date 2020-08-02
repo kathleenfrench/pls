@@ -13,4 +13,5 @@ var versionCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("pls version: %s\n", Version)
 	},
+	Hidden: true,
 }
