@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/kathleenfrench/pls/pkg/utils"
+	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 )
 
@@ -13,9 +14,28 @@ type Manager interface {
 
 // Settings represent the default settings for pls
 type Settings struct {
-	GithubToken    string
-	GithubUsername string
-	Name           string
+	GitToken    string `yaml:"git_token"`
+	GitUsername string `yaml:"git_username"`
+	Name        string `yaml:"name"`
+}
+
+func decodeWithYaml(tagName string) viper.DecoderConfigOption {
+	return func(c *mapstructure.DecoderConfig) {
+		c.TagName = tagName
+	}
+}
+
+// Parse unmarshals the viper configs into the pls settings struct
+func Parse(v *viper.Viper) (Settings, error) {
+	s := Settings{}
+
+	dco := decodeWithYaml("yaml")
+	err := v.Unmarshal(&s, dco)
+	if err != nil {
+		return s, err
+	}
+
+	return s, nil
 }
 
 // Get fetches a config value by key
