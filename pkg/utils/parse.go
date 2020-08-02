@@ -8,6 +8,9 @@ import (
 	"strings"
 )
 
+var httpsCheck = regexp.MustCompile(`^https?://`)
+var httpCheck = regexp.MustCompile(`^http?://`)
+
 // GetKeysFromMapStringInterface parses keys from a map[string]interface
 func GetKeysFromMapStringInterface(m map[string]interface{}) (keys []string) {
 	for k := range m {
@@ -25,9 +28,6 @@ func GetKeysFromMapString(m map[string]string) (keys []string) {
 
 	return keys
 }
-
-var httpsCheck = regexp.MustCompile(`^https?://`)
-var httpCheck = regexp.MustCompile(`^http?://`)
 
 // isHTTPS determines whether the string url has an https scheme prefix
 func isHTTPS(url string) bool {
