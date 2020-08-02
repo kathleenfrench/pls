@@ -22,6 +22,7 @@ var updateCfgSubCmd = &cobra.Command{
 	Aliases: []string{"cnfs"},
 	Run: func(cmd *cobra.Command, args []string) {
 		color.Red("TODO: INTERACTIVE DROPDOWN")
+		config.UpdatePrompt(viper.AllSettings())
 	},
 }
 
