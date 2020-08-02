@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/kathleenfrench/pls/internal/config"
+	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // variables injected during build
@@ -19,6 +22,8 @@ var (
 	Builder = "unknown"
 
 	versionFlag bool
+
+	plsCfg config.Settings
 )
 
 var rootCmd = &cobra.Command{
@@ -30,6 +35,14 @@ var rootCmd = &cobra.Command{
 		} else {
 			cmd.Usage()
 		}
+	},
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		s, err := config.Parse(viper.GetViper())
+		if err != nil {
+			utils.ExitWithError(err)
+		}
+
+		plsCfg = s
 	},
 }
 

@@ -30,6 +30,7 @@ func addTopLevelSubcommands() {
 	rootCmd.AddCommand(updateCmd)
 	rootCmd.AddCommand(addSubCmd)
 	rootCmd.AddCommand(showCmd)
+	rootCmd.AddCommand(getCmd)
 }
 
 func setPlsStyling() {
