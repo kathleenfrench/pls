@@ -23,3 +23,16 @@ func SelectPromptWithResponse(label string, options []string) string {
 
 	return selection
 }
+
+// ConfirmPrompt prompts the user for a yes/no response to a question, records then returns their response
+func ConfirmPrompt(label string, helpMessage string, defaultVal bool) bool {
+	var response bool
+	prompt := &survey.Confirm{
+		Message: label,
+		Default: defaultVal,
+		Help:    helpMessage,
+	}
+
+	survey.AskOne(prompt, &response)
+	return response
+}

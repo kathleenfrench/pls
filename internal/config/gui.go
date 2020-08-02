@@ -18,6 +18,10 @@ func UpdatePrompt(viperSettings map[string]interface{}) error {
 
 	color.HiBlue(fmt.Sprintf("wants to change: %s", choiceKey))
 
+	thatOkToChange := gui.ConfirmPrompt(fmt.Sprintf("%s is what you want to change?", choiceKey), "", true)
+
+	color.HiRed(fmt.Sprintf("%v", thatOkToChange))
+
 	return nil
 }
 
