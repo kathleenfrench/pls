@@ -1,6 +1,7 @@
 package pls
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -16,10 +17,31 @@ func stylizePls() string {
 		`Aliases:`, `{{StyleHeading "Aliases:"}}`,
 		`Available Commands:`, `{{StyleHeading "Available Commands:"}}`,
 		`Global Flags:`, `{{StyleHeading "Global Flags:"}}`,
-		// The following one steps on "Global Flags:"
-		// `Flags:`, `{{StyleHeading "Flags:"}}`,
 	).Replace(usageTemplate)
 	re := regexp.MustCompile(`(?m)^Flags:\s*$`)
 	usageTemplate = re.ReplaceAllLiteralString(usageTemplate, `{{StyleHeading "Flags:"}}`)
-	return usageTemplate
+	return fmt.Sprintf("%s%s", bannerString(), usageTemplate)
+}
+
+func bannerString() string {
+	return color.HiRedString(fmt.Sprintf("\n%s\n", `
+██████╗ ██╗     ███████╗
+██╔══██╗██║     ██╔════╝
+██████╔╝██║     ███████╗
+██╔═══╝ ██║     ╚════██║
+██║     ███████╗███████║
+╚═╝     ╚══════╝╚══════╝	
+`))
+}
+
+func printBanner() {
+	color.HiRed(`
+██████╗ ██╗     ███████╗
+██╔══██╗██║     ██╔════╝
+██████╔╝██║     ███████╗
+██╔═══╝ ██║     ╚════██║
+██║     ███████╗███████║
+╚═╝     ╚══════╝╚══════╝											
+`)
+	printVersion()
 }

@@ -3,6 +3,7 @@ package pls
 import (
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -11,7 +12,11 @@ var versionCmd = &cobra.Command{
 	Aliases: []string{"V"},
 	Short:   "print the current version of pls",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("pls version: %s\n", Version)
+		printVersion()
 	},
 	Hidden: true,
+}
+
+func printVersion() {
+	color.HiYellow(fmt.Sprintf("VERSION %s\n", Version))
 }
