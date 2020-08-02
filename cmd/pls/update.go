@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
+	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -34,7 +35,7 @@ var updateSingleCfgSubCmd = &cobra.Command{
 		val := args[1]
 
 		color.HiBlue(fmt.Sprintf("setting %s to %s from %s", key, val, viper.Get(key)))
-		viper.Set(key, val)
+		config.Set(key, val)
 
 		err := viper.WriteConfig()
 		if err != nil {
