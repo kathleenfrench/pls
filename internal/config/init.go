@@ -16,25 +16,29 @@ const (
 )
 
 // checkForUnsetDefaults prompts the user for unset defaults and sets them
-func checkForUnsetDefaults() {
+func checkForUnsetDefaults() bool {
 	var (
-		gt     string
-		gu     string
-		nm     string
-		prompt *survey.Input
+		gt         string
+		gu         string
+		nm         string
+		prompt     *survey.Input
+		unsetFound bool
 	)
 
 	gitUsername := viper.Get(githubUsernameKey)
 	if gitUsername == nil {
+		unsetFound = true
 		prompt = &survey.Input{
 			Message: "what is your github username?",
 		}
 
 		survey.AskOne(prompt, &gu)
+		viper.Set(githubUsernameKey, gu)
 	}
 
 	gitToken := viper.Get(githubTokenKey)
 	if gitToken == nil {
+		unsetFound = true
 		prompt = &survey.Input{
 			Message: "what is your github token?",
 		}
@@ -45,6 +49,7 @@ func checkForUnsetDefaults() {
 
 	name := viper.Get(nameKey)
 	if name == nil {
+		unsetFound = true
 		prompt = &survey.Input{
 			Message: "what's your name?",
 		}
@@ -52,13 +57,12 @@ func checkForUnsetDefaults() {
 		survey.AskOne(prompt, &nm)
 		viper.Set(nameKey, nm)
 	}
+
+	return unsetFound
 }
 
 // Initialize creates the directory and/or file with defaults for the application's configuration settings
 func Initialize() {
-	// set defaults
-	checkForUnsetDefaults()
-
 	// set fs properties
 	viper.AddConfigPath(constructConfigPath())
 	viper.SetConfigName(configFileName)
@@ -81,6 +85,17 @@ func Initialize() {
 	_ = viper.SafeWriteConfig()
 	err = viper.ReadInConfig()
 	if err != nil {
+		utils.PrintError(fmt.Sprintf("ReadInConfig: %s", err))
+		err = viper.WriteConfig()
+		if err != nil {
+			utils.PrintError(fmt.Sprintf("WriteConfig: %s", err))
+			utils.ExitWithError(err)
+		}
+	}
+
+	// set defaults
+	unsetValuesFound := checkForUnsetDefaults()
+	if unsetValuesFound {
 		err = viper.WriteConfig()
 		if err != nil {
 			utils.ExitWithError(err)
