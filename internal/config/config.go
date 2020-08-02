@@ -6,18 +6,13 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Manager is an interface for managing configs
-type Manager interface {
-	Get(key string)
-	Set(key string, value string)
-}
-
 // Settings represent the default settings for pls
 type Settings struct {
-	viper       *viper.Viper
-	GitToken    string `yaml:"git_token"`
-	GitUsername string `yaml:"git_username"`
-	Name        string `yaml:"name"`
+	viper         *viper.Viper
+	GitToken      string `yaml:"git_token"`
+	GitUsername   string `yaml:"git_username"`
+	Name          string `yaml:"name"`
+	DefaultEditor string `yaml:"default_editor"`
 }
 
 func decodeWithYaml(tagName string) viper.DecoderConfigOption {

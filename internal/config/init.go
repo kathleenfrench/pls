@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	"github.com/AlecAivazis/survey/v2"
+	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/kathleenfrench/pls/pkg/web/git"
 	"github.com/spf13/viper"
@@ -14,6 +14,7 @@ const (
 	githubUsernameKey = "git_username"
 	githubTokenKey    = "git_token"
 	nameKey           = "name"
+	defaultEditorKey  = "default_editor"
 )
 
 func unset(val interface{}) bool {
@@ -26,13 +27,7 @@ func unset(val interface{}) bool {
 
 // checkForUnsetRequiredDefaults prompts the user for unset defaults and sets them
 func checkForUnsetRequiredDefaults() bool {
-	var (
-		gt         string
-		gu         string
-		nm         string
-		prompt     *survey.Input
-		unsetFound bool
-	)
+	var unsetFound bool
 
 	if unset(viper.Get(githubUsernameKey)) {
 		// check if we can find it first using the git pkg
@@ -41,35 +36,28 @@ func checkForUnsetRequiredDefaults() bool {
 			viper.Set(githubUsernameKey, usernameCheck)
 		} else {
 			unsetFound = true
-			prompt = &survey.Input{
-				Message: "what is your github username?",
-			}
-
-			survey.AskOne(prompt, &gu)
+			gu := gui.InputPromptWithResponse("what is your github username?", "")
 			viper.Set(githubUsernameKey, gu)
 		}
 	}
 
 	if unset(viper.Get(githubTokenKey)) {
 		unsetFound = true
-		prompt = &survey.Input{
-			Message: "what is your github token?",
-		}
-
-		survey.AskOne(prompt, &gt)
+		gt := gui.InputPromptWithResponse("what is your github token?", "")
 		viper.Set(githubTokenKey, gt)
 	}
 
 	if unset(viper.Get(nameKey)) {
 		whoami, _ := utils.BashExec("whoami")
 		unsetFound = true
-		prompt = &survey.Input{
-			Message: "what's your name?",
-			Default: whoami,
-		}
-
-		survey.AskOne(prompt, &nm)
+		nm := gui.InputPromptWithResponse("what's your name?", whoami)
 		viper.Set(nameKey, nm)
+	}
+
+	if unset(viper.Get(defaultEditorKey)) {
+		unsetFound = true
+		de := promptForDefaultEditor()
+		viper.Set(defaultEditorKey, de)
 	}
 
 	return unsetFound

@@ -40,10 +40,11 @@ func ConfirmPrompt(label string, helpMessage string, defaultVal bool) bool {
 }
 
 // InputPromptWithResponse accepts a user's typed input to a question as a response
-func InputPromptWithResponse(label string) string {
+func InputPromptWithResponse(label string, defaultVal string) string {
 	var response string
 	prompt := &survey.Input{
 		Message: label,
+		Default: defaultVal,
 		Help:    ":q or :quit to exit",
 	}
 

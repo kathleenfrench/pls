@@ -11,12 +11,19 @@ import (
 
 // UpdatePrompt lets the user select from a dropdown of config keys for which value to update
 func UpdatePrompt(viperSettings map[string]interface{}) error {
+	var changedValue string
+
 	keys := viper.AllKeys()
 	uiKeys, uiKeyMap := genGuiKeyMap(keys)
 	choice := gui.SelectPromptWithResponse("which config value do you want to change?", uiKeys)
 	choiceKey := uiKeyMap[choice]
 	color.HiYellow(fmt.Sprintf("current value: %v", viperSettings[choiceKey]))
-	changedValue := gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", choice))
+
+	if choiceKey == defaultEditorKey {
+		changedValue = promptForDefaultEditor()
+	} else {
+		changedValue = gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", choice), "")
+	}
 
 	v := viper.GetViper()
 	v.Set(choiceKey, changedValue)
@@ -41,6 +48,8 @@ func genGuiKeyMap(keys []string) ([]string, map[string]string) {
 			m["Github Username"] = githubUsernameKey
 		case nameKey:
 			m["Name"] = nameKey
+		case defaultEditorKey:
+			m["Default Editor"] = defaultEditorKey
 		case "useviper":
 			// exclude from dropdown
 			break
@@ -51,4 +60,22 @@ func genGuiKeyMap(keys []string) ([]string, map[string]string) {
 
 	uiKeys := utils.GetKeysFromMapString(m)
 	return uiKeys, m
+}
+
+func promptForDefaultEditor() string {
+	options := []string{"vim", "emacs", "vscode", "atom", "sublime", "phpstorm"}
+	selection := gui.SelectPromptWithResponse("which would you like to set as your default editor?", options)
+
+	switch selection {
+	case "phpstorm":
+		// check for which executable is installed
+		p, err := utils.GetPHPStormExecutable()
+		if err != nil {
+			utils.ExitWithError(err)
+		}
+
+		return p
+	default:
+		return selection
+	}
 }

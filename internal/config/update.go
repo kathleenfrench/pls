@@ -21,6 +21,10 @@ func (s *Settings) UpdateSettings() error {
 		s.viper.Set(nameKey, strings.TrimSpace(s.Name))
 	}
 
+	if s.DefaultEditor != "" {
+		s.viper.Set(defaultEditorKey, strings.TrimSpace(s.DefaultEditor))
+	}
+
 	s.viper.MergeInConfig()
 	s.viper.SetConfigFile(cfgFile)
 	s.viper.SetConfigType(filepath.Ext(cfgFile))
