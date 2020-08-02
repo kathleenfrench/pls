@@ -1,6 +1,7 @@
 package pls
 
 import (
+	"github.com/fatih/color"
 	"github.com/kathleenfrench/pls/pkg/web/git"
 	"github.com/spf13/cobra"
 )
@@ -26,7 +27,11 @@ var cleanGitBranchesSubCmd = &cobra.Command{
 	Short:   "remove git branches that have already been merged into master - defaults to just within the current working directory",
 	Aliases: []string{"b"},
 	Run: func(cmd *cobra.Command, args []string) {
-		git.CleanupCurrentBranches()
+		if AllGitRepositories {
+			color.HiRed("TO DO")
+		} else {
+			git.CleanupCurrentBranches()
+		}
 	},
 }
 
