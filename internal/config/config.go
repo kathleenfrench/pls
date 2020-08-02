@@ -14,6 +14,7 @@ type Manager interface {
 
 // Settings represent the default settings for pls
 type Settings struct {
+	viper       *viper.Viper
 	GitToken    string `yaml:"git_token"`
 	GitUsername string `yaml:"git_username"`
 	Name        string `yaml:"name"`
@@ -25,9 +26,21 @@ func decodeWithYaml(tagName string) viper.DecoderConfigOption {
 	}
 }
 
+// ParseAndUpdate parses the viper settings as a pls settings struct and updates the config file
+func ParseAndUpdate(v *viper.Viper) error {
+	s, err := Parse(v)
+	if err != nil {
+		return err
+	}
+
+	return s.UpdateSettings()
+}
+
 // Parse unmarshals the viper configs into the pls settings struct
 func Parse(v *viper.Viper) (Settings, error) {
-	s := Settings{}
+	s := Settings{
+		viper: v,
+	}
 
 	dco := decodeWithYaml("yaml")
 	err := v.Unmarshal(&s, dco)

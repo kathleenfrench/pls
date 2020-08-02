@@ -2,8 +2,6 @@ package config
 
 import (
 	"fmt"
-	"path/filepath"
-	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/kathleenfrench/pls/pkg/utils"
@@ -119,35 +117,4 @@ func Initialize() {
 	}
 
 	viper.WatchConfig()
-}
-
-// UpdateSettings checks for pls config values that have already been set and ensures they're preserved when updating configs
-func (s *Settings) UpdateSettings(v *viper.Viper) error {
-	cfgFile := v.ConfigFileUsed()
-
-	if s.GitToken != "" {
-		v.Set(githubTokenKey, strings.TrimSpace(s.GitToken))
-	}
-
-	if s.GitUsername != "" {
-		v.Set(githubUsernameKey, strings.TrimSpace(s.GitUsername))
-	}
-
-	if s.Name != "" {
-		v.Set(nameKey, strings.TrimSpace(s.Name))
-	}
-
-	v.MergeInConfig()
-
-	v.SetConfigFile(cfgFile)
-
-	// preserve the config file type
-	v.SetConfigType(filepath.Ext(cfgFile))
-
-	err := v.WriteConfig()
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

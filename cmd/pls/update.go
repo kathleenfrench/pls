@@ -10,6 +10,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+var noUI bool
+
 var updateCmd = &cobra.Command{
 	Use:     "update",
 	Aliases: []string{"u"},
@@ -19,31 +21,28 @@ var updateCmd = &cobra.Command{
 var updateCfgSubCmd = &cobra.Command{
 	Use:     "configs",
 	Short:   "update your pls configs",
-	Aliases: []string{"cnfs"},
+	Aliases: []string{"config", "cnf", "cnfs"},
 	Run: func(cmd *cobra.Command, args []string) {
-		color.Red("TODO: INTERACTIVE DROPDOWN")
-		config.UpdatePrompt(viper.AllSettings())
-	},
-}
+		if noUI {
+			if len(args) != 2 {
+				utils.ExitWithError("you must have two arguments, the key and value - `pls update configs [key] [value]`")
+			} else {
+				key := args[0]
+				val := args[1]
 
-var updateSingleCfgSubCmd = &cobra.Command{
-	Use:     "config",
-	Short:   "update a single config value",
-	Args:    cobra.ExactArgs(2),
-	Aliases: []string{"cnf"},
-	Run: func(cmd *cobra.Command, args []string) {
-		key := args[0]
-		val := args[1]
+				color.HiBlue(fmt.Sprintf("setting %s to %s from %s", key, val, viper.Get(key)))
+				config.Set(key, val)
 
-		color.HiBlue(fmt.Sprintf("setting %s to %s from %s", key, val, viper.Get(key)))
-		config.Set(key, val)
+				err := config.ParseAndUpdate(viper.GetViper())
+				if err != nil {
+					utils.ExitWithError(err)
+				}
 
-		err := viper.WriteConfig()
-		if err != nil {
-			utils.ExitWithError(err)
+				color.HiGreen(fmt.Sprintf("successfully updated %s to %s!", key, val))
+			}
+		} else {
+			config.UpdatePrompt(viper.AllSettings())
 		}
-
-		color.HiGreen(fmt.Sprintf("successfully updated %s to %s!", key, val))
 	},
 }
 
@@ -57,7 +56,7 @@ var updateSelfSubCmd = &cobra.Command{
 }
 
 func init() {
+	updateCfgSubCmd.Flags().BoolVarP(&noUI, "raw", "r", false, "input as key value, skip the dropdown GUI")
 	updateCmd.AddCommand(updateCfgSubCmd)
 	updateCmd.AddCommand(updateSelfSubCmd)
-	updateCmd.AddCommand(updateSingleCfgSubCmd)
 }

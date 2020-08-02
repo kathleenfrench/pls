@@ -6,22 +6,27 @@ import (
 	"github.com/fatih/color"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
+	"github.com/spf13/viper"
 )
 
 // UpdatePrompt lets the user select from a dropdown of config keys for which value to update
 func UpdatePrompt(viperSettings map[string]interface{}) error {
-	keys := utils.GetKeysFromMapStringInterface(viperSettings)
+	keys := viper.AllKeys()
 	uiKeys, uiKeyMap := genGuiKeyMap(keys)
-
 	choice := gui.SelectPromptWithResponse("which config value do you want to change?", uiKeys)
 	choiceKey := uiKeyMap[choice]
+	color.HiYellow(fmt.Sprintf("current value: %v", viperSettings[choiceKey]))
+	changedValue := gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", choice))
 
-	color.HiBlue(fmt.Sprintf("wants to change: %s", choiceKey))
+	v := viper.GetViper()
+	v.Set(choiceKey, changedValue)
+	parsed, err := Parse(v)
+	if err != nil {
+		utils.ExitWithError(err)
+	}
 
-	thatOkToChange := gui.ConfirmPrompt(fmt.Sprintf("%s is what you want to change?", choiceKey), "", true)
-
-	color.HiRed(fmt.Sprintf("%v", thatOkToChange))
-
+	parsed.UpdateSettings()
+	color.HiGreen(fmt.Sprintf("successfully updated %s to equal %s!", choice, changedValue))
 	return nil
 }
 
@@ -36,8 +41,8 @@ func genGuiKeyMap(keys []string) ([]string, map[string]string) {
 			m["Github Username"] = githubUsernameKey
 		case nameKey:
 			m["Name"] = nameKey
-		case "userviper":
-			// don't let users change this one
+		case "useviper":
+			// exclude from dropdown
 			break
 		default:
 			m[k] = k
