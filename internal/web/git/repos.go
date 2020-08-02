@@ -1,8 +1,12 @@
 package gitpls
 
-import "github.com/google/go-github/v32/github"
+import (
+	"fmt"
 
-import "github.com/kathleenfrench/pls/pkg/gui"
+	"github.com/google/go-github/v32/github"
+	"github.com/kathleenfrench/pls/pkg/gui"
+	"github.com/kathleenfrench/pls/pkg/utils"
+)
 
 // CreateGitRepoDropdown prompts the user for selecting from a dropdown of repositories
 func CreateGitRepoDropdown(repositories []*github.Repository) *github.Repository {
@@ -19,9 +23,17 @@ func CreateGitRepoDropdown(repositories []*github.Repository) *github.Repository
 }
 
 // ChooseWhatToDoWithRepo lets the user decide what to do with their chosen repo
-func ChooseWhatToDoWithRepo(gc *github.Client, repository *github.Repository) error {
-
+func ChooseWhatToDoWithRepo(repository *github.Repository) error {
+	opts := []string{openInBrowser, cloneRepo}
 	// open in browser, clone
+	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", repository.GetName()), opts)
+
+	switch selected {
+	case openInBrowser:
+		utils.OpenURLInDefaultBrowser(repository.GetHTMLURL())
+	case cloneRepo:
+
+	}
 
 	return nil
 }

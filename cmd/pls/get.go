@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
+	"github.com/google/go-github/v32/github"
 	gitpls "github.com/kathleenfrench/pls/internal/web/git"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/kathleenfrench/pls/pkg/web/git"
@@ -42,20 +43,42 @@ var gitRepos = &cobra.Command{
 	Aliases: []string{"r", "repositories", "repo", "repository"},
 	Short:   "interact with github repositories",
 	Run: func(cmd *cobra.Command, args []string) {
-		username := plsCfg.GitUsername
+		username := ""
 		if gitUsername != "" {
 			username = gitUsername
 		}
 
 		ctx := context.Background()
 		gc := git.NewClient(ctx, plsCfg.GitToken)
-		repos, _, err := gc.Repositories.List(ctx, username, nil)
-		if err != nil {
-			utils.ExitWithError(err)
+
+		opts := &github.RepositoryListOptions{
+			Affiliation: "owner",
+			ListOptions: github.ListOptions{
+				PerPage: 100,
+			},
 		}
 
-		choice := gitpls.CreateGitRepoDropdown(repos)
-		color.HiGreen("chosen repo: %v", choice)
+		var allRepos []*github.Repository
+
+		for {
+			repos, resp, err := gc.Repositories.List(ctx, username, opts)
+			if err != nil {
+				utils.ExitWithError(err)
+			}
+
+			allRepos = append(allRepos, repos...)
+			color.HiRed(fmt.Sprintf("next page: %d", resp.NextPage))
+			if resp.NextPage == 0 {
+				break
+			}
+
+			opts.Page = resp.NextPage
+		}
+
+		color.HiGreen(fmt.Sprintf("%d repositories found for %s", len(allRepos), username))
+		choice := gitpls.CreateGitRepoDropdown(allRepos)
+		_ = gitpls.ChooseWhatToDoWithRepo(choice)
+
 	},
 }
 
