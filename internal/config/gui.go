@@ -3,39 +3,9 @@ package config
 import (
 	"fmt"
 
-	"github.com/fatih/color"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
-	"github.com/spf13/viper"
 )
-
-// UpdatePrompt lets the user select from a dropdown of config keys for which value to update
-func UpdatePrompt(viperSettings map[string]interface{}) error {
-	var changedValue string
-
-	keys := viper.AllKeys()
-	uiKeys, uiKeyMap := genGuiKeyMap(keys)
-	choice := gui.SelectPromptWithResponse("which config value do you want to change?", uiKeys)
-	choiceKey := uiKeyMap[choice]
-	color.HiYellow(fmt.Sprintf("current value: %v", viperSettings[choiceKey]))
-
-	if choiceKey == defaultEditorKey {
-		changedValue = promptForDefaultEditor()
-	} else {
-		changedValue = gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", choice), "")
-	}
-
-	v := viper.GetViper()
-	v.Set(choiceKey, changedValue)
-	parsed, err := Parse(v)
-	if err != nil {
-		utils.ExitWithError(err)
-	}
-
-	parsed.UpdateSettings()
-	color.HiGreen(fmt.Sprintf("successfully updated %s to equal %s!", choice, changedValue))
-	return nil
-}
 
 func genGuiKeyMap(keys []string) ([]string, map[string]string) {
 	m := make(map[string]string)
@@ -54,7 +24,11 @@ func genGuiKeyMap(keys []string) ([]string, map[string]string) {
 			// exclude from dropdown
 			break
 		default:
-			m[k] = k
+			if isWebShortcutKey(k) {
+				m["Web Shortcuts"] = webShortcutsKey
+			} else {
+				m[k] = k
+			}
 		}
 	}
 
@@ -78,4 +52,16 @@ func promptForDefaultEditor() string {
 	default:
 		return selection
 	}
+}
+
+func addNewWebShortcut() (string, string) {
+	target := gui.InputPromptWithResponse("what do you want to name the shortcut?", "")
+
+	url := gui.InputPromptWithResponse(fmt.Sprintf("what is the shortcut url you want to set for %s?", target), "")
+
+	if target == "" || url == "" {
+		utils.ExitWithError("missing required values")
+	}
+
+	return fmt.Sprintf("webshort.%s", target), url
 }

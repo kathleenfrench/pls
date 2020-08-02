@@ -9,10 +9,11 @@ import (
 // Settings represent the default settings for pls
 type Settings struct {
 	viper         *viper.Viper
-	GitToken      string `yaml:"git_token"`
-	GitUsername   string `yaml:"git_username"`
-	Name          string `yaml:"name"`
-	DefaultEditor string `yaml:"default_editor"`
+	GitToken      string            `yaml:"git_token"`
+	GitUsername   string            `yaml:"git_username"`
+	Name          string            `yaml:"name"`
+	DefaultEditor string            `yaml:"default_editor"`
+	WebShortcuts  map[string]string `yaml:"webshort"`
 }
 
 func decodeWithYaml(tagName string) viper.DecoderConfigOption {

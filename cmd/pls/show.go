@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
+	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -19,9 +20,8 @@ var showConfigsCmd = &cobra.Command{
 	Aliases: []string{"c"},
 	Short:   "show config values",
 	Run: func(cmd *cobra.Command, args []string) {
-		for k, v := range viper.AllSettings() {
-			color.HiBlue(fmt.Sprintf("%s: %v", k, v))
-		}
+		out, _ := utils.BashExec(fmt.Sprintf("cat %s", viper.ConfigFileUsed()))
+		color.HiBlue(out)
 	},
 }
 

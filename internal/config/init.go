@@ -15,6 +15,7 @@ const (
 	githubTokenKey    = "git_token"
 	nameKey           = "name"
 	defaultEditorKey  = "default_editor"
+	webShortcutsKey   = "webshort"
 )
 
 func unset(val interface{}) bool {
@@ -60,7 +61,17 @@ func checkForUnsetRequiredDefaults() bool {
 		viper.Set(defaultEditorKey, de)
 	}
 
+	if viper.Get(webShortcutsKey) == nil {
+		unsetFound = true
+		viper.Set(webShortcutsKey, defaultWebShortcuts)
+	}
+
 	return unsetFound
+}
+
+var defaultWebShortcuts = map[string]string{
+	"github": "https://github.com/",
+	"gmail":  "https://mail.google.com/mail/u/0/#inbox",
 }
 
 // Initialize creates the directory and/or file with defaults for the application's configuration settings
