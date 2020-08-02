@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os/exec"
+	"runtime"
 	"strings"
 
 	"github.com/fatih/color"
@@ -55,4 +56,24 @@ func BashExec(cmd string) (string, error) {
 
 	trimmed := strings.TrimSpace(string(r))
 	return trimmed, nil
+}
+
+// OpenURLInDefaultBrowser launches the user system's default browser with a given URL as the target
+func OpenURLInDefaultBrowser(url string) error {
+	switch runtime.GOOS {
+	case "darwin":
+		err := exec.Command("open", url).Start()
+		if err != nil {
+			ExitWithError(err)
+		}
+	case "linux":
+		err := exec.Command("xdg-open", url).Start()
+		if err != nil {
+			ExitWithError(err)
+		}
+	default:
+		ExitWithError(fmt.Sprintf("%s is not a supported platform", runtime.GOOS))
+	}
+
+	return nil
 }
