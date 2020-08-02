@@ -2,9 +2,12 @@ package config
 
 import (
 	"fmt"
+	"path/filepath"
+	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/kathleenfrench/pls/pkg/utils"
+	"github.com/kathleenfrench/pls/pkg/web/git"
 	"github.com/spf13/viper"
 )
 
@@ -15,8 +18,16 @@ const (
 	nameKey           = "name"
 )
 
-// checkForUnsetDefaults prompts the user for unset defaults and sets them
-func checkForUnsetDefaults() bool {
+func unset(val interface{}) bool {
+	if val == nil || val == "" {
+		return true
+	}
+
+	return false
+}
+
+// checkForUnsetRequiredDefaults prompts the user for unset defaults and sets them
+func checkForUnsetRequiredDefaults() bool {
 	var (
 		gt         string
 		gu         string
@@ -25,19 +36,23 @@ func checkForUnsetDefaults() bool {
 		unsetFound bool
 	)
 
-	gitUsername := viper.Get(githubUsernameKey)
-	if gitUsername == nil {
-		unsetFound = true
-		prompt = &survey.Input{
-			Message: "what is your github username?",
-		}
+	if unset(viper.Get(githubUsernameKey)) {
+		// check if we can find it first using the git pkg
+		usernameCheck, err := git.CheckForGitUsername()
+		if err == nil {
+			viper.Set(githubUsernameKey, usernameCheck)
+		} else {
+			unsetFound = true
+			prompt = &survey.Input{
+				Message: "what is your github username?",
+			}
 
-		survey.AskOne(prompt, &gu)
-		viper.Set(githubUsernameKey, gu)
+			survey.AskOne(prompt, &gu)
+			viper.Set(githubUsernameKey, gu)
+		}
 	}
 
-	gitToken := viper.Get(githubTokenKey)
-	if gitToken == nil {
+	if unset(viper.Get(githubTokenKey)) {
 		unsetFound = true
 		prompt = &survey.Input{
 			Message: "what is your github token?",
@@ -47,11 +62,12 @@ func checkForUnsetDefaults() bool {
 		viper.Set(githubTokenKey, gt)
 	}
 
-	name := viper.Get(nameKey)
-	if name == nil {
+	if unset(viper.Get(nameKey)) {
+		whoami, _ := utils.BashExec("whoami")
 		unsetFound = true
 		prompt = &survey.Input{
 			Message: "what's your name?",
+			Default: whoami,
 		}
 
 		survey.AskOne(prompt, &nm)
@@ -94,7 +110,7 @@ func Initialize() {
 	}
 
 	// set defaults
-	unsetValuesFound := checkForUnsetDefaults()
+	unsetValuesFound := checkForUnsetRequiredDefaults()
 	if unsetValuesFound {
 		err = viper.WriteConfig()
 		if err != nil {
@@ -103,4 +119,35 @@ func Initialize() {
 	}
 
 	viper.WatchConfig()
+}
+
+// UpdateSettings checks for pls config values that have already been set and ensures they're preserved when updating configs
+func (s *Settings) UpdateSettings(v *viper.Viper) error {
+	cfgFile := v.ConfigFileUsed()
+
+	if s.GitToken != "" {
+		v.Set(githubTokenKey, strings.TrimSpace(s.GitToken))
+	}
+
+	if s.GitUsername != "" {
+		v.Set(githubUsernameKey, strings.TrimSpace(s.GitUsername))
+	}
+
+	if s.Name != "" {
+		v.Set(nameKey, strings.TrimSpace(s.Name))
+	}
+
+	v.MergeInConfig()
+
+	v.SetConfigFile(cfgFile)
+
+	// preserve the config file type
+	v.SetConfigType(filepath.Ext(cfgFile))
+
+	err := v.WriteConfig()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

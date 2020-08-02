@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os/exec"
+	"strings"
 
 	"github.com/fatih/color"
 )
@@ -42,7 +43,7 @@ func ExecuteCommand(cmd *exec.Cmd) string {
 		return out
 	}
 
-	return out
+	return strings.TrimSpace(out)
 }
 
 // BashExec executes a command appended to a 'bash -c' command
@@ -52,5 +53,6 @@ func BashExec(cmd string) (string, error) {
 		return "", err
 	}
 
-	return string(r), nil
+	trimmed := strings.TrimSpace(string(r))
+	return trimmed, nil
 }
