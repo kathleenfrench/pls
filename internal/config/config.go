@@ -13,10 +13,9 @@ type Manager interface {
 
 // Settings represent the default settings for pls
 type Settings struct {
-	GithubToken    string `yaml:"git_token"`
-	GithubUsername string `yaml:"git_username"`
-	Name           string `yaml:"name"`
-	Mood           string `yaml:"mood"`
+	GithubToken    string
+	GithubUsername string
+	Name           string
 }
 
 // Get fetches a config value by key
