@@ -9,13 +9,15 @@ import (
 )
 
 var showCmd = &cobra.Command{
-	Use:   "show",
-	Short: "show values for various resources",
+	Use:     "show",
+	Short:   "show values for various resources",
+	Aliases: []string{"s"},
 }
 
 var showConfigsCmd = &cobra.Command{
-	Use:   "configs",
-	Short: "show config values",
+	Use:     "configs",
+	Aliases: []string{"c"},
+	Short:   "show config values",
 	Run: func(cmd *cobra.Command, args []string) {
 		for k, v := range viper.AllSettings() {
 			color.HiBlue(fmt.Sprintf("%s: %v", k, v))
