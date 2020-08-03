@@ -15,7 +15,6 @@ func CreateGitOrganizationsDropdown(organizations []*github.Organization) *githu
 	nameMap := make(map[string]*github.Organization)
 
 	for _, o := range organizations {
-		color.Green(fmt.Sprintf("org: %v", o))
 		names = append(names, o.GetLogin())
 		nameMap[o.GetLogin()] = o
 	}
