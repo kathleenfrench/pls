@@ -70,8 +70,8 @@ func checkForUnsetRequiredDefaults() bool {
 }
 
 var defaultWebShortcuts = map[string]string{
-	"github": "https://github.com/",
-	"gmail":  "https://mail.google.com/mail/u/0/#inbox",
+	"git":   "https://github.com/",
+	"gmail": "https://mail.google.com/mail/u/0/#inbox",
 }
 
 // Initialize creates the directory and/or file with defaults for the application's configuration settings

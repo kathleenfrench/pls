@@ -2,10 +2,11 @@ package utils
 
 import (
 	"fmt"
-	"github.com/asaskevich/govalidator"
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/asaskevich/govalidator"
 )
 
 var httpsCheck = regexp.MustCompile(`^https?://`)

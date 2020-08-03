@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
+	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/spf13/cobra"
 )
@@ -16,13 +17,30 @@ var openCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			// dropdown defaults
-		} else {
-			validatedURL, err := utils.ValidateURL(args[0])
-			if err != nil {
-				utils.ExitWithError(fmt.Sprintf("%s - %s is not a valid URL", err, args[0]))
-			}
-			color.Blue(fmt.Sprintf("opening %s...", validatedURL))
-			utils.OpenURLInDefaultBrowser(validatedURL)
+			gui.Exit()
 		}
+
+		var (
+			validatedURL string
+			err          error
+			arg          = args[0]
+		)
+
+		// first check if it's set as a favorite/shortcut
+		shortcuts := plsCfg.WebShortcuts
+		if _, ok := shortcuts[arg]; ok {
+			validatedURL = shortcuts[arg]
+		} else {
+			// if it's not, then see if we can validate it as a url
+			validatedURL, err = utils.ValidateURL(arg)
+			if err != nil {
+				utils.ExitWithError(fmt.Sprintf("%s - %s is not a valid URL", err, arg))
+			}
+
+		}
+
+		color.Blue(fmt.Sprintf("opening %s...", validatedURL))
+		utils.OpenURLInDefaultBrowser(validatedURL)
+
 	},
 }
