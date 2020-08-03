@@ -16,7 +16,10 @@ var openCmd = &cobra.Command{
 	Args:    cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
-			// dropdown defaults
+			faveKeys := utils.GetKeysFromMapString(plsCfg.WebShortcuts)
+			choice := gui.SelectPromptWithResponse("select a target URL from your shortcuts", faveKeys)
+			color.Blue(fmt.Sprintf("opening %s...", choice))
+			utils.OpenURLInDefaultBrowser(plsCfg.WebShortcuts[choice])
 			gui.Exit()
 		}
 
