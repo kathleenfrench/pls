@@ -1,7 +1,6 @@
 package pls
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/fatih/color"
@@ -9,7 +8,6 @@ import (
 	gitpls "github.com/kathleenfrench/pls/internal/web/git"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
-	"github.com/kathleenfrench/pls/pkg/web/git"
 	"github.com/spf13/cobra"
 )
 
@@ -32,13 +30,8 @@ var gitOrgs = &cobra.Command{
 	Aliases: []string{"o", "org", "organization", "organizations"},
 	Short:   "interact with someone else's github organizations",
 	Run: func(cmd *cobra.Command, args []string) {
-		ctx := context.Background()
-		gc := git.NewClient(ctx, plsCfg.GitToken)
-		opts := github.ListOptions{
-			PerPage: 100,
-		}
-
-		orgs, _, err := gc.Organizations.List(ctx, plsCfg.GitUsername, &opts)
+		color.HiRed("TODO")
+		orgs, err := gitpls.FetchOrganizations(plsCfg.GitUsername, plsCfg.GitToken)
 		if err != nil {
 			utils.ExitWithError(err)
 		}
@@ -77,7 +70,7 @@ var gitMyOrgs = &cobra.Command{
 	},
 }
 
-var fetchTypeChecker = map[string]string{
+var repoFetchTypeChecker = map[string]string{
 	"by":     "other_user",
 	"for":    "other_user",
 	"in":     "organization",
@@ -95,7 +88,7 @@ var gitRepos = &cobra.Command{
 		gui.Spin.Start()
 
 		var repos []*github.Repository
-		found, ok := fetchTypeChecker[args[0]]
+		found, ok := repoFetchTypeChecker[args[0]]
 		if !ok {
 			utils.ExitWithError(fmt.Sprintf("%s is not a valid command", found))
 		}
