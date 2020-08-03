@@ -3,19 +3,22 @@ package config
 import (
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/kathleenfrench/pls/pkg/web/git"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
 // default keys
 const (
-	githubUsernameKey = "git_username"
-	githubTokenKey    = "git_token"
-	nameKey           = "name"
-	defaultEditorKey  = "default_editor"
-	webShortcutsKey   = "webshort"
+	githubUsernameKey  = "git_username"
+	githubTokenKey     = "git_token"
+	nameKey            = "name"
+	defaultEditorKey   = "default_editor"
+	webShortcutsKey    = "webshort"
+	defaultCodepathKey = "default_codepath"
 )
 
 func unset(val interface{}) bool {
@@ -59,6 +62,20 @@ func checkForUnsetRequiredDefaults() bool {
 		unsetFound = true
 		de := promptForDefaultEditor()
 		viper.Set(defaultEditorKey, de)
+	}
+
+	if unset(viper.Get(defaultCodepathKey)) {
+		unsetFound = true
+		home, err := homedir.Dir()
+		if err != nil {
+			utils.ExitWithError(err)
+		}
+
+		home = fmt.Sprintf("%s/", home)
+		codePath := gui.InputPromptWithResponse(fmt.Sprintf("what is the relative path from %s you want repos cloned?", home), "")
+		codePath = fmt.Sprintf("%s%s", home, codePath)
+		color.Red(fmt.Sprintf("codepath: %s", codePath))
+		viper.Set(defaultCodepathKey, codePath)
 	}
 
 	if viper.Get(webShortcutsKey) == nil {

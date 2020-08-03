@@ -2,11 +2,13 @@ package pls
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/fatih/color"
 	"github.com/google/go-github/v32/github"
 	gitpls "github.com/kathleenfrench/pls/internal/web/git"
+	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/kathleenfrench/pls/pkg/web/git"
 	"github.com/spf13/cobra"
@@ -83,30 +85,93 @@ var gitMyOrgs = &cobra.Command{
 	},
 }
 
+var fetchTypeChecker = map[string]string{
+	"by":     "other_user",
+	"for":    "other_user",
+	"in":     "organization",
+	"my":     "current_user",
+	"called": "search",
+}
+
 var gitRepos = &cobra.Command{
 	Use:     "repos",
 	Aliases: []string{"r", "repositories", "repo", "repository"},
 	Short:   "interact with someone else's github repositories",
-	Example: color.HiGreenString(fmt.Sprintf("\npls get repos for <username>\npls get repos by <username>")),
+	Example: color.HiGreenString(fmt.Sprintf("\npls get repos for <username>\npls get repos by <username>\npls get repos in <organization>")),
 	Args:    cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		byUser, err := forWhoCheck(args)
-		if err != nil {
-			utils.ExitWithError(err)
+		var repos []*github.Repository
+		ctx := context.Background()
+		found, ok := fetchTypeChecker[args[0]]
+		if !ok {
+			utils.ExitWithError(fmt.Sprintf("%s is not a valid command", found))
 		}
 
-		ctx := context.Background()
-		repos, err := fetchRepos(ctx, byUser)
-		if err != nil {
-			utils.ExitWithError(err)
+		switch found {
+		case "other_user":
+			username := args[1]
+			otherUserRepos, err := fetchRepos(ctx, username)
+			if err != nil {
+				utils.ExitWithError(err)
+			}
+
+			repos = otherUserRepos
+		case "organization":
+			organization := args[1]
+			color.HiYellow(fmt.Sprintf("fetching repositories in the %s organization...", organization))
+			orgRepos, err := fetchReposInOrganization(ctx, organization)
+			if err != nil {
+				utils.ExitWithError(err)
+			}
+
+			repos = orgRepos
+		case "current_user":
+			username := ""
+			currentUserRepos, err := fetchRepos(ctx, username)
+			if err != nil {
+				utils.ExitWithError(err)
+			}
+
+			repos = currentUserRepos
+		case "search":
+			color.HiRed("TODO")
+		default:
+			utils.ExitWithError("sorry, but i don't understand what you want")
 		}
 
 		choice := gitpls.CreateGitRepoDropdown(repos)
 		_ = gitpls.ChooseWhatToDoWithRepo(choice)
+		gui.Exit()
 	},
 }
 
 //--------------------------------------- HELPERS
+
+func fetchReposInOrganization(ctx context.Context, organization string) ([]*github.Repository, error) {
+	var allOrgRepos []*github.Repository
+	gc := git.NewClient(ctx, plsCfg.GitToken)
+	opts := github.RepositoryListByOrgOptions{
+		ListOptions: github.ListOptions{
+			PerPage: 100,
+		},
+	}
+
+	for {
+		repos, resp, err := gc.Repositories.ListByOrg(ctx, organization, &opts)
+		if err != nil {
+			return nil, err
+		}
+
+		allOrgRepos = append(allOrgRepos, repos...)
+		if resp.NextPage == 0 {
+			break
+		}
+
+		opts.Page = resp.NextPage
+	}
+
+	return allOrgRepos, nil
+}
 
 func fetchRepos(ctx context.Context, username string) ([]*github.Repository, error) {
 	gc := git.NewClient(ctx, plsCfg.GitToken)
@@ -126,7 +191,6 @@ func fetchRepos(ctx context.Context, username string) ([]*github.Repository, err
 		}
 
 		allRepos = append(allRepos, repos...)
-		color.HiRed(fmt.Sprintf("next page: %d", resp.NextPage))
 		if resp.NextPage == 0 {
 			break
 		}
@@ -145,6 +209,10 @@ func fetchRepos(ctx context.Context, username string) ([]*github.Repository, err
 
 func forWhoCheck(args []string) (username string, err error) {
 	if args[0] != "for" && args[0] != "by" {
+		if args[0] == "in" {
+			return "", errors.New("organization")
+		}
+
 		return "", fmt.Errorf("%s is not a valid subcommand", args[0])
 	}
 

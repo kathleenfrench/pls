@@ -8,6 +8,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
@@ -33,6 +34,10 @@ func (s *Settings) UpdateSettings() error {
 
 	if s.WebShortcuts != nil {
 		s.viper.Set(webShortcutsKey, s.WebShortcuts)
+	}
+
+	if s.DefaultCodeDir != "" {
+		s.viper.Set(defaultCodepathKey, s.DefaultCodeDir)
 	}
 
 	s.viper.MergeInConfig()
@@ -79,6 +84,21 @@ func UpdatePrompt(viperSettings map[string]interface{}) error {
 			target, url := addNewWebShortcut()
 			v.Set(target, url)
 		}
+	case defaultCodepathKey:
+		rel := gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", choice), "")
+		home, err := homedir.Dir()
+		if err != nil {
+			utils.ExitWithError(err)
+		}
+
+		changedValue := fmt.Sprintf("%s/%s", home, rel)
+		confirmChange := gui.ConfirmPrompt(fmt.Sprintf("is %s the correct path?", changedValue), "", true)
+		if !confirmChange {
+			retry := gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", choice), "")
+			changedValue = fmt.Sprintf("%s/%s", home, retry)
+		}
+
+		v.Set(choiceKey, changedValue)
 	default:
 		changedValue = gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", choice), "")
 		v.Set(choiceKey, changedValue)

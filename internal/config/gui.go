@@ -20,6 +20,8 @@ func genGuiKeyMap(keys []string) ([]string, map[string]string) {
 			m["Name"] = nameKey
 		case defaultEditorKey:
 			m["Default Editor"] = defaultEditorKey
+		case "default_codepath":
+			m["Default Code Path"] = defaultCodepathKey
 		case "useviper":
 			// exclude from dropdown
 			break
