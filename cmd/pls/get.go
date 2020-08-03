@@ -100,6 +100,8 @@ var gitRepos = &cobra.Command{
 	Example: color.HiGreenString(fmt.Sprintf("\npls get repos for <username>\npls get repos by <username>\npls get repos in <organization>")),
 	Args:    cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
+		gui.Spin.Start()
+
 		var repos []*github.Repository
 		ctx := context.Background()
 		found, ok := fetchTypeChecker[args[0]]
@@ -111,6 +113,7 @@ var gitRepos = &cobra.Command{
 		case "other_user":
 			username := args[1]
 			otherUserRepos, err := fetchRepos(ctx, username)
+			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
 			}
@@ -120,6 +123,7 @@ var gitRepos = &cobra.Command{
 			organization := args[1]
 			color.HiYellow(fmt.Sprintf("fetching repositories in the %s organization...", organization))
 			orgRepos, err := fetchReposInOrganization(ctx, organization)
+			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
 			}
@@ -128,6 +132,7 @@ var gitRepos = &cobra.Command{
 		case "current_user":
 			username := ""
 			currentUserRepos, err := fetchRepos(ctx, username)
+			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
 			}
@@ -139,6 +144,7 @@ var gitRepos = &cobra.Command{
 			utils.ExitWithError("sorry, but i don't understand what you want")
 		}
 
+		color.HiYellow(fmt.Sprintf("%d repositories returned", len(repos)))
 		choice := gitpls.CreateGitRepoDropdown(repos)
 		_ = gitpls.ChooseWhatToDoWithRepo(choice)
 		gui.Exit()

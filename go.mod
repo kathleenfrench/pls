@@ -5,6 +5,7 @@ go 1.12
 require (
 	github.com/AlecAivazis/survey/v2 v2.0.8
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535
+	github.com/briandowns/spinner v1.11.1
 	github.com/fatih/color v1.9.0
 	github.com/google/go-github/v32 v32.1.0
 	github.com/mattn/go-colorable v0.1.7 // indirect

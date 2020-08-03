@@ -11,11 +11,16 @@ import (
 // SelectPromptWithResponse creates a dropdown selection prompt and records the user's choice
 func SelectPromptWithResponse(label string, options []string) string {
 	var selection string
+	var pageSize = len(options)
+
+	if pageSize > 20 {
+		pageSize = 20
+	}
 
 	prompt := &survey.Select{
 		Message:  label,
 		Options:  options,
-		PageSize: len(options),
+		PageSize: pageSize,
 	}
 
 	// see: https://github.com/AlecAivazis/survey/issues/101
