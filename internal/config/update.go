@@ -60,7 +60,6 @@ func UpdatePrompt(viperSettings map[string]interface{}) error {
 	uiKeys, uiKeyMap := genGuiKeyMap(keys)
 	choice := gui.SelectPromptWithResponse("which config value do you want to change?", uiKeys)
 	choiceKey := uiKeyMap[choice]
-	color.HiYellow(fmt.Sprintf("current value: %v", viperSettings[choiceKey]))
 
 	switch choiceKey {
 	case defaultEditorKey:
@@ -83,6 +82,7 @@ func UpdatePrompt(viperSettings map[string]interface{}) error {
 		} else {
 			target, url := addNewWebShortcut()
 			v.Set(target, url)
+			changedValue = url
 		}
 	case defaultCodepathKey:
 		rel := gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", choice), "")
