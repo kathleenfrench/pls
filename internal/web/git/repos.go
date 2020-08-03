@@ -3,6 +3,7 @@ package gitpls
 import (
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
@@ -18,13 +19,13 @@ func CreateGitRepoDropdown(repositories []*github.Repository) *github.Repository
 		nameMap[r.GetName()] = r
 	}
 
-	choice := gui.SelectPromptWithResponse("which repository?", names)
+	choice := gui.SelectPromptWithResponse("select a repository", names)
 	return nameMap[choice]
 }
 
 // ChooseWhatToDoWithRepo lets the user decide what to do with their chosen repo
 func ChooseWhatToDoWithRepo(repository *github.Repository) error {
-	opts := []string{openInBrowser, cloneRepo}
+	opts := []string{openInBrowser, cloneRepo, exitSelections}
 	// open in browser, clone
 	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", repository.GetName()), opts)
 
@@ -32,7 +33,10 @@ func ChooseWhatToDoWithRepo(repository *github.Repository) error {
 	case openInBrowser:
 		utils.OpenURLInDefaultBrowser(repository.GetHTMLURL())
 	case cloneRepo:
-
+		color.HiRed("TODO")
+		break
+	case exitSelections:
+		gui.Exit()
 	}
 
 	return nil
