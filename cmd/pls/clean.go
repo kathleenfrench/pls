@@ -12,7 +12,7 @@ var AllGitRepositories bool
 var cleanCmd = &cobra.Command{
 	Use:     "clean",
 	Short:   "cleanup subcommands",
-	Aliases: []string{"c"},
+	Aliases: []string{"c", "cleanup"},
 }
 
 // git clean --------------------------------
