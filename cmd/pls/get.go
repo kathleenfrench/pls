@@ -44,7 +44,7 @@ var gitOrgs = &cobra.Command{
 		}
 
 		choice := gitpls.CreateGitOrganizationsDropdown(orgs)
-		_ = gitpls.ChooseWithToDoWithOrganization(gc, choice)
+		_ = gitpls.ChooseWithToDoWithOrganization(choice, plsCfg.GitToken)
 	},
 }
 
@@ -67,19 +67,13 @@ var gitMyOrgs = &cobra.Command{
 	Use:     "orgs",
 	Aliases: []string{"o", "org", "organization", "organizations"},
 	Run: func(cmd *cobra.Command, args []string) {
-		ctx := context.Background()
-		gc := git.NewClient(ctx, plsCfg.GitToken)
-		opts := github.ListOptions{
-			PerPage: 100,
-		}
-
-		orgs, _, err := gc.Organizations.List(ctx, "", &opts)
+		orgs, err := gitpls.FetchOrganizations("", plsCfg.GitToken)
 		if err != nil {
 			utils.ExitWithError(err)
 		}
 
 		choice := gitpls.CreateGitOrganizationsDropdown(orgs)
-		_ = gitpls.ChooseWithToDoWithOrganization(gc, choice)
+		_ = gitpls.ChooseWithToDoWithOrganization(choice, plsCfg.GitToken)
 	},
 }
 

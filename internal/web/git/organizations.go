@@ -1,12 +1,14 @@
 package gitpls
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/fatih/color"
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
+	"github.com/kathleenfrench/pls/pkg/web/git"
 )
 
 // CreateGitOrganizationsDropdown prompts the user to select an organization from a dropdown
@@ -24,7 +26,10 @@ func CreateGitOrganizationsDropdown(organizations []*github.Organization) *githu
 }
 
 // ChooseWithToDoWithOrganization lets the user decide with to do with their chosen organization
-func ChooseWithToDoWithOrganization(gc *github.Client, organization *github.Organization) error {
+func ChooseWithToDoWithOrganization(organization *github.Organization, token string) error {
+	ctx := context.Background()
+	_ = git.NewClient(ctx, token)
+
 	opts := []string{openInBrowser, getOrganizationRepos, exitSelections}
 	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", organization.GetName()), opts)
 
@@ -39,4 +44,20 @@ func ChooseWithToDoWithOrganization(gc *github.Client, organization *github.Orga
 	}
 
 	return nil
+}
+
+// FetchOrganizations fetches github organizations by user
+func FetchOrganizations(username string, token string) ([]*github.Organization, error) {
+	ctx := context.Background()
+	gc := git.NewClient(ctx, token)
+	opts := github.ListOptions{
+		PerPage: 100,
+	}
+
+	orgs, _, err := gc.Organizations.List(ctx, "", &opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return orgs, nil
 }
