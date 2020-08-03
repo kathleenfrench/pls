@@ -9,5 +9,5 @@ import (
 // Exit says by and exits the program
 func Exit() {
 	color.HiGreen("bye!")
-	os.Exit(1)
+	os.Exit(0)
 }
