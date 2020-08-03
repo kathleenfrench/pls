@@ -37,7 +37,7 @@ var gitOrgs = &cobra.Command{
 		}
 
 		choice := gitpls.CreateGitOrganizationsDropdown(orgs)
-		_ = gitpls.ChooseWithToDoWithOrganization(choice, plsCfg.GitToken)
+		_ = gitpls.ChooseWithToDoWithOrganization(choice, plsCfg)
 	},
 }
 
@@ -52,7 +52,7 @@ var gitMyRepos = &cobra.Command{
 		}
 
 		choice := gitpls.CreateGitRepoDropdown(repos)
-		_ = gitpls.ChooseWhatToDoWithRepo(choice)
+		_ = gitpls.ChooseWhatToDoWithRepo(choice, plsCfg)
 	},
 }
 
@@ -66,7 +66,7 @@ var gitMyOrgs = &cobra.Command{
 		}
 
 		choice := gitpls.CreateGitOrganizationsDropdown(orgs)
-		_ = gitpls.ChooseWithToDoWithOrganization(choice, plsCfg.GitToken)
+		_ = gitpls.ChooseWithToDoWithOrganization(choice, plsCfg)
 	},
 }
 
@@ -130,8 +130,7 @@ var gitRepos = &cobra.Command{
 
 		color.HiYellow(fmt.Sprintf("%d repositories returned", len(repos)))
 		choice := gitpls.CreateGitRepoDropdown(repos)
-		_ = gitpls.ChooseWhatToDoWithRepo(choice)
-		gui.Exit()
+		_ = gitpls.ChooseWhatToDoWithRepo(choice, plsCfg)
 	},
 }
 

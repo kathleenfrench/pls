@@ -6,6 +6,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/google/go-github/v32/github"
+	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/kathleenfrench/pls/pkg/web/git"
@@ -26,17 +27,18 @@ func CreateGitRepoDropdown(repositories []*github.Repository) *github.Repository
 }
 
 // ChooseWhatToDoWithRepo lets the user decide what to do with their chosen repo
-func ChooseWhatToDoWithRepo(repository *github.Repository) error {
+func ChooseWhatToDoWithRepo(repository *github.Repository, settings config.Settings) error {
 	opts := []string{openInBrowser, cloneRepo, exitSelections}
-	// open in browser, clone
 	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", repository.GetName()), opts)
 
 	switch selected {
 	case openInBrowser:
 		utils.OpenURLInDefaultBrowser(repository.GetHTMLURL())
 	case cloneRepo:
-		color.HiRed("TODO")
-		break
+		err := git.CloneRepository(repository.GetName(), repository.GetCloneURL(), settings.DefaultCodeDir)
+		if err != nil {
+			return err
+		}
 	case exitSelections:
 		gui.Exit()
 	}

@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/fatih/color"
 	"github.com/google/go-github/v32/github"
+	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/kathleenfrench/pls/pkg/web/git"
@@ -26,9 +26,9 @@ func CreateGitOrganizationsDropdown(organizations []*github.Organization) *githu
 }
 
 // ChooseWithToDoWithOrganization lets the user decide with to do with their chosen organization
-func ChooseWithToDoWithOrganization(organization *github.Organization, token string) error {
+func ChooseWithToDoWithOrganization(organization *github.Organization, settings config.Settings) error {
 	ctx := context.Background()
-	_ = git.NewClient(ctx, token)
+	_ = git.NewClient(ctx, settings.GitToken)
 
 	opts := []string{openInBrowser, getOrganizationRepos, exitSelections}
 	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", organization.GetName()), opts)
@@ -37,8 +37,13 @@ func ChooseWithToDoWithOrganization(organization *github.Organization, token str
 	case openInBrowser:
 		utils.OpenURLInDefaultBrowser(organization.GetHTMLURL())
 	case getOrganizationRepos:
-		color.HiRed("TODO")
-		break
+		repos, err := FetchReposInOrganization(organization.GetName(), settings.GitToken)
+		if err != nil {
+			return err
+		}
+
+		choice := CreateGitRepoDropdown(repos)
+		_ = ChooseWhatToDoWithRepo(choice, settings)
 	case exitSelections:
 		gui.Exit()
 	}
