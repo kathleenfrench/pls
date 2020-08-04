@@ -45,6 +45,7 @@ var gitMyRepos = &cobra.Command{
 	Use:     "repos",
 	Aliases: []string{"r", "repositories", "repo", "repository"},
 	Short:   "interact with your github repositories",
+	Example: color.HiYellowString("pls get my repos"),
 	Run: func(cmd *cobra.Command, args []string) {
 		repos, err := gitpls.FetchUserRepos("", plsCfg.GitToken)
 		if err != nil {
@@ -59,6 +60,8 @@ var gitMyRepos = &cobra.Command{
 var gitMyOrgs = &cobra.Command{
 	Use:     "orgs",
 	Aliases: []string{"o", "org", "organization", "organizations"},
+	Short:   "interact with your github organizations",
+	Example: color.HiYellowString("pls get my orgs"),
 	Run: func(cmd *cobra.Command, args []string) {
 		orgs, err := gitpls.FetchOrganizations("", plsCfg.GitToken)
 		if err != nil {
