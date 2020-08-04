@@ -73,6 +73,25 @@ var gitMyOrgs = &cobra.Command{
 	},
 }
 
+var gitMyPRs = &cobra.Command{
+	Use:     "prs",
+	Aliases: []string{"pulls", "pull", "pr"},
+	Short:   "interact with your pull requests",
+	Example: color.HiYellowString("\n[PRs in current directory's repository]: pls get my prs\n[PRs in a repository you own]: pls get my prs in myrepo\n[PRs in another's repository]: pls get my prs in organization/repo"),
+	Run: func(cmd *cobra.Command, args []string) {
+		switch len(args) {
+		case 0:
+		case 1:
+			utils.ExitWithError("invalid input, try running `pls get my prs --help`")
+		case 2:
+			// pls get my prs in <repo> (owned)
+			// pls get my prs in <org>/<repo> (organization/another person's repo)
+		default:
+			utils.ExitWithError("invalid input, try running `pls get my prs --help`")
+		}
+	},
+}
+
 var repoFetchTypeChecker = map[string]string{
 	"by":     "other_user",
 	"for":    "other_user",
@@ -145,6 +164,7 @@ func init() {
 	// get only yours
 	myGetSubCmd.AddCommand(gitMyOrgs)
 	myGetSubCmd.AddCommand(gitMyRepos)
+	myGetSubCmd.AddCommand(gitMyPRs)
 
 	// get someone else's
 	getCmd.AddCommand(gitOrgs)

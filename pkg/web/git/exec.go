@@ -44,3 +44,43 @@ func CloneRepository(name string, sshURL string, path string) error {
 	fmt.Fprintln(os.Stdout)
 	return nil
 }
+
+// CurrentBranch returns the name of the branch in the current working directory
+func CurrentBranch() (string, error) {
+	inWorkTree, err := utils.BashExec("git rev-parse --is-inside-work-tree")
+	if err != nil {
+		return "", err
+	}
+
+	if inWorkTree != "true" {
+		return "", errors.New("no git work tree found")
+	}
+
+	currentBranch, err := utils.BashExec("git rev-parse --abbrev-ref HEAD")
+	if err != nil {
+		return "", err
+	}
+
+	return currentBranch, nil
+}
+
+// CurrentRepositoryName returns the name of the repository of the current working directory from any of its subdirectories
+func CurrentRepositoryName() (string, error) {
+	currentRepo, err := utils.BashExec("basename -s .git `git config --get remote.origin.url`")
+	if err != nil {
+		return "", errors.New("you have to be in a git repository to run this")
+	}
+
+	if len(currentRepo) == 0 {
+		return "", errors.New("could not determine the name of this git repository")
+	}
+
+	return currentRepo, nil
+}
+
+// RemotePullRequestRefExists returns a bool for whether a remote reference to a pull request exists
+func RemotePullRequestRefExists(ref string) bool {
+	check := exec.Command("git", "show-ref", "--verify", "--quiet", "ref")
+	err := check.Run()
+	return err == nil
+}
