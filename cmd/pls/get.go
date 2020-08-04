@@ -88,6 +88,7 @@ var gitMyPRs = &cobra.Command{
 		case 1:
 			// everywhere check
 			single := args[0]
+			color.HiGreen("arg: %s", single)
 			if single != "everywhere" && single != "all" {
 				utils.ExitWithError(fmt.Sprintf("%s is not a valid argument", single))
 			}

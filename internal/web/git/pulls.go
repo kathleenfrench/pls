@@ -2,7 +2,6 @@ package gitpls
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/internal/config"
@@ -28,7 +27,8 @@ func FetchUserPullRequestsEverywhere(settings config.Settings) ([]*github.Issue,
 
 	ctx := context.Background()
 	gc := git.NewClient(ctx, settings.GitToken)
-	query := fmt.Sprintf("author:%s type:pr", settings.GitUsername)
+	// TODO: add support for closed?
+	query := "author:@me type:pr state:open"
 
 	for {
 		prs, resp, err := gc.Search.Issues(ctx, query, &opts)
