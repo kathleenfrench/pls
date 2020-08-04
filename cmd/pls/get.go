@@ -73,16 +73,34 @@ var gitMyOrgs = &cobra.Command{
 	},
 }
 
+// pls get prs to review (current) | (in <>) | <everywhere>
+// pls get prs i merged (current) | (in <>) | <everywhere>
+// pls get prs i closed (current) | (in <>) | <everywhere>
+
 var gitMyPRs = &cobra.Command{
 	Use:     "prs",
 	Aliases: []string{"pulls", "pull", "pr"},
 	Short:   "interact with your pull requests",
-	Example: color.HiYellowString("\n[PRs in current directory's repository]: pls get my prs\n[PRs in a repository you own]: pls get my prs in myrepo\n[PRs in another's repository]: pls get my prs in organization/repo"),
+	Example: color.HiYellowString("\n[PRs in current directory's repository]: pls get my prs\n[PRs in a repository you own]: pls get my prs in myrepo\n[PRs in another's repository]: pls get my prs in organization/repo\n[PRs from all of github]: pls get my prs everywhere"),
 	Run: func(cmd *cobra.Command, args []string) {
 		switch len(args) {
 		case 0:
 		case 1:
-			utils.ExitWithError("invalid input, try running `pls get my prs --help`")
+			// everywhere check
+			single := args[0]
+			if single != "everywhere" && single != "all" {
+				utils.ExitWithError(fmt.Sprintf("%s is not a valid argument", single))
+			}
+
+			prs, err := gitpls.FetchUserPullRequestsEverywhere(plsCfg)
+			if err != nil {
+				utils.ExitWithError(err)
+			}
+
+			for _, pr := range prs {
+				color.HiGreen(fmt.Sprintf("%v", pr))
+			}
+			// fetch all
 		case 2:
 			// pls get my prs in <repo> (owned)
 			// pls get my prs in <org>/<repo> (organization/another person's repo)
