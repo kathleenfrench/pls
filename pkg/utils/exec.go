@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os/exec"
+	"runtime"
 	"strings"
 
 	"github.com/fatih/color"
@@ -55,4 +57,54 @@ func BashExec(cmd string) (string, error) {
 
 	trimmed := strings.TrimSpace(string(r))
 	return trimmed, nil
+}
+
+// OpenURLInDefaultBrowser launches the user system's default browser with a given URL as the target
+func OpenURLInDefaultBrowser(url string) error {
+	switch runtime.GOOS {
+	case "darwin":
+		err := exec.Command("open", url).Start()
+		if err != nil {
+			ExitWithError(err)
+		}
+	case "linux":
+		err := exec.Command("xdg-open", url).Start()
+		if err != nil {
+			ExitWithError(err)
+		}
+	default:
+		ExitWithError(fmt.Sprintf("%s is not a supported platform", runtime.GOOS))
+	}
+
+	return nil
+}
+
+// EditorLaunchCommands are the commands used to open a file in a specified text editor and wait for the file to be saved to close
+var EditorLaunchCommands = map[string]string{
+	"vim":      "vim",
+	"emacs":    "emacs",
+	"vscode":   "code --wait",
+	"atom":     "atom --wait",
+	"sublime":  "subl -n -w",
+	"phpstorm": "phpstorm --wait",
+	"pstorm":   "pstorm --wait",
+}
+
+// GetPHPStormExecutable checks for which phpstorm executable is set in their PATH to determine the launch command to use
+func GetPHPStormExecutable() (string, error) {
+	color.HiBlue("checking for phpstorm executable...")
+	phpstorm, err := BashExec("phpstorm -v 2>/dev/null")
+	if err != nil || phpstorm == "" {
+		color.HiYellow("phpstorm executable not found")
+		color.HiBlue("checking for pstorm executable...")
+		pstorm, err := BashExec("phpstorm -v 2>/dev/null")
+		if err != nil || pstorm == "" {
+			color.HiYellow("pstorm executable not found")
+			return "", errors.New("it looks like you don't have the phpstorm command line installed")
+		} else {
+			return "pstorm", nil
+		}
+	}
+
+	return "phpstorm", nil
 }

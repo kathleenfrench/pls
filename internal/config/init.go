@@ -2,20 +2,23 @@ package config
 
 import (
 	"fmt"
-	"path/filepath"
-	"strings"
 
-	"github.com/AlecAivazis/survey/v2"
+	"github.com/fatih/color"
+	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/kathleenfrench/pls/pkg/web/git"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
 // default keys
 const (
-	githubUsernameKey = "git_username"
-	githubTokenKey    = "git_token"
-	nameKey           = "name"
+	githubUsernameKey  = "git_username"
+	githubTokenKey     = "git_token"
+	nameKey            = "name"
+	defaultEditorKey   = "default_editor"
+	webShortcutsKey    = "webshort"
+	defaultCodepathKey = "default_codepath"
 )
 
 func unset(val interface{}) bool {
@@ -28,13 +31,7 @@ func unset(val interface{}) bool {
 
 // checkForUnsetRequiredDefaults prompts the user for unset defaults and sets them
 func checkForUnsetRequiredDefaults() bool {
-	var (
-		gt         string
-		gu         string
-		nm         string
-		prompt     *survey.Input
-		unsetFound bool
-	)
+	var unsetFound bool
 
 	if unset(viper.Get(githubUsernameKey)) {
 		// check if we can find it first using the git pkg
@@ -43,38 +40,55 @@ func checkForUnsetRequiredDefaults() bool {
 			viper.Set(githubUsernameKey, usernameCheck)
 		} else {
 			unsetFound = true
-			prompt = &survey.Input{
-				Message: "what is your github username?",
-			}
-
-			survey.AskOne(prompt, &gu)
+			gu := gui.InputPromptWithResponse("what is your github username?", "")
 			viper.Set(githubUsernameKey, gu)
 		}
 	}
 
 	if unset(viper.Get(githubTokenKey)) {
 		unsetFound = true
-		prompt = &survey.Input{
-			Message: "what is your github token?",
-		}
-
-		survey.AskOne(prompt, &gt)
+		gt := gui.InputPromptWithResponse("what is your github token?", "")
 		viper.Set(githubTokenKey, gt)
 	}
 
 	if unset(viper.Get(nameKey)) {
 		whoami, _ := utils.BashExec("whoami")
 		unsetFound = true
-		prompt = &survey.Input{
-			Message: "what's your name?",
-			Default: whoami,
-		}
-
-		survey.AskOne(prompt, &nm)
+		nm := gui.InputPromptWithResponse("what's your name?", whoami)
 		viper.Set(nameKey, nm)
 	}
 
+	if unset(viper.Get(defaultEditorKey)) {
+		unsetFound = true
+		de := promptForDefaultEditor()
+		viper.Set(defaultEditorKey, de)
+	}
+
+	if unset(viper.Get(defaultCodepathKey)) {
+		unsetFound = true
+		home, err := homedir.Dir()
+		if err != nil {
+			utils.ExitWithError(err)
+		}
+
+		home = fmt.Sprintf("%s/", home)
+		codePath := gui.InputPromptWithResponse(fmt.Sprintf("what is the relative path from %s you want repos cloned?", home), "")
+		codePath = fmt.Sprintf("%s%s", home, codePath)
+		color.Red(fmt.Sprintf("codepath: %s", codePath))
+		viper.Set(defaultCodepathKey, codePath)
+	}
+
+	if viper.Get(webShortcutsKey) == nil {
+		unsetFound = true
+		viper.Set(webShortcutsKey, defaultWebShortcuts)
+	}
+
 	return unsetFound
+}
+
+var defaultWebShortcuts = map[string]string{
+	"git":   "https://github.com/",
+	"gmail": "https://mail.google.com/mail/u/0/#inbox",
 }
 
 // Initialize creates the directory and/or file with defaults for the application's configuration settings
@@ -119,35 +133,4 @@ func Initialize() {
 	}
 
 	viper.WatchConfig()
-}
-
-// UpdateSettings checks for pls config values that have already been set and ensures they're preserved when updating configs
-func (s *Settings) UpdateSettings(v *viper.Viper) error {
-	cfgFile := v.ConfigFileUsed()
-
-	if s.GitToken != "" {
-		v.Set(githubTokenKey, strings.TrimSpace(s.GitToken))
-	}
-
-	if s.GitUsername != "" {
-		v.Set(githubUsernameKey, strings.TrimSpace(s.GitUsername))
-	}
-
-	if s.Name != "" {
-		v.Set(nameKey, strings.TrimSpace(s.Name))
-	}
-
-	v.MergeInConfig()
-
-	v.SetConfigFile(cfgFile)
-
-	// preserve the config file type
-	v.SetConfigType(filepath.Ext(cfgFile))
-
-	err := v.WriteConfig()
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

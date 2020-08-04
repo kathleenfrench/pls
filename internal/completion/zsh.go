@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
+	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 )
 
@@ -44,11 +44,6 @@ func ZshInstall(path string) error {
 }
 
 func confirmZshShellCompletionEnabled() bool {
-	zshAutoEnabled := false
-	prompt := &survey.Confirm{
-		Message: "is zsh shell completion enabled?",
-	}
-
-	survey.AskOne(prompt, &zshAutoEnabled)
+	zshAutoEnabled := gui.ConfirmPrompt("is zsh shell completion enabled?", `you can check this by searching for echo "autoload -U compinit; compinit" in your .zshrc file`, true)
 	return zshAutoEnabled
 }

@@ -6,17 +6,15 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Manager is an interface for managing configs
-type Manager interface {
-	Get(key string)
-	Set(key string, value string)
-}
-
 // Settings represent the default settings for pls
 type Settings struct {
-	GitToken    string `yaml:"git_token"`
-	GitUsername string `yaml:"git_username"`
-	Name        string `yaml:"name"`
+	viper          *viper.Viper
+	GitToken       string            `yaml:"git_token"`
+	GitUsername    string            `yaml:"git_username"`
+	Name           string            `yaml:"name"`
+	DefaultEditor  string            `yaml:"default_editor"`
+	WebShortcuts   map[string]string `yaml:"webshort"`
+	DefaultCodeDir string            `yaml:"default_codepath"`
 }
 
 func decodeWithYaml(tagName string) viper.DecoderConfigOption {
@@ -25,9 +23,21 @@ func decodeWithYaml(tagName string) viper.DecoderConfigOption {
 	}
 }
 
+// ParseAndUpdate parses the viper settings as a pls settings struct and updates the config file
+func ParseAndUpdate(v *viper.Viper) error {
+	s, err := Parse(v)
+	if err != nil {
+		return err
+	}
+
+	return s.UpdateSettings()
+}
+
 // Parse unmarshals the viper configs into the pls settings struct
 func Parse(v *viper.Viper) (Settings, error) {
-	s := Settings{}
+	s := Settings{
+		viper: v,
+	}
 
 	dco := decodeWithYaml("yaml")
 	err := v.Unmarshal(&s, dco)
