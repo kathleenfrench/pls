@@ -35,7 +35,26 @@ func ChooseWhatToDoWithRepo(repository *github.Repository, settings config.Setti
 	case openInBrowser:
 		utils.OpenURLInDefaultBrowser(repository.GetHTMLURL())
 	case cloneRepo:
-		err := git.CloneRepository(repository.GetName(), repository.GetCloneURL(), settings.DefaultCodeDir)
+		var clonePath string
+		// give user choice between current directory, default codebase path, specify a custom path
+		pathChoices := []string{
+			settings.DefaultCodeDir,
+			"Current Directory",
+			"Custom Directory",
+		}
+
+		selected := gui.SelectPromptWithResponse(fmt.Sprintf("where do you want to clone in %s?", repository.GetName()), pathChoices)
+
+		switch selected {
+		case settings.DefaultCodeDir:
+			clonePath = settings.DefaultCodeDir
+		case "Current Directory":
+			clonePath = ""
+		case "Custom Directory":
+			clonePath = gui.InputPromptWithResponse(fmt.Sprintf("what is the *full* path to the directory?"), "")
+		}
+
+		err := git.CloneRepository(repository.GetName(), repository.GetCloneURL(), clonePath)
 		if err != nil {
 			return err
 		}

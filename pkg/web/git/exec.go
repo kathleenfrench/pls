@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/kathleenfrench/pls/pkg/utils"
 )
@@ -27,6 +28,7 @@ func CheckForGitUsername() (string, error) {
 func CloneRepository(name string, sshURL string, path string) error {
 	cloneCmd := fmt.Sprintf("git clone %s", sshURL)
 	if path != "" {
+		path = strings.TrimSuffix(path, "/")
 		cloneCmd = fmt.Sprintf("git clone %s %s/%s", sshURL, path, name)
 	}
 
