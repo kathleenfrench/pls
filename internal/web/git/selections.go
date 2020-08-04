@@ -11,3 +11,6 @@ const exitSelections = "Exit"
 
 // getOrganizationRepos is a selection choice
 const getOrganizationRepos = "Get Organization Repositories"
+
+// openDiff is a selection choice
+const openDiff = "Open Diff"

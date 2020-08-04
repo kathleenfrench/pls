@@ -99,8 +99,8 @@ var gitMyPRs = &cobra.Command{
 				utils.ExitWithError(err)
 			}
 
-			pr := gitpls.CreateGitIssuesDropdown(prs)
-			color.HiBlue("%v", pr)
+			pr, prName := gitpls.CreateGitIssuesDropdown(prs)
+			_ = gitpls.ChooseWhatToDoWithIssue(pr, prName, true, plsCfg)
 		case 2:
 			// pls get my prs in <repo> (owned)
 			// pls get my prs in <org>/<repo> (organization/another person's repo)
