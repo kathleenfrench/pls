@@ -88,20 +88,19 @@ var gitMyPRs = &cobra.Command{
 		case 1:
 			// everywhere check
 			single := args[0]
-			color.HiGreen("arg: %s", single)
 			if single != "everywhere" && single != "all" {
 				utils.ExitWithError(fmt.Sprintf("%s is not a valid argument", single))
 			}
 
+			gui.Spin.Start()
 			prs, err := gitpls.FetchUserPullRequestsEverywhere(plsCfg)
+			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
 			}
 
-			for _, pr := range prs {
-				color.HiGreen(fmt.Sprintf("%v", pr))
-			}
-			// fetch all
+			pr := gitpls.CreateGitIssuesDropdown(prs)
+			color.HiBlue("%v", pr)
 		case 2:
 			// pls get my prs in <repo> (owned)
 			// pls get my prs in <org>/<repo> (organization/another person's repo)

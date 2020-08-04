@@ -2,9 +2,12 @@ package gitpls
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/internal/config"
+	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/web/git"
 )
 
@@ -45,4 +48,27 @@ func FetchUserPullRequestsEverywhere(settings config.Settings) ([]*github.Issue,
 	}
 
 	return allPRs, nil
+}
+
+func extractOrganizationAndRepoNameFromRepoURL(url string) (organization string, repo string) {
+	// example RepositoryURL: "https://api.github.com/repos/counterThreat/chess_app",
+	splitAfter := strings.SplitAfter(url, "repos/")
+	orgSplit := strings.Split(splitAfter[1], "/")
+	return orgSplit[0], orgSplit[1]
+}
+
+// CreateGitIssuesDropdown creates a GUI dropdown of issues - PRs are considered an issue per the searchservice in the go-github pkg, so we use this for PR search results as well
+func CreateGitIssuesDropdown(issues []*github.Issue) *github.Issue {
+	names := []string{}
+	nameMap := make(map[string]*github.Issue)
+	for _, i := range issues {
+		r := i.GetRepositoryURL()
+		org, repo := extractOrganizationAndRepoNameFromRepoURL(r)
+		name := fmt.Sprintf("[%s/%s]: %s", org, repo, i.GetTitle())
+		names = append(names, name)
+		nameMap[name] = i
+	}
+
+	choice := gui.SelectPromptWithResponse("select one", names)
+	return nameMap[choice]
 }
