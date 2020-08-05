@@ -21,7 +21,7 @@ func CreateGitOrganizationsDropdown(organizations []*github.Organization) *githu
 		nameMap[o.GetLogin()] = o
 	}
 
-	choice := gui.SelectPromptWithResponse("select an organization", names)
+	choice := gui.SelectPromptWithResponse("select an organization", names, false)
 	return nameMap[choice]
 }
 
@@ -31,7 +31,7 @@ func ChooseWithToDoWithOrganization(organization *github.Organization, settings 
 	_ = git.NewClient(ctx, settings.GitToken)
 
 	opts := []string{openInBrowser, getOrganizationRepos, exitSelections}
-	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", organization.GetName()), opts)
+	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", organization.GetName()), opts, false)
 
 	switch selected {
 	case openInBrowser:

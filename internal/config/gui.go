@@ -40,7 +40,7 @@ func genGuiKeyMap(keys []string) ([]string, map[string]string) {
 
 func promptForDefaultEditor() string {
 	options := []string{"vim", "emacs", "vscode", "atom", "sublime", "phpstorm"}
-	selection := gui.SelectPromptWithResponse("which would you like to set as your default editor?", options)
+	selection := gui.SelectPromptWithResponse("which would you like to set as your default editor?", options, false)
 
 	switch selection {
 	case "phpstorm":

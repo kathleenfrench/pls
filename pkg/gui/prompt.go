@@ -9,8 +9,10 @@ import (
 )
 
 // SelectPromptWithResponse creates a dropdown selection prompt and records the user's choice
-func SelectPromptWithResponse(label string, options []string) string {
-	clearScreen()
+func SelectPromptWithResponse(label string, options []string, disableClear bool) string {
+	if !disableClear {
+		clearScreen()
+	}
 
 	var selection string
 	var pageSize = len(options)

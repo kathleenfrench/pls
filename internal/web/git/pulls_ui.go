@@ -26,7 +26,7 @@ func CreateGitIssuesDropdown(issues []*github.Issue) (*github.Issue, *IssueMeta)
 		nameMap[name] = i
 	}
 
-	choice := gui.SelectPromptWithResponse("select one", names)
+	choice := gui.SelectPromptWithResponse("select one", names, false)
 
 	meta := &IssueMeta{
 		DisplayName: choice,
@@ -71,11 +71,9 @@ func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings conf
 		htmlURL = issue.GetHTMLURL()
 	}
 
-	color.HiBlue("pr: %v\n", pr)
-
 	// add exit option last
 	opts = append(opts, exitSelections)
-	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", meta.DisplayName), opts)
+	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", meta.DisplayName), opts, false)
 
 	switch selected {
 	case readBodyText:
@@ -84,6 +82,8 @@ func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings conf
 		} else {
 			color.HiBlue(issue.GetBody())
 		}
+
+		return nextOpts(issue, meta, settings)
 	case openInBrowser:
 		if isPullRequest {
 			utils.OpenURLInDefaultBrowser(htmlURL)
@@ -92,6 +92,20 @@ func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings conf
 		}
 	case openDiff:
 		utils.OpenURLInDefaultBrowser(fmt.Sprintf("%s/files", issue.PullRequestLinks.GetDiffURL()))
+	case exitSelections:
+		gui.Exit()
+	}
+
+	return nil
+}
+
+func nextOpts(issue *github.Issue, meta *IssueMeta, settings config.Settings) error {
+	opts := []string{returnToMenu, exitSelections}
+	selected := gui.SelectPromptWithResponse("what now?", opts, true)
+
+	switch selected {
+	case returnToMenu:
+		return ChooseWhatToDoWithIssue(issue, meta, settings)
 	case exitSelections:
 		gui.Exit()
 	}

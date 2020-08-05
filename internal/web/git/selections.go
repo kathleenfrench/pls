@@ -17,3 +17,6 @@ const openDiff = "Open Diff"
 
 // readBodyText is a selection choice
 const readBodyText = "Read Body Text"
+
+// returnToMenu is a selection choice
+const returnToMenu = "Return to Menu"
