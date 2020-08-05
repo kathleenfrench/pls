@@ -98,12 +98,24 @@ var gitMyPRs = &cobra.Command{
 			ChangesRequested: changesNeeded,
 		}
 
-		color.HiRed("getter flags: %v", getterFlags)
+		if !getterFlags.ClosedOnly {
+			getterFlags.State = "open"
+		} else {
+			getterFlags.State = "closed"
+		}
 
 		switch len(args) {
 		case 0:
 			// get prs in the current repo
+			gui.Spin.Start()
+			prs, err := gitpls.FetchPullRequestsFromCWDRepo(plsCfg, getterFlags)
+			gui.Spin.Stop()
+			if err != nil {
+				utils.ExitWithError(err)
+			}
 
+			pr, prName := gitpls.CreateGitIssuesDropdown(prs)
+			_ = gitpls.ChooseWhatToDoWithIssue(pr, prName, true, plsCfg)
 		case 1:
 			// everywhere check
 			single := args[0]
@@ -112,10 +124,8 @@ var gitMyPRs = &cobra.Command{
 			}
 
 			// TODO - ADD FLAGS
-			opts := &gitpls.MyPullsGetterFlags{}
-
 			gui.Spin.Start()
-			prs, err := gitpls.FetchUserPullRequestsEverywhere(plsCfg, opts)
+			prs, err := gitpls.FetchUserPullRequestsEverywhere(plsCfg, getterFlags)
 			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)

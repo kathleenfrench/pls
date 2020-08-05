@@ -33,6 +33,7 @@ type MyPullsGetterFlags struct {
 	MergedOnly    bool
 	DraftsOnly    bool
 	MergeableOnly bool
+	State         string
 
 	// review statuses
 	PendingApproval  bool
@@ -104,9 +105,22 @@ func constructMyPRSearchQuery(getter *MyPullsGetterFlags) string {
 func FetchPullRequestsFromCWDRepo(settings config.Settings, getterFlags *MyPullsGetterFlags) ([]*github.Issue, error) {
 	var allPullsInRepo []*github.Issue
 
+	// get org
+	org, err := git.CurrentRepositoryOrganization()
+	if err != nil {
+		return nil, err
+	}
+
+	repo, err := git.CurrentRepositoryName()
+	if err != nil {
+		return nil, err
+	}
+
+	// get repo
+
 	ctx := context.Background()
 	gc := git.NewClient(ctx, settings.GitToken)
-	query := "author:@me type: pr"
+	query := fmt.Sprintf("author:@me type:pr repo:%s/%s state:%s", org, repo, getterFlags.State)
 
 	// state defined
 	// 		endpoint = fmt.Sprintf("/search/issues?q=author:%s+type:pr+repo:%s/%s+state:%s&sort=updated&order=desc", author, org, repo, state)
