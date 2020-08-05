@@ -41,6 +41,8 @@ var (
 	changesNeeded    bool
 	assignedOnly     bool
 	forCurrentBranch bool
+	locked           bool
+	mentionedMe      bool
 	searchTarget     []string // <title|body|comments>
 )
 
@@ -103,6 +105,7 @@ var gitMyPRs = &cobra.Command{
 			ChangesRequested: changesNeeded,
 			AssignedOnly:     assignedOnly,
 			ForCurrentBranch: forCurrentBranch,
+			Locked:           locked,
 			Author:           "@me",
 		}
 
@@ -155,12 +158,17 @@ var gitMyPRs = &cobra.Command{
 				utils.ExitWithError(err)
 			}
 
+			if len(prs) == 0 {
+				color.HiYellow("no PRs found matching that criteria!")
+				gui.Exit()
+			}
+
 			pr, prName := gitpls.CreateGitIssuesDropdown(prs)
 			_ = gitpls.ChooseWhatToDoWithIssue(pr, prName, true, plsCfg)
 		case 1:
 			// everywhere check
 			single := args[0]
-			if single != "everywhere" && single != "all" {
+			if single != "everywhere" && single != "all" && single != "e" {
 				utils.ExitWithError(fmt.Sprintf("%s is not a valid argument", single))
 			}
 
@@ -170,6 +178,11 @@ var gitMyPRs = &cobra.Command{
 			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
+			}
+
+			if len(prs) == 0 {
+				color.HiYellow("no PRs found matching that criteria!")
+				gui.Exit()
 			}
 
 			pr, prName := gitpls.CreateGitIssuesDropdown(prs)
@@ -212,6 +225,9 @@ func init() {
 	myGetSubCmd.PersistentFlags().BoolVarP(&changesNeeded, "changesneeded", "x", false, "fetch only PRs where changes have been requested")
 	myGetSubCmd.PersistentFlags().BoolVar(&assignedOnly, "assigned", false, "fetch only PRs assigned to you")
 	myGetSubCmd.PersistentFlags().BoolVarP(&forCurrentBranch, "current", "b", false, "fetch the PR, if one exists, for your current working branch")
+	myGetSubCmd.PersistentFlags().BoolVarP(&locked, "locked", "l", false, "fetch only locked PRs")
+	myGetSubCmd.PersistentFlags().BoolVar(&mentionedMe, "mention", false, "fetch only PRs where i've been mentioned")
+	myGetSubCmd.PersistentFlags().BoolVarP(&draftOnly, "draft", "d", false, "fetch only draft PRs")
 
 	gitMyPRs.AddCommand(myWherePRSubCmd)
 	// flags
