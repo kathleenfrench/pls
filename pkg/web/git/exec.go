@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/kathleenfrench/pls/pkg/utils"
 )
 
@@ -66,6 +65,31 @@ func CurrentBranch() (string, error) {
 	return currentBranch, nil
 }
 
+// GetCurrentGitBaseURL returns the current base git url
+func GetCurrentGitBaseURL() string {
+	currentRemoteOriginURL, err := utils.BashExec("git config --local --get remote.origin.url")
+	if err != nil {
+		return ""
+	}
+
+	gitBaseCheck := regexp.MustCompile(`github.*.com`)
+	val := gitBaseCheck.FindString(currentRemoteOriginURL)
+	return strings.TrimSpace(val)
+}
+
+// IsEnterpriseGit is a helper for determining whether or not the active repository is from github.com or an enterprise instance
+func IsEnterpriseGit() (bool, error) {
+	if GetCurrentGitBaseURL() == "" {
+		return false, errors.New("an error occurred parsing your current git configuration")
+	}
+
+	if GetCurrentGitBaseURL() != "github.com" {
+		return true, nil
+	}
+
+	return false, nil
+}
+
 // CurrentRepositoryOrganization parses the local git config's remote.origin.url to determine the 'organization' or top-level 'user' of a repository
 func CurrentRepositoryOrganization() (string, error) {
 	var (
@@ -84,7 +108,6 @@ func CurrentRepositoryOrganization() (string, error) {
 
 	gitBaseCheck := regexp.MustCompile(`github.*.com`)
 	val := gitBaseCheck.FindString(currentRemoteOriginURL)
-	color.HiRed("val: %v", val)
 
 	switch strings.Contains(currentRemoteOriginURL, "https") {
 	case true:

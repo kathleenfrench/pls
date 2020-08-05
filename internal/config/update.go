@@ -40,6 +40,18 @@ func (s *Settings) UpdateSettings() error {
 		s.viper.Set(defaultCodepathKey, s.DefaultCodeDir)
 	}
 
+	if s.GitEnterpriseUsername != "" {
+		s.viper.Set(githubEnterpriseUsernameKey, s.GitEnterpriseUsername)
+	}
+
+	if s.GitEnterpriseHostname != "" {
+		s.viper.Set(githubEnterpriseHostKey, s.GitEnterpriseHostname)
+	}
+
+	if s.GitEnterpriseToken != "" {
+		s.viper.Set(githubEnterpriseTokenKey, s.GitEnterpriseToken)
+	}
+
 	s.viper.MergeInConfig()
 	s.viper.SetConfigFile(cfgFile)
 	s.viper.SetConfigType(filepath.Ext(cfgFile))
