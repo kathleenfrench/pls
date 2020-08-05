@@ -92,8 +92,11 @@ var gitMyPRs = &cobra.Command{
 				utils.ExitWithError(fmt.Sprintf("%s is not a valid argument", single))
 			}
 
+			// TODO - ADD FLAGS
+			opts := &gitpls.PullGetterFlags{}
+
 			gui.Spin.Start()
-			prs, err := gitpls.FetchUserPullRequestsEverywhere(plsCfg)
+			prs, err := gitpls.FetchUserPullRequestsEverywhere(plsCfg, opts)
 			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)

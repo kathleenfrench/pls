@@ -19,7 +19,7 @@ type PullRequestSearchFlags struct {
 }
 
 // FetchUserPullRequestsEverywhere search all of github for user's pull requests
-func FetchUserPullRequestsEverywhere(settings config.Settings) ([]*github.Issue, error) {
+func FetchUserPullRequestsEverywhere(settings config.Settings, gettFlags *PullGetterFlags) ([]*github.Issue, error) {
 	var allPRs []*github.Issue
 
 	opts := github.SearchOptions{
@@ -28,9 +28,10 @@ func FetchUserPullRequestsEverywhere(settings config.Settings) ([]*github.Issue,
 		},
 	}
 
+	// TODO: GETTER FLAGS
+
 	ctx := context.Background()
 	gc := git.NewClient(ctx, settings.GitToken)
-	// TODO: add support for closed?
 	query := "author:@me type:pr state:open"
 
 	for {
