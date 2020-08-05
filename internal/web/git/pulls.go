@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/gui"
@@ -11,9 +12,9 @@ import (
 	"github.com/kathleenfrench/pls/pkg/web/git"
 )
 
-// MyPullsGetterFlags are evaluated based off of flags/arguments set by the user when searching pull requests of the current user (author:@me)
+// PullsGetterFlags are evaluated based off of flags/arguments set by the user when searching pull requests of the current user (author:@me)
 // see: https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests
-type MyPullsGetterFlags struct {
+type PullsGetterFlags struct {
 	// basics
 	Repository   string // repo:USERNAME/REPOSITORY || example: repo:mozilla/shumway matches issues from @mozilla's shumway project
 	Organization string // org:ORGNAME | example: org:github matches issues in repositories owned by the GitHub organization
@@ -28,12 +29,19 @@ type MyPullsGetterFlags struct {
 	// state
 
 	// inclusions
-	IncludeClosed bool
-	ClosedOnly    bool
-	MergedOnly    bool
-	DraftsOnly    bool
-	MergeableOnly bool
+	ForCurrentBranch bool
+	AssignedOnly     bool
+	IncludeClosed    bool
+	ClosedOnly       bool
+	MergedOnly       bool
+	DraftsOnly       bool
+	MergeableOnly    bool
+
+	// values set given flags used
 	State         string
+	Assignee      string
+	CurrentBranch string // head:HEAD_BRANCH
+	Author        string
 
 	// review statuses
 	PendingApproval  bool
@@ -43,28 +51,8 @@ type MyPullsGetterFlags struct {
 	*MetaGetterFlags
 }
 
-// MetaGetterFlags are used for top-level search preferences
-type MetaGetterFlags struct {
-	PerPage int // default: 100
-	Page    int // if you want to query a specific page
-	/**
-	// How to sort the search results. Possible values are:
-	//   - for repositories: stars, fork, updated
-	//   - for commits: author-date, committer-date
-	//   - for code: indexed
-	//   - for issues: comments, created, updated
-	//   - for users: followers, repositories, joined
-	//
-	// Default is to sort by best match.
-	// ref: https://github.com/google/go-github/blob/master/github/search.go
-	*/
-	SortBy            string
-	Order             string // asc, desc (default: desc)
-	TextMatchMetadata bool   // fetch text match metadata with a query
-}
-
 // FetchUserPullRequestsEverywhere search all of github for user's pull requests
-func FetchUserPullRequestsEverywhere(settings config.Settings, getterFlags *MyPullsGetterFlags) ([]*github.Issue, error) {
+func FetchUserPullRequestsEverywhere(settings config.Settings, getterFlags *PullsGetterFlags) ([]*github.Issue, error) {
 	var allPRs []*github.Issue
 
 	opts := github.SearchOptions{
@@ -96,31 +84,34 @@ func FetchUserPullRequestsEverywhere(settings config.Settings, getterFlags *MyPu
 	return allPRs, nil
 }
 
-func constructMyPRSearchQuery(getter *MyPullsGetterFlags) string {
-	query := fmt.Sprintf("author:@me type:pr")
+func (g *PullsGetterFlags) constructMyPRSearchQuery() string {
+	query := fmt.Sprintf("type:pr state:%s", g.State)
+
+	if g.Author != "" {
+		query += fmt.Sprintf(" author:%s", g.Author)
+	}
+
+	if g.Organization != "" && g.Repository != "" {
+		query += fmt.Sprintf(" repo:%s/%s", g.Organization, g.Repository)
+	}
+
+	if g.ForCurrentBranch && g.CurrentBranch != "" {
+		query += fmt.Sprintf(" head:%s", g.CurrentBranch)
+	}
+
+	color.HiGreen("query: %s", query)
+	// query = fmt.Sprintf("author:@me type:pr repo:%s/%s state:%s", getterFlags.Organization, getterFlags.Repository, getterFlags.State)
+
 	return query
 }
 
 // FetchPullRequestsFromCWDRepo parses information about your current working directory's git repository and queries git's API for PRs in that repository
-func FetchPullRequestsFromCWDRepo(settings config.Settings, getterFlags *MyPullsGetterFlags) ([]*github.Issue, error) {
+func FetchPullRequestsFromCWDRepo(settings config.Settings, getterFlags *PullsGetterFlags) ([]*github.Issue, error) {
 	var allPullsInRepo []*github.Issue
-
-	// get org
-	org, err := git.CurrentRepositoryOrganization()
-	if err != nil {
-		return nil, err
-	}
-
-	repo, err := git.CurrentRepositoryName()
-	if err != nil {
-		return nil, err
-	}
-
-	// get repo
 
 	ctx := context.Background()
 	gc := git.NewClient(ctx, settings.GitToken)
-	query := fmt.Sprintf("author:@me type:pr repo:%s/%s state:%s", org, repo, getterFlags.State)
+	query := fmt.Sprintf("author:@me type:pr repo:%s/%s state:%s", getterFlags.Organization, getterFlags.Repository, getterFlags.State)
 
 	// state defined
 	// 		endpoint = fmt.Sprintf("/search/issues?q=author:%s+type:pr+repo:%s/%s+state:%s&sort=updated&order=desc", author, org, repo, state)

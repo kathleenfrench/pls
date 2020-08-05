@@ -107,9 +107,9 @@ func CurrentRepositoryName() (string, error) {
 	return currentRepo, nil
 }
 
-// RemotePullRequestRefExists returns a bool for whether a remote reference to a pull request exists
-func RemotePullRequestRefExists(ref string) bool {
-	check := exec.Command("git", "show-ref", "--verify", "--quiet", "ref")
+// RemoteRefExists returns a bool for whether a remote reference to a pull request exists
+func RemoteRefExists(ref string) bool {
+	check := exec.Command("git", "show-ref", "--verify", "--quiet", fmt.Sprintf("refs/remotes/origin/%s", ref))
 	err := check.Run()
 	return err == nil
 }

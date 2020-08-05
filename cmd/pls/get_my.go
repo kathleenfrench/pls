@@ -7,6 +7,7 @@ import (
 	gitpls "github.com/kathleenfrench/pls/internal/web/git"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
+	"github.com/kathleenfrench/pls/pkg/web/git"
 	"github.com/spf13/cobra"
 )
 
@@ -28,15 +29,19 @@ import (
 // searching text
 // pls get my prs where <text to search for> --isin|isinthe|inthe|in <title|body|comments>
 
+// TODO: add --by flag for sorting
+
 // search flag variables
 var (
-	mergedOnly    bool
-	closedOnly    bool
-	draftOnly     bool
-	pending       bool
-	approved      bool
-	changesNeeded bool
-	searchTarget  []string // <title|body|comments>
+	mergedOnly       bool
+	closedOnly       bool
+	draftOnly        bool
+	pending          bool
+	approved         bool
+	changesNeeded    bool
+	assignedOnly     bool
+	forCurrentBranch bool
+	searchTarget     []string // <title|body|comments>
 )
 
 // ------------------------------------------------------
@@ -89,13 +94,16 @@ var gitMyPRs = &cobra.Command{
 	Short:   "interact with your pull requests",
 	Example: color.HiYellowString("\n[PRs in current directory's repository]: pls get my prs\n[PRs in a repository you own]: pls get my prs in myrepo\n[PRs in another's repository]: pls get my prs in organization/repo\n[PRs from all of github]: pls get my prs everywhere"),
 	Run: func(cmd *cobra.Command, args []string) {
-		getterFlags := &gitpls.MyPullsGetterFlags{
+		getterFlags := &gitpls.PullsGetterFlags{
 			MergedOnly:       mergedOnly,
 			ClosedOnly:       closedOnly,
 			DraftsOnly:       draftOnly,
 			PendingApproval:  pending,
 			Approved:         approved,
 			ChangesRequested: changesNeeded,
+			AssignedOnly:     assignedOnly,
+			ForCurrentBranch: forCurrentBranch,
+			Author:           "@me",
 		}
 
 		if !getterFlags.ClosedOnly {
@@ -104,9 +112,42 @@ var gitMyPRs = &cobra.Command{
 			getterFlags.State = "closed"
 		}
 
+		if getterFlags.AssignedOnly {
+			getterFlags.Assignee = "@me"
+		}
+
+		if getterFlags.ForCurrentBranch {
+			cb, err := git.CurrentBranch()
+			if err != nil {
+				utils.ExitWithError(err)
+			}
+
+			// verify a remote ref exists first
+			branchHasPR := git.RemoteRefExists(cb)
+			if !branchHasPR {
+				utils.ExitWithError(fmt.Sprintf("your %s branch does not have an open PR", cb))
+			}
+
+			getterFlags.CurrentBranch = cb
+		}
+
 		switch len(args) {
 		case 0:
 			// get prs in the current repo
+			// get org
+			org, err := git.CurrentRepositoryOrganization()
+			if err != nil {
+				utils.ExitWithError(err)
+			}
+
+			repo, err := git.CurrentRepositoryName()
+			if err != nil {
+				utils.ExitWithError(err)
+			}
+
+			getterFlags.Organization = org
+			getterFlags.Repository = repo
+
 			gui.Spin.Start()
 			prs, err := gitpls.FetchPullRequestsFromCWDRepo(plsCfg, getterFlags)
 			gui.Spin.Stop()
@@ -169,6 +210,8 @@ func init() {
 	myGetSubCmd.PersistentFlags().BoolVarP(&pending, "pending", "p", false, "get only PRs that are pending approval")
 	myGetSubCmd.PersistentFlags().BoolVarP(&approved, "approved", "a", false, "fetch only PRs that have been approved")
 	myGetSubCmd.PersistentFlags().BoolVarP(&changesNeeded, "changesneeded", "x", false, "fetch only PRs where changes have been requested")
+	myGetSubCmd.PersistentFlags().BoolVar(&assignedOnly, "assigned", false, "fetch only PRs assigned to you")
+	myGetSubCmd.PersistentFlags().BoolVarP(&forCurrentBranch, "current", "b", false, "fetch the PR, if one exists, for your current working branch")
 
 	gitMyPRs.AddCommand(myWherePRSubCmd)
 	// flags
