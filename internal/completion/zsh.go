@@ -44,6 +44,6 @@ func ZshInstall(path string) error {
 }
 
 func confirmZshShellCompletionEnabled() bool {
-	zshAutoEnabled := gui.ConfirmPrompt("is zsh shell completion enabled?", `you can check this by searching for echo "autoload -U compinit; compinit" in your .zshrc file`, true)
+	zshAutoEnabled := gui.ConfirmPrompt("is zsh shell completion enabled?", `you can check this by searching for echo "autoload -U compinit; compinit" in your .zshrc file`, true, true)
 	return zshAutoEnabled
 }

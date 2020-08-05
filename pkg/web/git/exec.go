@@ -44,3 +44,72 @@ func CloneRepository(name string, sshURL string, path string) error {
 	fmt.Fprintln(os.Stdout)
 	return nil
 }
+
+// CurrentBranch returns the name of the branch in the current working directory
+func CurrentBranch() (string, error) {
+	inWorkTree, err := utils.BashExec("git rev-parse --is-inside-work-tree")
+	if err != nil {
+		return "", err
+	}
+
+	if inWorkTree != "true" {
+		return "", errors.New("no git work tree found")
+	}
+
+	currentBranch, err := utils.BashExec("git rev-parse --abbrev-ref HEAD")
+	if err != nil {
+		return "", err
+	}
+
+	return currentBranch, nil
+}
+
+// CurrentRepositoryOrganization parses the local git config's remote.origin.url to determine the 'organization' or top-level 'user' of a repository
+func CurrentRepositoryOrganization() (string, error) {
+	var (
+		org      string
+		gitSplit string
+	)
+
+	currentRemoteOriginURL, err := utils.BashExec("git config --local --get remote.origin.url")
+	if err != nil {
+		return "", err
+	}
+
+	if len(currentRemoteOriginURL) == 0 {
+		return "", errors.New("could not fetch the remote origin URL of your current working directory's repository")
+	}
+
+	switch strings.Contains(currentRemoteOriginURL, "https") {
+	case true:
+		// https, like: https://github.com/kathleenfrench/pls.git
+		gitSplit = strings.Split(currentRemoteOriginURL, "https://github.com/")[1]
+	case false:
+		// ssh, like: git@github.com:kathleenfrench/pls.git
+		gitSplit = strings.Split(currentRemoteOriginURL, "git@github.com:")[1]
+	}
+
+	org = strings.Split(gitSplit, "/")[0]
+	return org, nil
+}
+
+// CurrentRepositoryName returns the name of the repository of the current working directory from any of its subdirectories
+func CurrentRepositoryName() (string, error) {
+	currentRepo, err := utils.BashExec("basename -s .git `git config --local --get remote.origin.url`")
+	if err != nil {
+		return "", fmt.Errorf("%s - you have to be in a git repository to run this", err)
+	}
+
+	if len(currentRepo) == 0 {
+		return "", errors.New("could not determine the name of this git repository")
+	}
+
+	return currentRepo, nil
+}
+
+// RemoteRefExists returns a bool for whether a remote reference to a pull request exists
+func RemoteRefExists(ref string) bool {
+	check := exec.Command("git", "show-ref", "--verify", "--quiet", fmt.Sprintf("refs/remotes/origin/%s", ref))
+	err := check.Run()
+	return err == nil
+}

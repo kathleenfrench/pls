@@ -9,7 +9,11 @@ import (
 )
 
 // SelectPromptWithResponse creates a dropdown selection prompt and records the user's choice
-func SelectPromptWithResponse(label string, options []string) string {
+func SelectPromptWithResponse(label string, options []string, disableClear bool) string {
+	if !disableClear {
+		clearScreen()
+	}
+
 	var selection string
 	var pageSize = len(options)
 
@@ -32,7 +36,11 @@ func SelectPromptWithResponse(label string, options []string) string {
 }
 
 // ConfirmPrompt prompts the user for a yes/no response to a question, records then returns their response
-func ConfirmPrompt(label string, helpMessage string, defaultVal bool) bool {
+func ConfirmPrompt(label string, helpMessage string, defaultVal bool, disableClear bool) bool {
+	if !disableClear {
+		clearScreen()
+	}
+
 	var response bool
 	prompt := &survey.Confirm{
 		Message: label,
@@ -45,7 +53,11 @@ func ConfirmPrompt(label string, helpMessage string, defaultVal bool) bool {
 }
 
 // InputPromptWithResponse accepts a user's typed input to a question as a response
-func InputPromptWithResponse(label string, defaultVal string) string {
+func InputPromptWithResponse(label string, defaultVal string, disableClear bool) string {
+	if !disableClear {
+		clearScreen()
+	}
+
 	var response string
 	prompt := &survey.Input{
 		Message: label,

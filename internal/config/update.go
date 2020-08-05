@@ -58,7 +58,7 @@ func UpdatePrompt(viperSettings map[string]interface{}) error {
 	v := viper.GetViper()
 	keys := viper.AllKeys()
 	uiKeys, uiKeyMap := genGuiKeyMap(keys)
-	choice := gui.SelectPromptWithResponse("which config value do you want to change?", uiKeys)
+	choice := gui.SelectPromptWithResponse("which config value do you want to change?", uiKeys, false)
 	choiceKey := uiKeyMap[choice]
 
 	switch choiceKey {
@@ -73,11 +73,11 @@ func UpdatePrompt(viperSettings map[string]interface{}) error {
 		}
 
 		// check if they want to edit an existing value
-		editExisting := gui.ConfirmPrompt("do you want to modify an existing url?", "", false)
+		editExisting := gui.ConfirmPrompt("do you want to modify an existing url?", "", false, true)
 		if editExisting {
 			shortKeys := utils.GetKeysFromMapString(shorts)
-			editWhich := gui.SelectPromptWithResponse("which do you want to change?", shortKeys)
-			changedValue = gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", editWhich), "")
+			editWhich := gui.SelectPromptWithResponse("which do you want to change?", shortKeys, false)
+			changedValue = gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", editWhich), "", true)
 			v.Set(fmt.Sprintf("webshort.%s", editWhich), changedValue)
 		} else {
 			target, url := addNewWebShortcut()
@@ -85,22 +85,22 @@ func UpdatePrompt(viperSettings map[string]interface{}) error {
 			changedValue = url
 		}
 	case defaultCodepathKey:
-		rel := gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", choice), "")
+		rel := gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", choice), "", true)
 		home, err := homedir.Dir()
 		if err != nil {
 			utils.ExitWithError(err)
 		}
 
 		changedValue := fmt.Sprintf("%s/%s", home, rel)
-		confirmChange := gui.ConfirmPrompt(fmt.Sprintf("is %s the correct path?", changedValue), "", true)
+		confirmChange := gui.ConfirmPrompt(fmt.Sprintf("is %s the correct path?", changedValue), "", true, true)
 		if !confirmChange {
-			retry := gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", choice), "")
+			retry := gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", choice), "", true)
 			changedValue = fmt.Sprintf("%s/%s", home, retry)
 		}
 
 		v.Set(choiceKey, changedValue)
 	default:
-		changedValue = gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", choice), "")
+		changedValue = gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", choice), "", true)
 		v.Set(choiceKey, changedValue)
 	}
 

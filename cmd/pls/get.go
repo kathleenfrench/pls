@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-//--------------------------------------- COMMANDS
+// ------------------------------------------------------
 
 var getCmd = &cobra.Command{
 	Use:     "get",
@@ -19,11 +19,7 @@ var getCmd = &cobra.Command{
 	Short:   "shorthand for `git` in most cases, but can also get you other stuff",
 }
 
-var myGetSubCmd = &cobra.Command{
-	Use:     "my",
-	Aliases: []string{"m"},
-	Short:   "fetch your stuff specifically",
-}
+// --------------------------- ORGANIZATIONS
 
 var gitOrgs = &cobra.Command{
 	Use:     "orgs",
@@ -41,37 +37,7 @@ var gitOrgs = &cobra.Command{
 	},
 }
 
-var gitMyRepos = &cobra.Command{
-	Use:     "repos",
-	Aliases: []string{"r", "repositories", "repo", "repository"},
-	Short:   "interact with your github repositories",
-	Example: color.HiYellowString("pls get my repos"),
-	Run: func(cmd *cobra.Command, args []string) {
-		repos, err := gitpls.FetchUserRepos("", plsCfg.GitToken)
-		if err != nil {
-			utils.ExitWithError(err)
-		}
-
-		choice := gitpls.CreateGitRepoDropdown(repos)
-		_ = gitpls.ChooseWhatToDoWithRepo(choice, plsCfg)
-	},
-}
-
-var gitMyOrgs = &cobra.Command{
-	Use:     "orgs",
-	Aliases: []string{"o", "org", "organization", "organizations"},
-	Short:   "interact with your github organizations",
-	Example: color.HiYellowString("pls get my orgs"),
-	Run: func(cmd *cobra.Command, args []string) {
-		orgs, err := gitpls.FetchOrganizations("", plsCfg.GitToken)
-		if err != nil {
-			utils.ExitWithError(err)
-		}
-
-		choice := gitpls.CreateGitOrganizationsDropdown(orgs)
-		_ = gitpls.ChooseWithToDoWithOrganization(choice, plsCfg)
-	},
-}
+// --------------------------- REPOS
 
 var repoFetchTypeChecker = map[string]string{
 	"by":     "other_user",
@@ -137,16 +103,11 @@ var gitRepos = &cobra.Command{
 	},
 }
 
-//--------------------------------------- INIT
+// ------------------------------------------------------
+// INIT
+// ------------------------------------------------------
 
 func init() {
-	getCmd.AddCommand(myGetSubCmd)
-
-	// get only yours
-	myGetSubCmd.AddCommand(gitMyOrgs)
-	myGetSubCmd.AddCommand(gitMyRepos)
-
-	// get someone else's
 	getCmd.AddCommand(gitOrgs)
 	getCmd.AddCommand(gitRepos)
 }

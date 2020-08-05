@@ -11,3 +11,12 @@ const exitSelections = "Exit"
 
 // getOrganizationRepos is a selection choice
 const getOrganizationRepos = "Get Organization Repositories"
+
+// openDiff is a selection choice
+const openDiff = "Open Diff"
+
+// readBodyText is a selection choice
+const readBodyText = "Read Body Text"
+
+// returnToMenu is a selection choice
+const returnToMenu = "Return to Menu"

@@ -40,21 +40,21 @@ func checkForUnsetRequiredDefaults() bool {
 			viper.Set(githubUsernameKey, usernameCheck)
 		} else {
 			unsetFound = true
-			gu := gui.InputPromptWithResponse("what is your github username?", "")
+			gu := gui.InputPromptWithResponse("what is your github username?", "", true)
 			viper.Set(githubUsernameKey, gu)
 		}
 	}
 
 	if unset(viper.Get(githubTokenKey)) {
 		unsetFound = true
-		gt := gui.InputPromptWithResponse("what is your github token?", "")
+		gt := gui.InputPromptWithResponse("what is your github token?", "", true)
 		viper.Set(githubTokenKey, gt)
 	}
 
 	if unset(viper.Get(nameKey)) {
 		whoami, _ := utils.BashExec("whoami")
 		unsetFound = true
-		nm := gui.InputPromptWithResponse("what's your name?", whoami)
+		nm := gui.InputPromptWithResponse("what's your name?", whoami, true)
 		viper.Set(nameKey, nm)
 	}
 
@@ -72,7 +72,7 @@ func checkForUnsetRequiredDefaults() bool {
 		}
 
 		home = fmt.Sprintf("%s/", home)
-		codePath := gui.InputPromptWithResponse(fmt.Sprintf("what is the relative path from %s you want repos cloned?", home), "")
+		codePath := gui.InputPromptWithResponse(fmt.Sprintf("what is the relative path from %s you want repos cloned?", home), "", true)
 		codePath = fmt.Sprintf("%s%s", home, codePath)
 		color.Red(fmt.Sprintf("codepath: %s", codePath))
 		viper.Set(defaultCodepathKey, codePath)
