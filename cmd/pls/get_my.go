@@ -164,8 +164,8 @@ var gitMyPRs = &cobra.Command{
 				gui.Exit()
 			}
 
-			pr, prName := gitpls.CreateGitIssuesDropdown(prs)
-			_ = gitpls.ChooseWhatToDoWithIssue(pr, prName, true, plsCfg)
+			pr, prMeta := gitpls.CreateGitIssuesDropdown(prs)
+			_ = gitpls.ChooseWhatToDoWithIssue(pr, prMeta, plsCfg)
 		case 1:
 			// everywhere check
 			single := args[0]
@@ -185,8 +185,8 @@ var gitMyPRs = &cobra.Command{
 				gui.Exit()
 			}
 
-			pr, prName := gitpls.CreateGitIssuesDropdown(prs)
-			_ = gitpls.ChooseWhatToDoWithIssue(pr, prName, true, plsCfg)
+			pr, prMeta := gitpls.CreateGitIssuesDropdown(prs)
+			_ = gitpls.ChooseWhatToDoWithIssue(pr, prMeta, plsCfg)
 		case 2:
 			// pls get my prs in <repo> (owned)
 			// pls get my prs in <org>/<repo> (organization/another person's repo)
@@ -220,8 +220,8 @@ var gitMyPRs = &cobra.Command{
 				gui.Exit()
 			}
 
-			pr, prName := gitpls.CreateGitIssuesDropdown(prs)
-			_ = gitpls.ChooseWhatToDoWithIssue(pr, prName, true, plsCfg)
+			pr, prMeta := gitpls.CreateGitIssuesDropdown(prs)
+			_ = gitpls.ChooseWhatToDoWithIssue(pr, prMeta, plsCfg)
 		default:
 			utils.ExitWithError("invalid input, try running `pls get my prs --help`")
 		}

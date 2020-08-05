@@ -14,3 +14,6 @@ const getOrganizationRepos = "Get Organization Repositories"
 
 // openDiff is a selection choice
 const openDiff = "Open Diff"
+
+// readBodyText is a selection choice
+const readBodyText = "Read Body Text"
