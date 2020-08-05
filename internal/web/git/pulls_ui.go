@@ -51,6 +51,7 @@ func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings conf
 		htmlURL string
 		pr      *github.PullRequest
 		body    string
+		title   string
 	)
 
 	opts := []string{openInBrowser, readBodyText}
@@ -68,9 +69,11 @@ func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings conf
 
 		pr = prFetch
 		body = pr.GetBody()
+		title = pr.GetTitle()
 	} else {
 		htmlURL = issue.GetHTMLURL()
 		body = issue.GetBody()
+		title = issue.GetTitle()
 	}
 
 	// add exit option last
@@ -79,7 +82,8 @@ func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings conf
 
 	switch selected {
 	case readBodyText:
-		fmt.Println(gui.RenderMarkdown(body))
+		render := fmt.Sprintf("# %s\n\n%s", title, body)
+		fmt.Println(gui.RenderMarkdown(render))
 		return nextOpts(issue, meta, settings)
 	case openInBrowser:
 		if isPullRequest {
