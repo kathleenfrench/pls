@@ -2,6 +2,7 @@ package pls
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/fatih/color"
 	gitpls "github.com/kathleenfrench/pls/internal/web/git"
@@ -152,7 +153,7 @@ var gitMyPRs = &cobra.Command{
 			getterFlags.Repository = repo
 
 			gui.Spin.Start()
-			prs, err := gitpls.FetchPullRequestsFromCWDRepo(plsCfg, getterFlags)
+			prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
 			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
@@ -172,9 +173,8 @@ var gitMyPRs = &cobra.Command{
 				utils.ExitWithError(fmt.Sprintf("%s is not a valid argument", single))
 			}
 
-			// TODO - ADD FLAGS
 			gui.Spin.Start()
-			prs, err := gitpls.FetchUserPullRequestsEverywhere(plsCfg, getterFlags)
+			prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
 			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
@@ -190,6 +190,38 @@ var gitMyPRs = &cobra.Command{
 		case 2:
 			// pls get my prs in <repo> (owned)
 			// pls get my prs in <org>/<repo> (organization/another person's repo)
+			in := args[0]
+			target := args[1]
+
+			if in != "in" {
+				utils.ExitWithError(fmt.Sprintf("%s %s is not a valid input", in, target))
+			}
+
+			// determine whether we're searching their @username's repo or another
+			if strings.Contains(target, "/") {
+				sp := strings.Split(target, "/")
+				getterFlags.Organization = sp[0]
+				getterFlags.Repository = sp[1]
+			} else {
+				getterFlags.Organization = plsCfg.GitUsername
+				getterFlags.Repository = target
+			}
+
+			color.HiBlue("searching %s/%s...", getterFlags.Organization, getterFlags.Repository)
+			gui.Spin.Start()
+			prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
+			gui.Spin.Stop()
+			if err != nil {
+				utils.ExitWithError(err)
+			}
+
+			if len(prs) == 0 {
+				color.HiYellow("no PRs found matching that criteria!")
+				gui.Exit()
+			}
+
+			pr, prName := gitpls.CreateGitIssuesDropdown(prs)
+			_ = gitpls.ChooseWhatToDoWithIssue(pr, prName, true, plsCfg)
 		default:
 			utils.ExitWithError("invalid input, try running `pls get my prs --help`")
 		}

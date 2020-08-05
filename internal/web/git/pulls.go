@@ -48,8 +48,8 @@ type PullsGetterFlags struct {
 	*MetaGetterFlags
 }
 
-// FetchUserPullRequestsEverywhere search all of github for user's pull requests
-func FetchUserPullRequestsEverywhere(settings config.Settings, getterFlags *PullsGetterFlags) ([]*github.Issue, error) {
+// FetchPullRequests search all of github for user's pull requests based on search criteria
+func FetchPullRequests(settings config.Settings, getterFlags *PullsGetterFlags) ([]*github.Issue, error) {
 	var allPRs []*github.Issue
 
 	opts := github.SearchOptions{
@@ -127,35 +127,4 @@ func (g *PullsGetterFlags) constructMyPRSearchQuery() string {
 	}
 
 	return query
-}
-
-// FetchPullRequestsFromCWDRepo parses information about your current working directory's git repository and queries git's API for PRs in that repository
-func FetchPullRequestsFromCWDRepo(settings config.Settings, getterFlags *PullsGetterFlags) ([]*github.Issue, error) {
-	var allPullsInRepo []*github.Issue
-
-	ctx := context.Background()
-	gc := git.NewClient(ctx, settings.GitToken)
-	query := getterFlags.constructMyPRSearchQuery()
-
-	opts := github.SearchOptions{
-		ListOptions: github.ListOptions{
-			PerPage: 100,
-		},
-	}
-
-	for {
-		prs, resp, err := gc.Search.Issues(ctx, query, &opts)
-		if err != nil {
-			return nil, err
-		}
-
-		allPullsInRepo = append(allPullsInRepo, prs.Issues...)
-		if resp.NextPage == 0 {
-			break
-		}
-
-		opts.Page = resp.NextPage
-	}
-
-	return allPullsInRepo, nil
 }
