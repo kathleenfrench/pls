@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/kathleenfrench/pls/pkg/utils"
 )
 
@@ -80,13 +82,19 @@ func CurrentRepositoryOrganization() (string, error) {
 		return "", errors.New("could not fetch the remote origin URL of your current working directory's repository")
 	}
 
+	gitBaseCheck := regexp.MustCompile(`github.*.com`)
+	val := gitBaseCheck.FindString(currentRemoteOriginURL)
+	color.HiRed("val: %v", val)
+
 	switch strings.Contains(currentRemoteOriginURL, "https") {
 	case true:
 		// https, like: https://github.com/kathleenfrench/pls.git
-		gitSplit = strings.Split(currentRemoteOriginURL, "https://github.com/")[1]
+		base := fmt.Sprintf("https://%s/", val)
+		gitSplit = strings.Split(currentRemoteOriginURL, base)[1]
 	case false:
 		// ssh, like: git@github.com:kathleenfrench/pls.git
-		gitSplit = strings.Split(currentRemoteOriginURL, "git@github.com:")[1]
+		base := fmt.Sprintf("git@%s:", val)
+		gitSplit = strings.Split(currentRemoteOriginURL, base)[1]
 	}
 
 	org = strings.Split(gitSplit, "/")[0]

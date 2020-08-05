@@ -2,6 +2,7 @@ package git
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/go-github/v32/github"
 	"golang.org/x/oauth2"
@@ -18,4 +19,22 @@ func NewClient(ctx context.Context, token string) *github.Client {
 	tc := oauth2.NewClient(ctx, ts)
 	client := github.NewClient(tc)
 	return client
+}
+
+// NewEnterpriseClient creates a new github enterprise client
+func NewEnterpriseClient(ctx context.Context, baseURL string, token string) (*github.Client, error) {
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{
+			AccessToken: token,
+		},
+	)
+
+	tc := oauth2.NewClient(ctx, ts)
+	uploadURL := fmt.Sprintf("https://%s/api/uploads/", baseURL)
+	client, err := github.NewEnterpriseClient(baseURL, uploadURL, tc)
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
 }
