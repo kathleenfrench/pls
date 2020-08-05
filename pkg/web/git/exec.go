@@ -64,11 +64,40 @@ func CurrentBranch() (string, error) {
 	return currentBranch, nil
 }
 
+// CurrentRepositoryOrganization parses the local git config's remote.origin.url to determine the 'organization' or top-level 'user' of a repository
+func CurrentRepositoryOrganization() (string, error) {
+	var (
+		org      string
+		gitSplit string
+	)
+
+	currentRemoteOriginURL, err := utils.BashExec("git config --local --get remote.origin.url")
+	if err != nil {
+		return "", err
+	}
+
+	if len(currentRemoteOriginURL) == 0 {
+		return "", errors.New("could not fetch the remote origin URL of your current working directory's repository")
+	}
+
+	switch strings.Contains(currentRemoteOriginURL, "https") {
+	case true:
+		// https, like: https://github.com/kathleenfrench/pls.git
+		gitSplit = strings.Split(currentRemoteOriginURL, "https://github.com/")[1]
+	case false:
+		// ssh, like: git@github.com:kathleenfrench/pls.git
+		gitSplit = strings.Split(currentRemoteOriginURL, "git@github.com:")[1]
+	}
+
+	org = strings.Split(gitSplit, "/")[0]
+	return org, nil
+}
+
 // CurrentRepositoryName returns the name of the repository of the current working directory from any of its subdirectories
 func CurrentRepositoryName() (string, error) {
-	currentRepo, err := utils.BashExec("basename -s .git `git config --get remote.origin.url`")
+	currentRepo, err := utils.BashExec("basename -s .git `git config --local --get remote.origin.url`")
 	if err != nil {
-		return "", errors.New("you have to be in a git repository to run this")
+		return "", fmt.Errorf("%s - you have to be in a git repository to run this", err)
 	}
 
 	if len(currentRepo) == 0 {

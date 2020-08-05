@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-//--------------------------------------- COMMANDS
+// ------------------------------------------------------
 
 var getCmd = &cobra.Command{
 	Use:     "get",
@@ -19,11 +19,7 @@ var getCmd = &cobra.Command{
 	Short:   "shorthand for `git` in most cases, but can also get you other stuff",
 }
 
-var myGetSubCmd = &cobra.Command{
-	Use:     "my",
-	Aliases: []string{"m"},
-	Short:   "fetch your stuff specifically",
-}
+// --------------------------- ORGANIZATIONS
 
 var gitOrgs = &cobra.Command{
 	Use:     "orgs",
@@ -41,77 +37,7 @@ var gitOrgs = &cobra.Command{
 	},
 }
 
-var gitMyRepos = &cobra.Command{
-	Use:     "repos",
-	Aliases: []string{"r", "repositories", "repo", "repository"},
-	Short:   "interact with your github repositories",
-	Example: color.HiYellowString("pls get my repos"),
-	Run: func(cmd *cobra.Command, args []string) {
-		repos, err := gitpls.FetchUserRepos("", plsCfg.GitToken)
-		if err != nil {
-			utils.ExitWithError(err)
-		}
-
-		choice := gitpls.CreateGitRepoDropdown(repos)
-		_ = gitpls.ChooseWhatToDoWithRepo(choice, plsCfg)
-	},
-}
-
-var gitMyOrgs = &cobra.Command{
-	Use:     "orgs",
-	Aliases: []string{"o", "org", "organization", "organizations"},
-	Short:   "interact with your github organizations",
-	Example: color.HiYellowString("pls get my orgs"),
-	Run: func(cmd *cobra.Command, args []string) {
-		orgs, err := gitpls.FetchOrganizations("", plsCfg.GitToken)
-		if err != nil {
-			utils.ExitWithError(err)
-		}
-
-		choice := gitpls.CreateGitOrganizationsDropdown(orgs)
-		_ = gitpls.ChooseWithToDoWithOrganization(choice, plsCfg)
-	},
-}
-
-// pls get prs to review (current) | (in <>) | <everywhere>
-// pls get prs i merged (current) | (in <>) | <everywhere>
-// pls get prs i closed (current) | (in <>) | <everywhere>
-
-var gitMyPRs = &cobra.Command{
-	Use:     "prs",
-	Aliases: []string{"pulls", "pull", "pr"},
-	Short:   "interact with your pull requests",
-	Example: color.HiYellowString("\n[PRs in current directory's repository]: pls get my prs\n[PRs in a repository you own]: pls get my prs in myrepo\n[PRs in another's repository]: pls get my prs in organization/repo\n[PRs from all of github]: pls get my prs everywhere"),
-	Run: func(cmd *cobra.Command, args []string) {
-		switch len(args) {
-		case 0:
-		case 1:
-			// everywhere check
-			single := args[0]
-			if single != "everywhere" && single != "all" {
-				utils.ExitWithError(fmt.Sprintf("%s is not a valid argument", single))
-			}
-
-			// TODO - ADD FLAGS
-			opts := &gitpls.PullGetterFlags{}
-
-			gui.Spin.Start()
-			prs, err := gitpls.FetchUserPullRequestsEverywhere(plsCfg, opts)
-			gui.Spin.Stop()
-			if err != nil {
-				utils.ExitWithError(err)
-			}
-
-			pr, prName := gitpls.CreateGitIssuesDropdown(prs)
-			_ = gitpls.ChooseWhatToDoWithIssue(pr, prName, true, plsCfg)
-		case 2:
-			// pls get my prs in <repo> (owned)
-			// pls get my prs in <org>/<repo> (organization/another person's repo)
-		default:
-			utils.ExitWithError("invalid input, try running `pls get my prs --help`")
-		}
-	},
-}
+// --------------------------- REPOS
 
 var repoFetchTypeChecker = map[string]string{
 	"by":     "other_user",
@@ -177,17 +103,11 @@ var gitRepos = &cobra.Command{
 	},
 }
 
-//--------------------------------------- INIT
+// ------------------------------------------------------
+// INIT
+// ------------------------------------------------------
 
 func init() {
-	getCmd.AddCommand(myGetSubCmd)
-
-	// get only yours
-	myGetSubCmd.AddCommand(gitMyOrgs)
-	myGetSubCmd.AddCommand(gitMyRepos)
-	myGetSubCmd.AddCommand(gitMyPRs)
-
-	// get someone else's
 	getCmd.AddCommand(gitOrgs)
 	getCmd.AddCommand(gitRepos)
 }

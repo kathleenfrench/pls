@@ -11,15 +11,59 @@ import (
 	"github.com/kathleenfrench/pls/pkg/web/git"
 )
 
-// PullRequestSearchFlags are optional flags that can be set on a PR search
-type PullRequestSearchFlags struct {
-	Closed   bool
-	Language string
-	Draft    bool
+// MyPullsGetterFlags are evaluated based off of flags/arguments set by the user when searching pull requests of the current user (author:@me)
+// see: https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests
+type MyPullsGetterFlags struct {
+	// basics
+	Repository   string // repo:USERNAME/REPOSITORY || example: repo:mozilla/shumway matches issues from @mozilla's shumway project
+	Organization string // org:ORGNAME | example: org:github matches issues in repositories owned by the GitHub organization
+	User         string // user:USERNAME | example: user:defunkt ubuntu matches issues with the word "ubuntu" from repositories owned by @defunkt
+
+	// searching text
+	Match       bool   // pls get my prs --match <title|body|comments> [text to search for]
+	InTitleText string // in:title | example: warning in:title matches issues with "warning" in their title.
+	InBodyText  string // in:body | example: error in:title,body matches issues with "error" in their title or body.
+	InComments  string // in:comments | shipit in:comments matches issues mentioning "shipit" in their comments.
+
+	// state
+
+	// inclusions
+	IncludeClosed bool
+	ClosedOnly    bool
+	MergedOnly    bool
+	DraftsOnly    bool
+	MergeableOnly bool
+
+	// review statuses
+	PendingApproval  bool
+	Approved         bool
+	ChangesRequested bool
+
+	*MetaGetterFlags
+}
+
+// MetaGetterFlags are used for top-level search preferences
+type MetaGetterFlags struct {
+	PerPage int // default: 100
+	Page    int // if you want to query a specific page
+	/**
+	// How to sort the search results. Possible values are:
+	//   - for repositories: stars, fork, updated
+	//   - for commits: author-date, committer-date
+	//   - for code: indexed
+	//   - for issues: comments, created, updated
+	//   - for users: followers, repositories, joined
+	//
+	// Default is to sort by best match.
+	// ref: https://github.com/google/go-github/blob/master/github/search.go
+	*/
+	SortBy            string
+	Order             string // asc, desc (default: desc)
+	TextMatchMetadata bool   // fetch text match metadata with a query
 }
 
 // FetchUserPullRequestsEverywhere search all of github for user's pull requests
-func FetchUserPullRequestsEverywhere(settings config.Settings, gettFlags *PullGetterFlags) ([]*github.Issue, error) {
+func FetchUserPullRequestsEverywhere(settings config.Settings, getterFlags *MyPullsGetterFlags) ([]*github.Issue, error) {
 	var allPRs []*github.Issue
 
 	opts := github.SearchOptions{
@@ -51,21 +95,46 @@ func FetchUserPullRequestsEverywhere(settings config.Settings, gettFlags *PullGe
 	return allPRs, nil
 }
 
-// PullGetterFlags are evaluated based off of flags/arguments set by the user
-type PullGetterFlags struct {
-	IncludeClosed    bool // pls get my prs --all|a
-	ClosedOnly       bool // pls get my prs --only closed|c
-	MergedOnly       bool // pls get my prs --only merged|mg
-	DraftsOnly       bool // pls get my prs --only drafts|d | pls get my prs --only closed drafts
-	MergeableOnly    bool // pls get my prs --only mergeable|mgbl
-	PendingApproval  bool // pls get my prs --status pending|p
-	Approved         bool // pls get my prs --status approved|a
-	ChangesRequested bool // pls get my prs --status changesrequested|cr
+func constructMyPRSearchQuery(getter *MyPullsGetterFlags) string {
+	query := fmt.Sprintf("author:@me type:pr")
+	return query
 }
 
 // FetchPullRequestsFromCWDRepo parses information about your current working directory's git repository and queries git's API for PRs in that repository
-func FetchPullRequestsFromCWDRepo(settings config.Settings, getterFlags *PullGetterFlags) ([]*github.PullRequest, error) {
-	return nil, nil
+func FetchPullRequestsFromCWDRepo(settings config.Settings, getterFlags *MyPullsGetterFlags) ([]*github.Issue, error) {
+	var allPullsInRepo []*github.Issue
+
+	ctx := context.Background()
+	gc := git.NewClient(ctx, settings.GitToken)
+	query := "author:@me type: pr"
+
+	// state defined
+	// 		endpoint = fmt.Sprintf("/search/issues?q=author:%s+type:pr+repo:%s/%s+state:%s&sort=updated&order=desc", author, org, repo, state)
+
+	// state not defined
+	// 		endpoint = fmt.Sprintf("/search/issues?q=author:%s+type:pr+repo:%s/%s&sort=updated&order=desc", author, org, repo)
+
+	opts := github.SearchOptions{
+		ListOptions: github.ListOptions{
+			PerPage: 100,
+		},
+	}
+
+	for {
+		prs, resp, err := gc.Search.Issues(ctx, query, &opts)
+		if err != nil {
+			return nil, err
+		}
+
+		allPullsInRepo = append(allPullsInRepo, prs.Issues...)
+		if resp.NextPage == 0 {
+			break
+		}
+
+		opts.Page = resp.NextPage
+	}
+
+	return allPullsInRepo, nil
 }
 
 // CreateGitIssuesDropdown creates a GUI dropdown of issues - PRs are considered an issue per the searchservice in the go-github pkg, so we use this for PR search results as well, returns our custom, readable name
