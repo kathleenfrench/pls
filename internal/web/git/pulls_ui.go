@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/fatih/color"
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/gui"
@@ -51,6 +50,7 @@ func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings conf
 	var (
 		htmlURL string
 		pr      *github.PullRequest
+		body    string
 	)
 
 	opts := []string{openInBrowser, readBodyText}
@@ -67,8 +67,10 @@ func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings conf
 		}
 
 		pr = prFetch
+		body = pr.GetBody()
 	} else {
 		htmlURL = issue.GetHTMLURL()
+		body = issue.GetBody()
 	}
 
 	// add exit option last
@@ -77,12 +79,7 @@ func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings conf
 
 	switch selected {
 	case readBodyText:
-		if isPullRequest {
-			color.HiBlue(pr.GetBody())
-		} else {
-			color.HiBlue(issue.GetBody())
-		}
-
+		fmt.Println(gui.RenderMarkdown(body))
 		return nextOpts(issue, meta, settings)
 	case openInBrowser:
 		if isPullRequest {
