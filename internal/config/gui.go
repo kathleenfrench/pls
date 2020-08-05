@@ -57,9 +57,9 @@ func promptForDefaultEditor() string {
 }
 
 func addNewWebShortcut() (string, string) {
-	target := gui.InputPromptWithResponse("what do you want to name the shortcut?", "")
+	target := gui.InputPromptWithResponse("what do you want to name the shortcut?", "", false)
 
-	url := gui.InputPromptWithResponse(fmt.Sprintf("what is the shortcut url you want to set for %s?", target), "")
+	url := gui.InputPromptWithResponse(fmt.Sprintf("what is the shortcut url you want to set for %s?", target), "", false)
 
 	if target == "" || url == "" {
 		utils.ExitWithError("missing required values")

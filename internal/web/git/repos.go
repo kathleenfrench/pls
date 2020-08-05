@@ -51,7 +51,7 @@ func ChooseWhatToDoWithRepo(repository *github.Repository, settings config.Setti
 		case "Current Directory":
 			clonePath = ""
 		case "Custom Directory":
-			clonePath = gui.InputPromptWithResponse(fmt.Sprintf("what is the *full* path to the directory?"), "")
+			clonePath = gui.InputPromptWithResponse(fmt.Sprintf("what is the *full* path to the directory?"), "", true)
 		}
 
 		err := git.CloneRepository(repository.GetName(), repository.GetCloneURL(), clonePath)
