@@ -3,7 +3,6 @@ package gitpls
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/internal/config"
@@ -51,11 +50,21 @@ func FetchUserPullRequestsEverywhere(settings config.Settings) ([]*github.Issue,
 	return allPRs, nil
 }
 
-func extractOrganizationAndRepoNameFromRepoURL(url string) (organization string, repo string) {
-	// example RepositoryURL: "https://api.github.com/repos/counterThreat/chess_app",
-	splitAfter := strings.SplitAfter(url, "repos/")
-	orgSplit := strings.Split(splitAfter[1], "/")
-	return orgSplit[0], orgSplit[1]
+// PullGetterFlags are evaluated based off of flags/arguments set by the user
+type PullGetterFlags struct {
+	IncludeClosed    bool // pls get my prs --all|a
+	ClosedOnly       bool // pls get my prs --only closed|c
+	MergedOnly       bool // pls get my prs --only merged|mg
+	DraftsOnly       bool // pls get my prs --only drafts|d | pls get my prs --only closed drafts
+	MergeableOnly    bool // pls get my prs --only mergeable|mgbl
+	PendingApproval  bool // pls get my prs --status pending|p
+	Approved         bool // pls get my prs --status approved|a
+	ChangesRequested bool // pls get my prs --status changesrequested|cr
+}
+
+// FetchPullRequestsFromCWDRepo parses information about your current working directory's git repository and queries git's API for PRs in that repository
+func FetchPullRequestsFromCWDRepo(settings config.Settings, getterFlags *PullGetterFlags) ([]*github.PullRequest, error) {
+	return nil, nil
 }
 
 // CreateGitIssuesDropdown creates a GUI dropdown of issues - PRs are considered an issue per the searchservice in the go-github pkg, so we use this for PR search results as well, returns our custom, readable name
@@ -64,7 +73,7 @@ func CreateGitIssuesDropdown(issues []*github.Issue) (*github.Issue, string) {
 	nameMap := make(map[string]*github.Issue)
 	for _, i := range issues {
 		r := i.GetRepositoryURL()
-		org, repo := extractOrganizationAndRepoNameFromRepoURL(r)
+		org, repo := git.ExtractOrganizationAndRepoNameFromRepoURL(r)
 		name := fmt.Sprintf("[%s/%s]: %s", org, repo, i.GetTitle())
 		names = append(names, name)
 		nameMap[name] = i
