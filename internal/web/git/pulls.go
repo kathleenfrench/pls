@@ -31,11 +31,9 @@ type PullsGetterFlags struct {
 	// inclusions
 	ForCurrentBranch bool
 	AssignedOnly     bool
-	IncludeClosed    bool
 	ClosedOnly       bool
 	MergedOnly       bool
 	DraftsOnly       bool
-	MergeableOnly    bool
 
 	// values set given flags used
 	State         string
@@ -97,6 +95,30 @@ func (g *PullsGetterFlags) constructMyPRSearchQuery() string {
 
 	if g.ForCurrentBranch && g.CurrentBranch != "" {
 		query += fmt.Sprintf(" head:%s", g.CurrentBranch)
+	}
+
+	if g.DraftsOnly {
+		query += " draft:true"
+	}
+
+	if g.AssignedOnly {
+		query += fmt.Sprintf(" assignee:%s", g.Assignee)
+	}
+
+	if g.Approved {
+		query += " review:approved"
+	}
+
+	if g.ChangesRequested {
+		query += " review:changes_requested"
+	}
+
+	if g.PendingApproval {
+		query += " review:none"
+	}
+
+	if g.MergedOnly {
+		query += " is:merged"
 	}
 
 	color.HiGreen("query: %s", query)

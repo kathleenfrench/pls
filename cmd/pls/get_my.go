@@ -106,7 +106,7 @@ var gitMyPRs = &cobra.Command{
 			Author:           "@me",
 		}
 
-		if !getterFlags.ClosedOnly {
+		if !getterFlags.ClosedOnly && !getterFlags.MergedOnly {
 			getterFlags.State = "open"
 		} else {
 			getterFlags.State = "closed"
