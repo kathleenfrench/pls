@@ -104,7 +104,7 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 			return errors.New(result.GetMessage())
 		}
 
-		gui.Log(":party:", result.GetMessage(), result.GetSHA())
+		gui.Log(":balloon:", result.GetMessage(), result.GetSHA())
 	case closePR:
 		color.HiRed("TODO")
 	case closeIssue:
