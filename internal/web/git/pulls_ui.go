@@ -2,9 +2,11 @@ package gitpls
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 
+	"github.com/fatih/color"
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/gui"
@@ -55,10 +57,11 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 	)
 
 	opts := []string{openInBrowser, readBodyText}
+	ctx := context.Background()
 
 	isPullRequest := issue.IsPullRequest()
 	if isPullRequest {
-		opts = append(opts, openDiff)
+		opts = append(opts, openDiff, mergePullRequest, closePR)
 		htmlURL = issue.GetPullRequestLinks().GetHTMLURL()
 		prFetch, _, err := gc.PullRequests.Get(context.Background(), meta.Owner, meta.Repo, meta.Number)
 		if err != nil {
@@ -69,6 +72,7 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		body = pr.GetBody()
 		title = pr.GetTitle()
 	} else {
+		opts = append(opts, closeIssue)
 		htmlURL = issue.GetHTMLURL()
 		body = issue.GetBody()
 		title = issue.GetTitle()
@@ -76,13 +80,35 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 
 	// add exit option last
 	opts = append(opts, exitSelections)
-	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", meta.DisplayName), opts, false)
+	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", meta.DisplayName), opts, true)
 
 	switch selected {
 	case readBodyText:
 		render := fmt.Sprintf("# %s\n\n%s", title, body)
 		fmt.Println(gui.RenderMarkdown(render))
 		return nextOpts(gc, issue, meta, settings)
+	case mergePullRequest:
+		if !pr.GetMergeable() || pr.GetMergeableState() != "clean" {
+			return errors.New("this PR is currently not in a mergeable state")
+		}
+
+		// TODO: add support for squash, rebase (default is straight merge)
+		opts := github.PullRequestOptions{}
+
+		result, _, err := gc.PullRequests.Merge(ctx, meta.Owner, meta.Repo, pr.GetNumber(), "", &opts)
+		if err != nil {
+			return err
+		}
+
+		if !result.GetMerged() {
+			return errors.New(result.GetMessage())
+		}
+
+		gui.Log(":balloon:", result.GetMessage(), result.GetSHA())
+	case closePR:
+		color.HiRed("TODO")
+	case closeIssue:
+		color.HiRed("TODO")
 	case openInBrowser:
 		if isPullRequest {
 			utils.OpenURLInDefaultBrowser(htmlURL)
