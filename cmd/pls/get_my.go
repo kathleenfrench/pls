@@ -93,7 +93,10 @@ var gitMyRepos = &cobra.Command{
 		}
 
 		choice := gitpls.CreateGitRepoDropdown(repos)
-		_ = gitpls.ChooseWhatToDoWithRepo(choice, plsCfg)
+		err = gitpls.ChooseWhatToDoWithRepo(choice, plsCfg)
+		if err != nil {
+			utils.ExitWithError(err)
+		}
 	},
 }
 

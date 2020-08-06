@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
 	"github.com/google/go-github/v32/github"
+	"github.com/jedib0t/go-pretty/table"
 	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
@@ -28,8 +30,19 @@ func CreateGitRepoDropdown(repositories []*github.Repository) *github.Repository
 
 // ChooseWhatToDoWithRepo lets the user decide what to do with their chosen repo
 func ChooseWhatToDoWithRepo(repository *github.Repository, settings config.Settings) error {
+	rows := []table.Row{
+		{"full name", repository.GetFullName()},
+		{"description", repository.GetDescription()},
+		{"default branch", repository.GetDefaultBranch()},
+		{"created", humanize.Time(repository.GetCreatedAt().Time)},
+		{"updated", humanize.Time(repository.GetUpdatedAt().Time)},
+		{"language", repository.GetLanguage()},
+	}
+
+	gui.SideBySideTable(rows)
+
 	opts := []string{openInBrowser, cloneRepo, exitSelections}
-	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", repository.GetName()), opts, false)
+	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", repository.GetName()), opts, true)
 
 	switch selected {
 	case openInBrowser:
