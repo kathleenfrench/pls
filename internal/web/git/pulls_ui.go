@@ -120,11 +120,15 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 					closeIt := gui.ConfirmPrompt(fmt.Sprintf("are you sure you want to close %q?", title), "", false, true)
 					if closeIt {
 						pr.State = &untypedClosed
+					} else {
+						return nextOpts(gc, issue, meta, settings)
 					}
 				case stateClosed:
 					reOpenIt := gui.ConfirmPrompt(fmt.Sprintf("are you sure you want to re-open %q?", title), "", false, true)
 					if reOpenIt {
 						pr.State = &untypedOpen
+					} else {
+						return nextOpts(gc, issue, meta, settings)
 					}
 				}
 			}
