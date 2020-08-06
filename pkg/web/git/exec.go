@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/fatih/color"
+	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 )
 
@@ -187,26 +187,100 @@ func RemoteRefOfCurrentBranchExists() (bool, error) {
 	return RemoteRefExists(cb), nil
 }
 
-// HasUnpushedChangesOrCommits checks whether there are unpushed local commits
-func HasUnpushedChangesOrCommits() (bool, error) {
-	check, err := utils.BashExec("git diff")
-	if err != nil {
-		return false, err
-	}
-
-	if len(check) > 0 {
-		color.HiRed("uncommitted changes found!")
-		return true, nil
-	}
-
+func getStatus() (string, error) {
 	status, err := utils.BashExec("git status")
 	if err != nil {
+		return status, err
+	}
+
+	return status, nil
+}
+
+func gitAddAll() error {
+	gui.PleaseHold("adding changes", nil)
+	_, err := utils.BashExec("git add .")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func gitCommit() error {
+	commitMessage := gui.InputPromptWithResponse("add a commit message", "", true)
+	if commitMessage == "" {
+		gui.OhNo("you must enter a commit message to proceed")
+		return gitCommit()
+	}
+
+	_, err := utils.BashExec(fmt.Sprintf("git commit -am %q", commitMessage))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+const (
+	notStaged      = "changes not staged for commit"
+	needCommitting = "changes to be committed"
+	branchAhead    = "your branch is ahead"
+)
+
+// HasUnpushedChangesOrCommits checks whether there are unpushed local commits
+func HasUnpushedChangesOrCommits() (bool, error) {
+	status, err := getStatus()
+	if err != nil {
 		return false, err
 	}
 
-	if strings.Contains(status, "Changes to be committed") || strings.Contains(status, "Changes not staged for commit") {
-		changesFound := fmt.Sprintf("you have uncommitted and/or unstaged changes!\n%s", status)
-		return true, errors.New(changesFound)
+	normalizeStatus := strings.ToLower(status)
+
+	if strings.Contains(normalizeStatus, notStaged) {
+		confirmAddCommitPush := gui.ConfirmPrompt("you have un-added changes - want me to add, commit, and push them?", "", true, true)
+		if !confirmAddCommitPush {
+			gui.Exit()
+		}
+
+		err = gitAddAll()
+		if err != nil {
+			return false, err
+		}
+
+		err = gitCommit()
+		if err != nil {
+			return false, err
+		}
+
+		err = PushBranchToOrigin("")
+		if err != nil {
+			return false, err
+		}
+
+		return HasUnpushedChangesOrCommits()
+	}
+
+	if strings.Contains(normalizeStatus, needCommitting) {
+		err = gitCommit()
+		if err != nil {
+			return false, err
+		}
+
+		err = PushBranchToOrigin("")
+		if err != nil {
+			return false, err
+		}
+
+		return HasUnpushedChangesOrCommits()
+	}
+
+	if strings.Contains(normalizeStatus, branchAhead) {
+		err = PushBranchToOrigin("")
+		if err != nil {
+			return false, err
+		}
+
+		return HasUnpushedChangesOrCommits()
 	}
 
 	return false, nil
