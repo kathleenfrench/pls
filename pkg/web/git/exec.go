@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/kathleenfrench/pls/pkg/utils"
 )
 
@@ -186,9 +187,29 @@ func RemoteRefOfCurrentBranchExists() (bool, error) {
 	return RemoteRefExists(cb), nil
 }
 
-// HasUnpushedCommits checks whether there are unpushed local commits
-func HasUnpushedCommits() {
+// HasUnpushedChangesOrCommits checks whether there are unpushed local commits
+func HasUnpushedChangesOrCommits() (bool, error) {
+	check, err := utils.BashExec("git diff")
+	if err != nil {
+		return false, err
+	}
 
+	if len(check) > 0 {
+		color.HiRed("uncommitted changes found!")
+		return true, nil
+	}
+
+	status, err := utils.BashExec("git status")
+	if err != nil {
+		return false, err
+	}
+
+	if strings.Contains(status, "Changes to be committed") || strings.Contains(status, "Changes not staged for commit") {
+		changesFound := fmt.Sprintf("you have uncommitted and/or unstaged changes!\n%s", status)
+		return true, errors.New(changesFound)
+	}
+
+	return false, nil
 }
 
 // RemoteRefExists returns a bool for whether a remote reference to a pull request exists
