@@ -21,7 +21,7 @@ require (
 	github.com/google/go-github/v32 v32.1.0
 	github.com/jedib0t/go-pretty v4.3.0+incompatible
 	github.com/kr/pretty v0.2.1 // indirect
-	github.com/kyokomi/emoji v2.2.4+incompatible // indirect
+	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.3.3
