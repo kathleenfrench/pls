@@ -56,12 +56,12 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		title   string
 	)
 
-	opts := []string{openInBrowser, readBodyText}
+	opts := []string{openInBrowser, readBodyText, editSelection}
 	ctx := context.Background()
 
 	isPullRequest := issue.IsPullRequest()
 	if isPullRequest {
-		opts = append(opts, openDiff, mergePullRequest, closePR)
+		opts = append(opts, openDiff, mergeSelection)
 		htmlURL = issue.GetPullRequestLinks().GetHTMLURL()
 		prFetch, _, err := gc.PullRequests.Get(context.Background(), meta.Owner, meta.Repo, meta.Number)
 		if err != nil {
@@ -72,14 +72,13 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		body = pr.GetBody()
 		title = pr.GetTitle()
 	} else {
-		opts = append(opts, closeIssue)
 		htmlURL = issue.GetHTMLURL()
 		body = issue.GetBody()
 		title = issue.GetTitle()
 	}
 
-	// add exit option last
-	opts = append(opts, exitSelections)
+	// add exit and close options last
+	opts = append(opts, closeSelection, exitSelections)
 	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", meta.DisplayName), opts, true)
 
 	switch selected {
@@ -87,7 +86,9 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		render := fmt.Sprintf("# %s\n\n%s", title, body)
 		fmt.Println(gui.RenderMarkdown(render))
 		return nextOpts(gc, issue, meta, settings)
-	case mergePullRequest:
+	case editSelection:
+		color.HiRed("TODO")
+	case mergeSelection:
 		if !pr.GetMergeable() || pr.GetMergeableState() != "clean" {
 			return errors.New("this PR is currently not in a mergeable state")
 		}
@@ -105,9 +106,7 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		}
 
 		gui.Log(":balloon:", result.GetMessage(), result.GetSHA())
-	case closePR:
-		color.HiRed("TODO")
-	case closeIssue:
+	case closeSelection:
 		color.HiRed("TODO")
 	case openInBrowser:
 		if isPullRequest {
