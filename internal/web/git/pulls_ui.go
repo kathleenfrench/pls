@@ -189,7 +189,7 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 			return errors.New(result.GetMessage())
 		}
 
-		gui.Log(":balloon:", result.GetMessage(), result.GetSHA())
+		gui.Log(":partying_face:", result.GetMessage(), result.GetSHA())
 		gui.PleaseHold("checking you back into master and pulling the latest code", nil)
 		err = git.CheckoutMasterAndPull()
 		if err != nil {
