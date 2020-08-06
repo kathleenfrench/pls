@@ -176,9 +176,16 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		}
 
 		gui.Log(":balloon:", result.GetMessage(), result.GetSHA())
+		gui.PleaseHold("checking you back into master and pulling the latest code", nil)
 		err = git.CheckoutMasterAndPull()
 		if err != nil {
 			return fmt.Errorf("could not checkout and pull latest master - %s", err)
+		}
+
+		gui.PleaseHold("removing merged branches", nil)
+		err = git.CleanupCurrentBranches()
+		if err != nil {
+			return err
 		}
 	case openInBrowser:
 		if isPullRequest {

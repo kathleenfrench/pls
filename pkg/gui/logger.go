@@ -10,9 +10,9 @@ import (
 // PleaseHold is a logging helper for indicating active processes
 func PleaseHold(msg string, extra interface{}) {
 	if extra != nil {
-		fmt.Println(fmt.Sprintf("%s%s [%v]", emoji.Sprint(":popcorn:"), fmt.Sprintf("%s...", msg), color.HiBlueString("%v", extra)))
+		fmt.Println(fmt.Sprintf("%s %s [%v]", emoji.Sprint(":popcorn:"), fmt.Sprintf("%s...", msg), color.HiBlueString("%v", extra)))
 	} else {
-		fmt.Println(fmt.Sprintf("%s%s", emoji.Sprint(":popcorn"), msg))
+		fmt.Println(fmt.Sprintf("%s %s", emoji.Sprint(":popcorn:"), msg))
 	}
 }
 

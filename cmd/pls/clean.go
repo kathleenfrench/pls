@@ -2,6 +2,7 @@ package pls
 
 import (
 	"github.com/fatih/color"
+	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/kathleenfrench/pls/pkg/web/git"
 	"github.com/spf13/cobra"
 )
@@ -30,7 +31,10 @@ var cleanGitBranchesSubCmd = &cobra.Command{
 		if AllGitRepositories {
 			color.HiRed("TO DO")
 		} else {
-			git.CleanupCurrentBranches()
+			err := git.CleanupCurrentBranches()
+			if err != nil {
+				utils.ExitWithError(err)
+			}
 		}
 	},
 }
