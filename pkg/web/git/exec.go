@@ -201,11 +201,12 @@ func getStatus() (string, error) {
 }
 
 func gitAddAll() error {
-	gui.PleaseHold("adding changes", nil)
 	_, err := utils.BashExec("git add .")
 	if err != nil {
 		return err
 	}
+
+	gui.Log(":white_check_mark:", "added changes", nil)
 
 	return nil
 }
