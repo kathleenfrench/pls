@@ -2,6 +2,7 @@ package gitpls
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/google/go-github/v32/github"
@@ -26,24 +27,51 @@ func CreateGitOrganizationsDropdown(organizations []*github.Organization) *githu
 }
 
 // ChooseWithToDoWithOrganization lets the user decide with to do with their chosen organization
-func ChooseWithToDoWithOrganization(organization *github.Organization, settings config.Settings) error {
+func ChooseWithToDoWithOrganization(organization *github.Organization, settings config.Settings, useEnterprise bool) error {
+	var gc *github.Client
+	var err error
+
 	ctx := context.Background()
-	_ = git.NewClient(ctx, settings.GitToken)
+
+	if useEnterprise {
+		gc, err = git.NewEnterpriseClient(ctx, settings.GitEnterpriseHostname, settings.GitEnterpriseToken)
+		if err != nil {
+			return err
+		}
+	} else {
+		gc = git.NewClient(ctx, settings.GitToken)
+	}
+
+	// TODO: REMOVE
+	fmt.Println(gc)
+
+	login := organization.GetLogin()
+	if login == "" {
+		login = organization.GetName()
+		if login == "" {
+			return errors.New("no name could be parsed for this organization")
+		}
+	}
 
 	opts := []string{openInBrowser, getOrganizationRepos, exitSelections}
-	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", organization.GetName()), opts, false)
+	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", organization.GetLogin()), opts, false)
 
 	switch selected {
 	case openInBrowser:
 		utils.OpenURLInDefaultBrowser(organization.GetHTMLURL())
 	case getOrganizationRepos:
-		repos, err := FetchReposInOrganization(organization.GetName(), settings.GitToken)
+		gui.Spin.Start()
+		repos, err := FetchReposInOrganization(organization.GetLogin(), settings, useEnterprise)
+		gui.Spin.Stop()
 		if err != nil {
 			return err
 		}
 
 		choice := CreateGitRepoDropdown(repos)
-		_ = ChooseWhatToDoWithRepo(choice, settings)
+		err = ChooseWhatToDoWithRepo(choice, settings, useEnterprise)
+		if err != nil {
+			return err
+		}
 	case exitSelections:
 		gui.Exit()
 	}
@@ -71,7 +99,9 @@ func FetchOrganizations(username string, settings config.Settings, useEnterprise
 		PerPage: 100,
 	}
 
+	gui.Spin.Start()
 	orgs, _, err := gc.Organizations.List(ctx, "", &opts)
+	gui.Spin.Stop()
 	if err != nil {
 		return nil, err
 	}

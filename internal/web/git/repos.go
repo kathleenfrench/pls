@@ -29,7 +29,7 @@ func CreateGitRepoDropdown(repositories []*github.Repository) *github.Repository
 }
 
 // ChooseWhatToDoWithRepo lets the user decide what to do with their chosen repo
-func ChooseWhatToDoWithRepo(repository *github.Repository, settings config.Settings) error {
+func ChooseWhatToDoWithRepo(repository *github.Repository, settings config.Settings, useEnterprise bool) error {
 	rows := []table.Row{
 		{"full name", repository.GetFullName()},
 		{"description", repository.GetDescription()},
@@ -79,11 +79,22 @@ func ChooseWhatToDoWithRepo(repository *github.Repository, settings config.Setti
 }
 
 // FetchReposInOrganization fetches repositories in an organization
-func FetchReposInOrganization(organization string, token string) ([]*github.Repository, error) {
+func FetchReposInOrganization(organization string, settings config.Settings, useEnterprise bool) ([]*github.Repository, error) {
 	var allOrgRepos []*github.Repository
+	var gc *github.Client
+	var err error
 
 	ctx := context.Background()
-	gc := git.NewClient(ctx, token)
+
+	if useEnterprise {
+		gc, err = git.NewEnterpriseClient(ctx, settings.GitEnterpriseHostname, settings.GitEnterpriseToken)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		gc = git.NewClient(ctx, settings.GitToken)
+	}
+
 	opts := github.RepositoryListByOrgOptions{
 		ListOptions: github.ListOptions{
 			PerPage: 100,

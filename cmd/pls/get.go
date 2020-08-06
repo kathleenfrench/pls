@@ -31,13 +31,6 @@ var gitOrgs = &cobra.Command{
 	Short:   "interact with someone else's github organizations",
 	Run: func(cmd *cobra.Command, args []string) {
 		color.HiRed("TODO")
-		// orgs, err := gitpls.FetchOrganizations(plsCfg.GitUsername, plsCfg, work)
-		// if err != nil {
-		// 	utils.ExitWithError(err)
-		// }
-
-		// choice := gitpls.CreateGitOrganizationsDropdown(orgs)
-		// _ = gitpls.ChooseWithToDoWithOrganization(choice, plsCfg)
 	},
 }
 
@@ -79,7 +72,7 @@ var gitRepos = &cobra.Command{
 		case "organization":
 			organization := args[1]
 			color.HiYellow(fmt.Sprintf("fetching repositories in the %s organization...", organization))
-			orgRepos, err := gitpls.FetchReposInOrganization(organization, plsCfg.GitToken)
+			orgRepos, err := gitpls.FetchReposInOrganization(organization, plsCfg, work)
 			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
@@ -103,7 +96,10 @@ var gitRepos = &cobra.Command{
 
 		color.HiYellow(fmt.Sprintf("%d repositories returned", len(repos)))
 		choice := gitpls.CreateGitRepoDropdown(repos)
-		_ = gitpls.ChooseWhatToDoWithRepo(choice, plsCfg)
+		err := gitpls.ChooseWhatToDoWithRepo(choice, plsCfg, work)
+		if err != nil {
+			utils.ExitWithError(err)
+		}
 	},
 }
 

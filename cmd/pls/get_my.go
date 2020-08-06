@@ -76,7 +76,10 @@ var gitMyOrgs = &cobra.Command{
 		}
 
 		choice := gitpls.CreateGitOrganizationsDropdown(orgs)
-		_ = gitpls.ChooseWithToDoWithOrganization(choice, plsCfg)
+		err = gitpls.ChooseWithToDoWithOrganization(choice, plsCfg, work)
+		if err != nil {
+			utils.ExitWithError(err)
+		}
 	},
 }
 
@@ -93,7 +96,7 @@ var gitMyRepos = &cobra.Command{
 		}
 
 		choice := gitpls.CreateGitRepoDropdown(repos)
-		err = gitpls.ChooseWhatToDoWithRepo(choice, plsCfg)
+		err = gitpls.ChooseWhatToDoWithRepo(choice, plsCfg, work)
 		if err != nil {
 			utils.ExitWithError(err)
 		}
