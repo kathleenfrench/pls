@@ -30,6 +30,7 @@ require (
 	github.com/spf13/viper v1.4.0
 	github.com/stretchr/objx v0.3.0 // indirect
 	github.com/yuin/goldmark v1.2.1 // indirect
+	github.vimeows.com/Vimeo/dex v0.0.91
 	go.mongodb.org/mongo-driver v1.4.0 // indirect
 	golang.org/dl v0.0.0-20200724191219-e4fbcf8a7a81 // indirect
 	golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de // indirect
