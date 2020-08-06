@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/fatih/color"
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/gui"
@@ -56,7 +57,8 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		state   string
 	)
 
-	opts := []string{openInBrowser, readBodyText, editSelection}
+	// TODO: REMOVE mergeableStateTest
+	opts := []string{openInBrowser, readBodyText, editSelection, mergeableStateTest}
 	ctx := context.Background()
 
 	isPullRequest := issue.IsPullRequest()
@@ -155,9 +157,12 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 			gui.Log(":+1:", fmt.Sprintf("successfully updated your issue %q", updatedIssue.GetTitle()), updatedIssue.GetNumber())
 			issue = updatedIssue
 		}
+	case mergeableStateTest:
+		color.HiBlue("mergeable: %v", pr.GetMergeable())
+		color.HiBlue("mergeable state: %v", pr.GetMergeableState())
 	case mergeSelection:
 		if !pr.GetMergeable() || pr.GetMergeableState() != "clean" {
-			return errors.New("this PR is currently not in a mergeable state")
+			return fmt.Errorf("this PR is currently not in a mergeable state - mergeable: %v, mergeable state: %v", pr.GetMergeable(), pr.GetMergeableState())
 		}
 
 		methods := []string{mergeStraight, mergeSquash, mergeRebase}
