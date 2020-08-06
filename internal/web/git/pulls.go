@@ -193,7 +193,7 @@ func CreatePullRequestFromCWD(settings config.Settings) error {
 		return err
 	}
 
-	gui.Log(":partying face:", fmt.Sprintf("success! your PR %q is now open for business", pr.GetTitle()), fmt.Sprintf("#%d", pr.GetNumber()))
+	gui.Log(":party:", fmt.Sprintf("success! your PR %q is now open for business", pr.GetTitle()), fmt.Sprintf("#%d", pr.GetNumber()))
 
 	openNow := gui.ConfirmPrompt("do you want to open your PR in the browser?", "", true, true)
 	if openNow {
