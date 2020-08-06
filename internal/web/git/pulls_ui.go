@@ -80,14 +80,8 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		state = issue.GetState()
 	}
 
-	if state == stateClosed {
-		opts = append(opts, openSelection)
-	} else if state == stateOpen {
-		opts = append(opts, closeSelection)
-	}
-
-	// add exit and close options last
-	opts = append(opts, closeSelection, exitSelections)
+	// add exit option last
+	opts = append(opts, exitSelections)
 	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", meta.DisplayName), opts, nil, true)
 
 	switch selected {
@@ -96,16 +90,56 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		fmt.Println(gui.RenderMarkdown(render))
 		return nextOpts(gc, issue, meta, settings)
 	case editSelection:
-		if isPullRequest {
-			updatedPR, _, err := gc.PullRequests.Edit(ctx, meta.Owner, meta.Repo, pr.GetNumber(), pr)
+		editOpts := []string{editTitle, editBody, editState}
+		switch isPullRequest {
+		case true:
+			if pr.GetDraft() {
+				editOpts = append(editOpts, editReadyForReview)
+			}
 
+			prEditTarget := gui.SelectPromptWithResponse("what do you want to change?", editOpts, nil, true)
+			switch prEditTarget {
+			case editTitle:
+				updatedTitle := gui.InputPromptWithResponse("what do you want to call this PR?", title, true)
+				pr.Title = &updatedTitle
+			case editReadyForReview:
+				noDraft := false
+				pr.Draft = &noDraft
+			case editBody:
+				editorCmd := utils.EditorLaunchCommands[settings.DefaultEditor]
+				updatedBody := gui.TextEditorInputAndSave("make updates to your PR body", body, editorCmd)
+				pr.Body = &updatedBody
+			case editState:
+				var (
+					untypedClosed = "closed"
+					untypedOpen   = "open"
+				)
+
+				switch state {
+				case stateOpen:
+					closeIt := gui.ConfirmPrompt(fmt.Sprintf("are you sure you want to close %q?", title), "", false, true)
+					if closeIt {
+						pr.State = &untypedClosed
+					}
+				case stateClosed:
+					reOpenIt := gui.ConfirmPrompt(fmt.Sprintf("are you sure you want to re-open %q?", title), "", false, true)
+					if reOpenIt {
+						pr.State = &untypedOpen
+					}
+				}
+			}
+
+			updatedPR, _, err := gc.PullRequests.Edit(ctx, meta.Owner, meta.Repo, pr.GetNumber(), pr)
 			if err != nil {
 				return err
 			}
 
+			gui.Log(":thumbs up:", fmt.Sprintf("successfully updated your PR %q", updatedPR.GetTitle()), updatedPR.GetNumber())
 			pr = updatedPR
-		} else {
-			color.HiRed("TODO")
+		default:
+			// edit issue
+			editTarget := gui.SelectPromptWithResponse("what do you want to change?", editOpts, nil, true)
+			color.HiRed("TODO: %s", editTarget)
 		}
 	case mergeSelection:
 		if !pr.GetMergeable() || pr.GetMergeableState() != "clean" {
@@ -128,10 +162,6 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		}
 
 		gui.Log(":balloon:", result.GetMessage(), result.GetSHA())
-	case openSelection:
-		color.HiRed("TODO")
-	case closeSelection:
-		color.HiRed("TODO")
 	case openInBrowser:
 		if isPullRequest {
 			utils.OpenURLInDefaultBrowser(htmlURL)

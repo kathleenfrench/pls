@@ -25,18 +25,17 @@ const (
 	// ------------ editSelection is a selection choice
 	editSelection = "Edit"
 	// ---- subchoices
-	editTitle = "Title"
-	editBody  = "Body"
-	editState = "State"
+	editTitle          = "Title"
+	editBody           = "Body"
+	editState          = "State"
+	editReadyForReview = "Mark as Ready for Review" // only applicable to 'draft' PRs
+	// ------------ closeSelection is a selection choice
+	closeSelection = "Close"
+	// ------------ openSelection is a selection choice
+	openSelection = "Re-Open"
 	// ------ state changes
 	stateOpen   = "open"
 	stateClosed = "closed"
-
-	// closeSelection is a selection choice
-	closeSelection = "Close"
-
-	// openSelection is a selection choice
-	openSelection = "Open"
 
 	// ------------ mergeSelection is a selection choice
 	mergeSelection = "Merge"
