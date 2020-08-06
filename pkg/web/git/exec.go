@@ -186,6 +186,11 @@ func RemoteRefOfCurrentBranchExists() (bool, error) {
 	return RemoteRefExists(cb), nil
 }
 
+// HasUnpushedCommits checks whether there are unpushed local commits
+func HasUnpushedCommits() {
+
+}
+
 // RemoteRefExists returns a bool for whether a remote reference to a pull request exists
 func RemoteRefExists(ref string) bool {
 	check := exec.Command("git", "show-ref", "--verify", "--quiet", fmt.Sprintf("refs/remotes/origin/%s", ref))
