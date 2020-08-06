@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/fatih/color"
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/gui"
@@ -215,8 +214,6 @@ func CreatePullRequestFromCWD(settings config.Settings) error {
 
 // undocumented, but: mergeable state values: clean, dirty, blocked, unstable, or unknown
 func pollForMergeability(gc *github.Client, pr *github.PullRequest, meta *IssueMeta) bool {
-	color.HiYellow("initial check - mergeable: %v, state: %v", pr.GetMergeable(), pr.GetMergeableState())
-
 	if pr.GetMergeable() {
 		return true
 	}
@@ -233,8 +230,6 @@ func pollForMergeability(gc *github.Client, pr *github.PullRequest, meta *IssueM
 			if err != nil {
 				return false
 			}
-
-			color.HiYellow("pr check - mergeable: %v, state: %v", prCheck.GetMergeable(), prCheck.GetMergeableState())
 
 			if prCheck.GetMergeable() {
 				break

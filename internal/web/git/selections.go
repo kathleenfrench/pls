@@ -43,6 +43,4 @@ const (
 	mergeSquash   = "squash"
 	mergeRebase   = "rebase"
 	mergeStraight = "merge"
-
-	mergeableStateTest = "merge test"
 )
