@@ -56,7 +56,7 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		state   string
 	)
 
-	opts := []string{openInBrowser, readBodyText, editSelection}
+	opts := []string{readBodyText, editSelection, openInBrowser}
 	ctx := context.Background()
 
 	isPullRequest := issue.IsPullRequest()

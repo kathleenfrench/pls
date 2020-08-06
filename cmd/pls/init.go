@@ -2,6 +2,7 @@ package pls
 
 import (
 	"github.com/kathleenfrench/pls/internal/config"
+	"github.com/kathleenfrench/pls/internal/style"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -34,7 +35,7 @@ func addTopLevelSubcommands() {
 }
 
 func setPlsStyling() {
-	rootCmd.SetUsageTemplate(stylizePls())
+	rootCmd.SetUsageTemplate(style.MainMenu(rootCmd.UsageTemplate()))
 }
 
 func init() {

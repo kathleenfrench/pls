@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/kathleenfrench/pls/internal/config"
+	"github.com/kathleenfrench/pls/internal/style"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -31,7 +32,8 @@ var rootCmd = &cobra.Command{
 	Short: "a helpful little CLI that does things for you when you ask nice...",
 	Run: func(cmd *cobra.Command, args []string) {
 		if versionFlag {
-			printBanner()
+			style.PrintBanner()
+			printVersion()
 		} else {
 			cmd.Usage()
 		}
