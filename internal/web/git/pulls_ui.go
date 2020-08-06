@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/fatih/color"
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/gui"
@@ -110,27 +109,12 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 				updatedBody := gui.TextEditorInputAndSave("make updates to your PR body", body, editorCmd)
 				pr.Body = &updatedBody
 			case editState:
-				var (
-					untypedClosed = "closed"
-					untypedOpen   = "open"
-				)
-
-				switch state {
-				case stateOpen:
-					closeIt := gui.ConfirmPrompt(fmt.Sprintf("are you sure you want to close %q?", title), "", false, true)
-					if closeIt {
-						pr.State = &untypedClosed
-					} else {
-						return nextOpts(gc, issue, meta, settings)
-					}
-				case stateClosed:
-					reOpenIt := gui.ConfirmPrompt(fmt.Sprintf("are you sure you want to re-open %q?", title), "", false, true)
-					if reOpenIt {
-						pr.State = &untypedOpen
-					} else {
-						return nextOpts(gc, issue, meta, settings)
-					}
+				changedState := changeState(state, issue.GetTitle())
+				if changedState == nil {
+					return nextOpts(gc, issue, meta, settings)
 				}
+
+				pr.State = changedState
 			}
 
 			gui.Spin.Start()
@@ -143,9 +127,33 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 			gui.Log(":+1:", fmt.Sprintf("successfully updated your PR %q", updatedPR.GetTitle()), updatedPR.GetNumber())
 			pr = updatedPR
 		default:
+			ir := &github.IssueRequest{}
 			// edit issue
 			editTarget := gui.SelectPromptWithResponse("what do you want to change?", editOpts, nil, true)
-			color.HiRed("TODO: %s", editTarget)
+			switch editTarget {
+			case editTitle:
+				updatedTitle := gui.InputPromptWithResponse("what do you want to call this issue?", title, true)
+				ir.Title = &updatedTitle
+			case editBody:
+				editorCmd := utils.EditorLaunchCommands[settings.DefaultEditor]
+				updatedBody := gui.TextEditorInputAndSave("make updates to your issue body", body, editorCmd)
+				ir.Body = &updatedBody
+			case editState:
+				changedState := changeState(state, issue.GetTitle())
+				if changedState == nil {
+					return nextOpts(gc, issue, meta, settings)
+				}
+
+				ir.State = changedState
+			}
+
+			updatedIssue, _, err := gc.Issues.Edit(ctx, meta.Owner, meta.Repo, issue.GetNumber(), ir)
+			if err != nil {
+				return err
+			}
+
+			gui.Log(":+1:", fmt.Sprintf("successfully updated your issue %q", updatedIssue.GetTitle()), updatedIssue.GetNumber())
+			issue = updatedIssue
 		}
 	case mergeSelection:
 		if !pr.GetMergeable() || pr.GetMergeableState() != "clean" {
@@ -192,6 +200,28 @@ func nextOpts(gc *github.Client, issue *github.Issue, meta *IssueMeta, settings 
 		return ChooseWhatToDoWithIssue(gc, issue, meta, settings)
 	case exitSelections:
 		gui.Exit()
+	}
+
+	return nil
+}
+
+func changeState(state string, title string) *string {
+	var (
+		untypedClosed = "closed"
+		untypedOpen   = "open"
+	)
+
+	switch state {
+	case stateOpen:
+		closeIt := gui.ConfirmPrompt(fmt.Sprintf("are you sure you want to close %q?", title), "", false, true)
+		if closeIt {
+			return &untypedClosed
+		}
+	case stateClosed:
+		reOpenIt := gui.ConfirmPrompt(fmt.Sprintf("are you sure you want to re-open %q?", title), "", false, true)
+		if reOpenIt {
+			return &untypedOpen
+		}
 	}
 
 	return nil
