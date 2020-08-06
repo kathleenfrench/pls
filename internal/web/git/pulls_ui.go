@@ -176,6 +176,10 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		}
 
 		gui.Log(":balloon:", result.GetMessage(), result.GetSHA())
+		err = git.CheckoutMasterAndPull()
+		if err != nil {
+			return fmt.Errorf("could not checkout and pull latest master - %s", err)
+		}
 	case openInBrowser:
 		if isPullRequest {
 			utils.OpenURLInDefaultBrowser(htmlURL)
