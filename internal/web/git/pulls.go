@@ -2,11 +2,14 @@ package gitpls
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/internal/config"
+	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/web/git"
+	"github.vimeows.com/Vimeo/dex/pkg/utils"
 )
 
 // PullsGetterFlags are evaluated based off of flags/arguments set by the user when searching pull requests of the current user (author:@me)
@@ -140,14 +143,62 @@ func (g *PullsGetterFlags) constructMyPRSearchQuery() string {
 	return query
 }
 
-func collectPullRequestResponses(owner string, repo string) (*github.NewPullRequest, error) {
-	return nil, nil
-}
-
 // CreatePullRequestFromCWD creates a PR for the branch in your current working directory
-// func CreatePullRequestFromCWD() error {
-// 	// get current org and repo
+func CreatePullRequestFromCWD(settings config.Settings) error {
+	var gc *github.Client
 
-// 	pr, err := collectPullRequestResponses()
-// 	return nil
-// }
+	remoteRefExists, err := git.RemoteRefOfCurrentBranchExists()
+	if err != nil {
+		return err
+	}
+
+	if !remoteRefExists {
+		return errors.New("no remote ref for your current branch exists - make sure to push it before attempting to create a PR")
+	}
+
+	ctx := context.Background()
+
+	org, err := git.CurrentRepositoryOrganization()
+	if err != nil {
+		return err
+	}
+
+	repo, err := git.CurrentRepositoryName()
+	if err != nil {
+		return err
+	}
+
+	isEnterprise, err := git.IsEnterpriseGit()
+	if err != nil {
+		return err
+	}
+
+	newPR, err := collectPullRequestResponses(settings, isEnterprise)
+	if err != nil {
+		return err
+	}
+
+	if isEnterprise {
+		gc, err = git.NewEnterpriseClient(ctx, settings.GitEnterpriseHostname, settings.GitEnterpriseToken)
+		if err != nil {
+			return err
+		}
+	} else {
+		gc = git.NewClient(ctx, settings.GitToken)
+	}
+
+	fmt.Println(newPR, org, repo)
+	pr, _, err := gc.PullRequests.Create(ctx, org, repo, newPR)
+	if err != nil {
+		return err
+	}
+
+	gui.Log(":partying face:", fmt.Sprintf("success! your PR %q is now open for business", pr.GetTitle()), fmt.Sprintf("#%d", pr.GetNumber()))
+
+	openNow := gui.ConfirmPrompt("do you want to open your PR in the browser?", "", true, true)
+	if openNow {
+		utils.LaunchInBrowser(pr.GetHTMLURL())
+	}
+
+	return nil
+}

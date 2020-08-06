@@ -52,6 +52,23 @@ func ConfirmPrompt(label string, helpMessage string, defaultVal bool, disableCle
 	return response
 }
 
+// TextEditorInputAndSave launches a temporary file with a text editor, captures the input on save, and removes the tmp file while closing the editor
+func TextEditorInputAndSave(label string, defaultText string, editor string) string {
+	var content string
+
+	prompt := &survey.Editor{
+		Message:       label,
+		Default:       defaultText,
+		AppendDefault: true,
+		HideDefault:   true,
+		Editor:        editor,
+		Help:          "enter text, save it, and pls will handle the rest!",
+	}
+
+	survey.AskOne(prompt, &content)
+	return content
+}
+
 // InputPromptWithResponse accepts a user's typed input to a question as a response
 func InputPromptWithResponse(label string, defaultVal string, disableClear bool) string {
 	if !disableClear {

@@ -3,6 +3,7 @@ package gitpls
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/internal/config"
@@ -109,4 +110,48 @@ func nextOpts(gc *github.Client, issue *github.Issue, meta *IssueMeta, settings 
 	}
 
 	return nil
+}
+
+func collectPullRequestResponses(settings config.Settings, isEnterprise bool) (*github.NewPullRequest, error) {
+	var draft bool
+
+	pr := &github.NewPullRequest{}
+
+	currentBranch, err := git.CurrentBranch()
+	if err != nil {
+		return nil, err
+	}
+
+	base := "master"
+	title := gui.InputPromptWithResponse("what do you want to call this PR?", "", true)
+
+	// drafts pull requests are available in public repositories with GitHub Free and GitHub Free for organizations, GitHub Pro, and legacy per-repository billing plans, and in public and private repositories with GitHub Team and GitHub Enterprise Cloud
+	if isEnterprise {
+		draft = gui.ConfirmPrompt("do you want to create this as a draft?", "", true, true)
+	}
+
+	issueLinkCheck := gui.ConfirmPrompt("do you want to link this to an existing issue?", "", false, true)
+	if issueLinkCheck {
+		numAsString := gui.InputPromptWithResponse("what is the issue number?", "do not include #", true)
+		num, err := strconv.Atoi(numAsString)
+		if err != nil {
+			return nil, err
+		}
+
+		pr.Issue = &num
+	}
+
+	editorCmd := utils.EditorLaunchCommands[settings.DefaultEditor]
+	body := gui.TextEditorInputAndSave("enter a description of this PR", "", editorCmd)
+
+	body += fmt.Sprintf("\n\n---\n<sub>:balloon: i opened this PR by saying [`pls`](https://github.com/kathleenfrench/pls)</sub>\n")
+
+	// set the values
+	pr.Title = &title
+	pr.Base = &base
+	pr.Head = &currentBranch
+	pr.Draft = &draft
+	pr.Body = &body
+
+	return pr, nil
 }

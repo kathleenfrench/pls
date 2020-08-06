@@ -138,6 +138,16 @@ func CurrentRepositoryName() (string, error) {
 	return currentRepo, nil
 }
 
+// RemoteRefOfCurrentBranchExists checks whether a remote ref of the current working directory's branch exists
+func RemoteRefOfCurrentBranchExists() (bool, error) {
+	cb, err := CurrentBranch()
+	if err != nil {
+		return false, err
+	}
+
+	return RemoteRefExists(cb), nil
+}
+
 // RemoteRefExists returns a bool for whether a remote reference to a pull request exists
 func RemoteRefExists(ref string) bool {
 	check := exec.Command("git", "show-ref", "--verify", "--quiet", fmt.Sprintf("refs/remotes/origin/%s", ref))
