@@ -129,12 +129,14 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 				}
 			}
 
+			gui.Spin.Start()
 			updatedPR, _, err := gc.PullRequests.Edit(ctx, meta.Owner, meta.Repo, pr.GetNumber(), pr)
+			gui.Spin.Stop()
 			if err != nil {
 				return err
 			}
 
-			gui.Log(":thumbs up:", fmt.Sprintf("successfully updated your PR %q", updatedPR.GetTitle()), updatedPR.GetNumber())
+			gui.Log(":+1:", fmt.Sprintf("successfully updated your PR %q", updatedPR.GetTitle()), updatedPR.GetNumber())
 			pr = updatedPR
 		default:
 			// edit issue
