@@ -207,7 +207,6 @@ func gitAddAll() error {
 	}
 
 	gui.Log(":white_check_mark:", "added changes", nil)
-
 	return nil
 }
 
