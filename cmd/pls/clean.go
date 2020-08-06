@@ -11,22 +11,17 @@ import (
 var AllGitRepositories bool
 
 var cleanCmd = &cobra.Command{
-	Use:     "clean",
+	Use:     "cleanup",
 	Short:   "cleanup subcommands",
-	Aliases: []string{"c", "cleanup"},
+	Aliases: []string{"c", "clean"},
 }
 
 // git clean --------------------------------
 var cleanGitSubCmd = &cobra.Command{
 	Use:     "git",
-	Short:   "git cleanup subcommands",
 	Aliases: []string{"g"},
-}
-
-var cleanGitBranchesSubCmd = &cobra.Command{
-	Use:     "branches",
+	Example: "pls cleanup git",
 	Short:   "remove git branches that have already been merged into master - defaults to just within the current working directory",
-	Aliases: []string{"b"},
 	Run: func(cmd *cobra.Command, args []string) {
 		if AllGitRepositories {
 			color.HiRed("TO DO")
@@ -43,6 +38,5 @@ func init() {
 	cleanCmd.AddCommand(cleanGitSubCmd)
 
 	// clean branches
-	cleanGitSubCmd.AddCommand(cleanGitBranchesSubCmd)
-	cleanGitBranchesSubCmd.Flags().BoolVarP(&AllGitRepositories, "all", "a", false, "cleanup branches in all git repository folders on your machine")
+	cleanGitSubCmd.Flags().BoolVarP(&AllGitRepositories, "all", "a", false, "cleanup branches in all git repository folders on your machine")
 }
