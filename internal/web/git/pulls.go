@@ -21,7 +21,7 @@ type IssueGetterFlags struct {
 	User         string // user:USERNAME | example: user:defunkt ubuntu matches issues with the word "ubuntu" from repositories owned by @defunkt
 
 	// searching text
-	Match       bool   // pls get my prs --match <title|body|comments> [text to search for]
+	Match       bool   // pls get my prs|issues --match <title|body|comments> [text to search for]
 	InTitleText string // in:title | example: warning in:title matches issues with "warning" in their title.
 	InBodyText  string // in:body | example: error in:title,body matches issues with "error" in their title or body.
 	InComments  string // in:comments | shipit in:comments matches issues mentioning "shipit" in their comments.
