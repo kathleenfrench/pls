@@ -11,6 +11,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// CURRENTLY NOT IN USE
+
 var checkCmd = &cobra.Command{
 	Use:     "check",
 	Short:   "run a check on a given resource",
@@ -25,4 +27,5 @@ var checkCmd = &cobra.Command{
 
 		color.HiYellow(fmt.Sprintf("git user: %s", github.Stringify(user)))
 	},
+	Hidden: true,
 }
