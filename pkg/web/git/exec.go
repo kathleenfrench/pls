@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 )
 
@@ -23,6 +24,22 @@ func CheckForGitUsername() (string, error) {
 	}
 
 	return username, nil
+}
+
+// CheckoutMasterAndPull checks out the current branch to master and pulls down the latest
+func CheckoutMasterAndPull() error {
+	gui.PleaseHold("checking into master and pulling latest", nil)
+	cmd := exec.Command("bash", "-c", "git checkout master && git pull")
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
+	fmt.Fprintln(os.Stdout)
+	return nil
 }
 
 // CloneRepository accepts an ssh url and clones a repository to a specified directory
