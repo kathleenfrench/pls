@@ -95,9 +95,21 @@ func FetchReposInOrganization(organization string, token string) ([]*github.Repo
 }
 
 // FetchUserRepos fetches repositories by user
-func FetchUserRepos(username string, token string) ([]*github.Repository, error) {
+func FetchUserRepos(username string, settings config.Settings, useEnterprise bool) ([]*github.Repository, error) {
+	var gc *github.Client
+	var err error
+
 	ctx := context.Background()
-	gc := git.NewClient(ctx, token)
+
+	if useEnterprise {
+		gc, err = git.NewEnterpriseClient(ctx, settings.GitEnterpriseHostname, settings.GitEnterpriseToken)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		gc = git.NewClient(ctx, settings.GitToken)
+	}
+
 	opts := &github.RepositoryListOptions{
 		Affiliation: "owner",
 		ListOptions: github.ListOptions{
