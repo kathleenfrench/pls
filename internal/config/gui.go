@@ -20,8 +20,14 @@ func genGuiKeyMap(keys []string) ([]string, map[string]string) {
 			m["Name"] = nameKey
 		case defaultEditorKey:
 			m["Default Editor"] = defaultEditorKey
-		case "default_codepath":
+		case defaultCodepathKey:
 			m["Default Code Path"] = defaultCodepathKey
+		case githubEnterpriseUsernameKey:
+			m["Github Enterprise Username"] = githubEnterpriseUsernameKey
+		case githubEnterpriseHostKey:
+			m["Github Enterprise Hostname"] = githubEnterpriseHostKey
+		case githubEnterpriseTokenKey:
+			m["Github Enterprise Token"] = githubEnterpriseTokenKey
 		case "useviper":
 			// exclude from dropdown
 			break

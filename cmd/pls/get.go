@@ -11,6 +11,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	fetchAll bool
+)
+
 // ------------------------------------------------------
 
 var getCmd = &cobra.Command{
@@ -27,13 +31,13 @@ var gitOrgs = &cobra.Command{
 	Short:   "interact with someone else's github organizations",
 	Run: func(cmd *cobra.Command, args []string) {
 		color.HiRed("TODO")
-		orgs, err := gitpls.FetchOrganizations(plsCfg.GitUsername, plsCfg.GitToken)
-		if err != nil {
-			utils.ExitWithError(err)
-		}
+		// orgs, err := gitpls.FetchOrganizations(plsCfg.GitUsername, plsCfg, work)
+		// if err != nil {
+		// 	utils.ExitWithError(err)
+		// }
 
-		choice := gitpls.CreateGitOrganizationsDropdown(orgs)
-		_ = gitpls.ChooseWithToDoWithOrganization(choice, plsCfg)
+		// choice := gitpls.CreateGitOrganizationsDropdown(orgs)
+		// _ = gitpls.ChooseWithToDoWithOrganization(choice, plsCfg)
 	},
 }
 
@@ -65,7 +69,7 @@ var gitRepos = &cobra.Command{
 		switch found {
 		case "other_user":
 			username := args[1]
-			otherUserRepos, err := gitpls.FetchUserRepos(username, plsCfg.GitToken)
+			otherUserRepos, err := gitpls.FetchUserRepos(username, plsCfg, work)
 			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
@@ -84,7 +88,7 @@ var gitRepos = &cobra.Command{
 			repos = orgRepos
 		case "current_user":
 			username := ""
-			currentUserRepos, err := gitpls.FetchUserRepos(username, plsCfg.GitToken)
+			currentUserRepos, err := gitpls.FetchUserRepos(username, plsCfg, work)
 			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
@@ -108,6 +112,7 @@ var gitRepos = &cobra.Command{
 // ------------------------------------------------------
 
 func init() {
+	getCmd.PersistentFlags().BoolVar(&fetchAll, "all", false, "search all of github")
 	getCmd.AddCommand(gitOrgs)
 	getCmd.AddCommand(gitRepos)
 }

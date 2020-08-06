@@ -11,6 +11,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+const notApplicable = "NA"
+
 // default keys
 const (
 	githubUsernameKey  = "git_username"
@@ -19,6 +21,10 @@ const (
 	defaultEditorKey   = "default_editor"
 	webShortcutsKey    = "webshort"
 	defaultCodepathKey = "default_codepath"
+
+	githubEnterpriseUsernameKey = "ghe_username"
+	githubEnterpriseTokenKey    = "ghe_token"
+	githubEnterpriseHostKey     = "ghe_hostname"
 )
 
 func unset(val interface{}) bool {
@@ -37,7 +43,13 @@ func checkForUnsetRequiredDefaults() bool {
 		// check if we can find it first using the git pkg
 		usernameCheck, err := git.CheckForGitUsername()
 		if err == nil {
-			viper.Set(githubUsernameKey, usernameCheck)
+			confirmUsername := gui.ConfirmPrompt(fmt.Sprintf("is %s the correct username?", usernameCheck), "", true, true)
+			if confirmUsername {
+				viper.Set(githubUsernameKey, usernameCheck)
+			} else {
+				correctUsername := gui.InputPromptWithResponse("input the correct username", "", true)
+				viper.Set(githubUsernameKey, correctUsername)
+			}
 		} else {
 			unsetFound = true
 			gu := gui.InputPromptWithResponse("what is your github username?", "", true)
@@ -81,6 +93,23 @@ func checkForUnsetRequiredDefaults() bool {
 	if viper.Get(webShortcutsKey) == nil {
 		unsetFound = true
 		viper.Set(webShortcutsKey, defaultWebShortcuts)
+	}
+
+	if viper.Get(githubEnterpriseHostKey) == nil {
+		unsetFound = true
+		useGitEnterprise := gui.ConfirmPrompt("do you want to configure pls to work with github enterprise?", "", false, true)
+		if useGitEnterprise {
+			host := gui.InputPromptWithResponse("what is the hostname of your git enterprise?", "github.[company].com", true)
+			viper.Set(githubEnterpriseHostKey, host)
+			gheUser := gui.InputPromptWithResponse("what is your git enterprise username?", "", true)
+			viper.Set(githubEnterpriseUsernameKey, gheUser)
+			gheToken := gui.InputPromptWithResponse("what is your git enterprise token?", "", true)
+			viper.Set(githubEnterpriseTokenKey, gheToken)
+		} else {
+			viper.Set(githubEnterpriseHostKey, notApplicable)
+			viper.Set(githubEnterpriseUsernameKey, notApplicable)
+			viper.Set(githubEnterpriseTokenKey, notApplicable)
+		}
 	}
 
 	return unsetFound

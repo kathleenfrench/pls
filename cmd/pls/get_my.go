@@ -18,6 +18,12 @@ import (
 
 // pls get prs to review (current) | (in <org/repo>) | <everywhere>
 
+// pls get --all my prs
+// pls get --all my --work prs
+
+// indicate enterprise by using the --work flag
+// pls get my --work prs
+
 // pls get my prs [default: all open prs, includes drafts]
 // pls get my --merged prs
 // pls get my --closed prs
@@ -45,6 +51,7 @@ var (
 	locked           bool
 	mentionedMe      bool
 	searchTarget     []string // <title|body|comments>
+	work             bool
 )
 
 // ------------------------------------------------------
@@ -63,7 +70,7 @@ var gitMyOrgs = &cobra.Command{
 	Short:   "interact with your github organizations",
 	Example: color.HiYellowString("pls get my orgs"),
 	Run: func(cmd *cobra.Command, args []string) {
-		orgs, err := gitpls.FetchOrganizations("", plsCfg.GitToken)
+		orgs, err := gitpls.FetchOrganizations("", plsCfg, work)
 		if err != nil {
 			utils.ExitWithError(err)
 		}
@@ -80,7 +87,7 @@ var gitMyRepos = &cobra.Command{
 	Short:   "interact with your github repositories",
 	Example: color.HiYellowString("pls get my repos"),
 	Run: func(cmd *cobra.Command, args []string) {
-		repos, err := gitpls.FetchUserRepos("", plsCfg.GitToken)
+		repos, err := gitpls.FetchUserRepos("", plsCfg, work)
 		if err != nil {
 			utils.ExitWithError(err)
 		}
@@ -107,7 +114,14 @@ var gitMyPRs = &cobra.Command{
 			AssignedOnly:     assignedOnly,
 			ForCurrentBranch: forCurrentBranch,
 			Locked:           locked,
-			Author:           "@me",
+			MetaGetterFlags:  &gitpls.MetaGetterFlags{},
+		}
+
+		if work {
+			getterFlags.MetaGetterFlags.UseEnterpriseAccount = true
+			getterFlags.Author = plsCfg.GitEnterpriseUsername
+		} else {
+			getterFlags.Author = "@me"
 		}
 
 		if !getterFlags.ClosedOnly && !getterFlags.MergedOnly {
@@ -117,7 +131,11 @@ var gitMyPRs = &cobra.Command{
 		}
 
 		if getterFlags.AssignedOnly {
-			getterFlags.Assignee = "@me"
+			if getterFlags.MetaGetterFlags.UseEnterpriseAccount {
+				getterFlags.Assignee = plsCfg.GitEnterpriseUsername
+			} else {
+				getterFlags.Assignee = "@me"
+			}
 		}
 
 		if getterFlags.ForCurrentBranch {
@@ -137,56 +155,65 @@ var gitMyPRs = &cobra.Command{
 
 		switch len(args) {
 		case 0:
-			// get prs in the current repo
-			// get org
-			org, err := git.CurrentRepositoryOrganization()
-			if err != nil {
-				utils.ExitWithError(err)
-			}
+			// fetch all check
+			if !fetchAll {
+				// get for whatever is in the current working directory's repo
+				org, err := git.CurrentRepositoryOrganization()
+				if err != nil {
+					utils.ExitWithError(err)
+				}
 
-			repo, err := git.CurrentRepositoryName()
-			if err != nil {
-				utils.ExitWithError(err)
-			}
+				repo, err := git.CurrentRepositoryName()
+				if err != nil {
+					utils.ExitWithError(err)
+				}
 
-			getterFlags.Organization = org
-			getterFlags.Repository = repo
+				getterFlags.Organization = org
+				getterFlags.Repository = repo
+
+				isEnterprise, err := git.IsEnterpriseGit()
+				if err != nil {
+					utils.ExitWithError(err)
+				}
+
+				src := "github"
+				if isEnterprise {
+					gui.PleaseHold("github enterprise repository detected...", nil)
+					getterFlags.MetaGetterFlags.UseEnterpriseAccount = true
+					getterFlags.Author = plsCfg.GitEnterpriseUsername
+
+					if getterFlags.AssignedOnly {
+						getterFlags.Assignee = plsCfg.GitEnterpriseUsername
+					}
+
+					src = "github enterprise"
+				}
+
+				gui.PleaseHold(fmt.Sprintf("searching %s/%s", org, repo), src)
+			}
 
 			gui.Spin.Start()
-			prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
+			gc, prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
 			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
 			}
 
 			if len(prs) == 0 {
-				color.HiYellow("no PRs found matching that criteria!")
+				gui.OhNo("no PRs found matching that crtieria")
 				gui.Exit()
 			}
 
 			pr, prMeta := gitpls.CreateGitIssuesDropdown(prs)
-			_ = gitpls.ChooseWhatToDoWithIssue(pr, prMeta, plsCfg)
+			err = gitpls.ChooseWhatToDoWithIssue(gc, pr, prMeta, plsCfg)
+			if err != nil {
+				utils.ExitWithError(err)
+			}
+
+			break
 		case 1:
-			// everywhere check
-			single := args[0]
-			if single != "everywhere" && single != "all" && single != "e" {
-				utils.ExitWithError(fmt.Sprintf("%s is not a valid argument", single))
-			}
-
-			gui.Spin.Start()
-			prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
-			gui.Spin.Stop()
-			if err != nil {
-				utils.ExitWithError(err)
-			}
-
-			if len(prs) == 0 {
-				color.HiYellow("no PRs found matching that criteria!")
-				gui.Exit()
-			}
-
-			pr, prMeta := gitpls.CreateGitIssuesDropdown(prs)
-			_ = gitpls.ChooseWhatToDoWithIssue(pr, prMeta, plsCfg)
+			utils.ExitWithError(fmt.Sprintf("%s is not a valid argument", args[0]))
+			break
 		case 2:
 			// pls get my prs in <repo> (owned)
 			// pls get my prs in <org>/<repo> (organization/another person's repo)
@@ -203,13 +230,21 @@ var gitMyPRs = &cobra.Command{
 				getterFlags.Organization = sp[0]
 				getterFlags.Repository = sp[1]
 			} else {
+				if work {
+					utils.ExitWithError("when working with git enterprise resources, an organization value must be specified")
+				}
+
 				getterFlags.Organization = plsCfg.GitUsername
 				getterFlags.Repository = target
 			}
 
-			color.HiBlue("searching %s/%s...", getterFlags.Organization, getterFlags.Repository)
+			src := "github"
+			if work {
+				src = "github enterprise"
+			}
+			gui.PleaseHold(fmt.Sprintf("searching %s/%s", getterFlags.Organization, getterFlags.Repository), src)
 			gui.Spin.Start()
-			prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
+			gc, prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
 			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
@@ -221,7 +256,12 @@ var gitMyPRs = &cobra.Command{
 			}
 
 			pr, prMeta := gitpls.CreateGitIssuesDropdown(prs)
-			_ = gitpls.ChooseWhatToDoWithIssue(pr, prMeta, plsCfg)
+			err = gitpls.ChooseWhatToDoWithIssue(gc, pr, prMeta, plsCfg)
+			if err != nil {
+				utils.ExitWithError(err)
+			}
+
+			break
 		default:
 			utils.ExitWithError("invalid input, try running `pls get my prs --help`")
 		}
@@ -250,6 +290,7 @@ func init() {
 	myGetSubCmd.AddCommand(gitMyPRs)
 
 	// flags
+	myGetSubCmd.PersistentFlags().BoolVarP(&work, "work", "w", false, "fetch resources via your github enterprise account")
 	myGetSubCmd.PersistentFlags().BoolVarP(&mergedOnly, "merged", "m", false, "fetch only PRs that have been merged")
 	myGetSubCmd.PersistentFlags().BoolVarP(&closedOnly, "closed", "c", false, "fetch only closed PRs")
 	myGetSubCmd.PersistentFlags().BoolVarP(&pending, "pending", "p", false, "get only PRs that are pending approval")

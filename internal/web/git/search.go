@@ -18,4 +18,6 @@ type MetaGetterFlags struct {
 	SortBy            string
 	Order             string // asc, desc (default: desc)
 	TextMatchMetadata bool   // fetch text match metadata with a query
+
+	UseEnterpriseAccount bool
 }

@@ -13,6 +13,6 @@ var Spin = spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 
 // Exit says by and exits the program
 func Exit() {
-	color.HiGreen("bye!")
+	color.HiCyan("\nbye")
 	os.Exit(0)
 }

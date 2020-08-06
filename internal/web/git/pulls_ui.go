@@ -17,24 +17,23 @@ func CreateGitIssuesDropdown(issues []*github.Issue) (*github.Issue, *IssueMeta)
 	var org string
 	var repo string
 	nameMap := make(map[string]*github.Issue)
+	metas := make(map[string]*IssueMeta)
 	for _, i := range issues {
 		r := i.GetRepositoryURL()
 		org, repo = git.ExtractOrganizationAndRepoNameFromRepoURL(r)
 		name := fmt.Sprintf("[%s/%s]: %s", org, repo, i.GetTitle())
 		names = append(names, name)
 		nameMap[name] = i
+		metas[name] = &IssueMeta{
+			DisplayName: name,
+			Owner:       org,
+			Repo:        repo,
+			Number:      i.GetNumber(),
+		}
 	}
 
 	choice := gui.SelectPromptWithResponse("select one", names, false)
-
-	meta := &IssueMeta{
-		DisplayName: choice,
-		Owner:       org,
-		Repo:        repo,
-		Number:      nameMap[choice].GetNumber(),
-	}
-
-	return nameMap[choice], meta
+	return nameMap[choice], metas[choice]
 }
 
 // IssueMeta is a helper for relevant info when making subsequent API calls from the GUI
@@ -46,7 +45,7 @@ type IssueMeta struct {
 }
 
 // ChooseWhatToDoWithIssue lets the user decide what to do with their chosen issue
-func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings config.Settings) error {
+func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *IssueMeta, settings config.Settings) error {
 	var (
 		htmlURL string
 		pr      *github.PullRequest
@@ -55,14 +54,12 @@ func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings conf
 	)
 
 	opts := []string{openInBrowser, readBodyText}
-	ctx := context.Background()
-	gc := git.NewClient(ctx, settings.GitToken)
 
 	isPullRequest := issue.IsPullRequest()
 	if isPullRequest {
 		opts = append(opts, openDiff)
 		htmlURL = issue.GetPullRequestLinks().GetHTMLURL()
-		prFetch, _, err := gc.PullRequests.Get(ctx, meta.Owner, meta.Repo, meta.Number)
+		prFetch, _, err := gc.PullRequests.Get(context.Background(), meta.Owner, meta.Repo, meta.Number)
 		if err != nil {
 			return err
 		}
@@ -84,7 +81,7 @@ func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings conf
 	case readBodyText:
 		render := fmt.Sprintf("# %s\n\n%s", title, body)
 		fmt.Println(gui.RenderMarkdown(render))
-		return nextOpts(issue, meta, settings)
+		return nextOpts(gc, issue, meta, settings)
 	case openInBrowser:
 		if isPullRequest {
 			utils.OpenURLInDefaultBrowser(htmlURL)
@@ -100,13 +97,13 @@ func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings conf
 	return nil
 }
 
-func nextOpts(issue *github.Issue, meta *IssueMeta, settings config.Settings) error {
+func nextOpts(gc *github.Client, issue *github.Issue, meta *IssueMeta, settings config.Settings) error {
 	opts := []string{returnToMenu, exitSelections}
 	selected := gui.SelectPromptWithResponse("what now?", opts, true)
 
 	switch selected {
 	case returnToMenu:
-		return ChooseWhatToDoWithIssue(issue, meta, settings)
+		return ChooseWhatToDoWithIssue(gc, issue, meta, settings)
 	case exitSelections:
 		gui.Exit()
 	}
