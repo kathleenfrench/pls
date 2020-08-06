@@ -11,6 +11,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
+	"github.com/kyokomi/emoji"
 )
 
 // CheckForGitUsername checks for a git username set in the expected location
@@ -36,10 +37,7 @@ func PushBranchToOrigin(cb string) (err error) {
 		}
 	}
 
-	err = printCodeChanges(true)
-	if err != nil {
-		return err
-	}
+	gui.PleaseHold("attempting a push", cb)
 
 	cmd := exec.Command("bash", "-c", fmt.Sprintf("git push -u origin %s", cb))
 	cmd.Stdout = os.Stdout
@@ -212,38 +210,24 @@ func gitAddAll() error {
 	return nil
 }
 
-func printCodeChanges(short bool) (err error) {
-	var changes string
-
-	if short {
-		changes, err = utils.BashExec("git status -s")
-		if err != nil {
-			return err
-		}
-	} else {
-		changes, err = utils.BashExec("git status -b")
-		if err != nil {
-			return err
-		}
-	}
-
-	fmt.Println(fmt.Sprintf("%s\n%s", color.HiYellowString("CHANGES:"), changes))
-	return nil
-}
-
-func gitCommit() error {
-	err := printCodeChanges(false)
+func printCodeChanges() (err error) {
+	changes, err := utils.BashExec("git status -b")
 	if err != nil {
 		return err
 	}
 
+	fmt.Println(fmt.Sprintf("%s\n%s", color.HiRedString("%s UNTRACKED CHANGES FOUND %s", emoji.Sprint(":police_car_light:"), emoji.Sprint(":police_car_light:")), changes))
+	return nil
+}
+
+func gitCommit() error {
 	commitMessage := gui.InputPromptWithResponse("add a commit message", "", true)
 	if commitMessage == "" {
 		gui.OhNo("you must enter a commit message to proceed")
 		return gitCommit()
 	}
 
-	_, err = utils.BashExec(fmt.Sprintf("git commit -am %q", commitMessage))
+	_, err := utils.BashExec(fmt.Sprintf("git commit -am %q", commitMessage))
 	if err != nil {
 		return err
 	}
@@ -267,7 +251,7 @@ func HasUnpushedChangesOrCommits() (bool, error) {
 	normalizeStatus := strings.ToLower(status)
 
 	if strings.Contains(normalizeStatus, notStaged) {
-		err := printCodeChanges(false)
+		err := printCodeChanges()
 		if err != nil {
 			return false, err
 		}
@@ -296,6 +280,11 @@ func HasUnpushedChangesOrCommits() (bool, error) {
 	}
 
 	if strings.Contains(normalizeStatus, needCommitting) {
+		err := printCodeChanges()
+		if err != nil {
+			return false, err
+		}
+
 		confirmCommitPush := gui.ConfirmPrompt("you have un-committed changes - want me to commit and push them?", "", true, true)
 		if !confirmCommitPush {
 			return true, nil
@@ -315,6 +304,11 @@ func HasUnpushedChangesOrCommits() (bool, error) {
 	}
 
 	if strings.Contains(normalizeStatus, branchAhead) {
+		err := printCodeChanges()
+		if err != nil {
+			return false, err
+		}
+
 		confirmPush := gui.ConfirmPrompt("you have un-pushed commits - want me to push them?", "", true, true)
 		if !confirmPush {
 			return true, nil
