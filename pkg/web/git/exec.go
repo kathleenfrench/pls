@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 )
@@ -33,6 +34,11 @@ func PushBranchToOrigin(cb string) (err error) {
 		if err != nil {
 			return err
 		}
+	}
+
+	err = printCodeChanges(true)
+	if err != nil {
+		return err
 	}
 
 	cmd := exec.Command("bash", "-c", fmt.Sprintf("git push -u origin %s", cb))
@@ -206,14 +212,38 @@ func gitAddAll() error {
 	return nil
 }
 
+func printCodeChanges(short bool) (err error) {
+	var changes string
+
+	if short {
+		changes, err = utils.BashExec("git status -s")
+		if err != nil {
+			return err
+		}
+	} else {
+		changes, err = utils.BashExec("git status -b")
+		if err != nil {
+			return err
+		}
+	}
+
+	fmt.Println(fmt.Sprintf("%s\n%s", color.HiYellowString("CHANGES:"), changes))
+	return nil
+}
+
 func gitCommit() error {
+	err := printCodeChanges(false)
+	if err != nil {
+		return err
+	}
+
 	commitMessage := gui.InputPromptWithResponse("add a commit message", "", true)
 	if commitMessage == "" {
 		gui.OhNo("you must enter a commit message to proceed")
 		return gitCommit()
 	}
 
-	_, err := utils.BashExec(fmt.Sprintf("git commit -am %q", commitMessage))
+	_, err = utils.BashExec(fmt.Sprintf("git commit -am %q", commitMessage))
 	if err != nil {
 		return err
 	}
@@ -237,6 +267,11 @@ func HasUnpushedChangesOrCommits() (bool, error) {
 	normalizeStatus := strings.ToLower(status)
 
 	if strings.Contains(normalizeStatus, notStaged) {
+		err := printCodeChanges(false)
+		if err != nil {
+			return false, err
+		}
+
 		confirmAddCommitPush := gui.ConfirmPrompt("you have un-added changes - want me to add, commit, and push them?", "", true, true)
 		if !confirmAddCommitPush {
 			return true, nil
