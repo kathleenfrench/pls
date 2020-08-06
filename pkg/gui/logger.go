@@ -19,9 +19,9 @@ func PleaseHold(msg string, extra interface{}) {
 // Log is a logging helper that allows custom input with the emoji
 func Log(e interface{}, msg string, extra interface{}) {
 	if extra != nil {
-		fmt.Println(fmt.Sprintf("%s%s [%v]", emoji.Sprint(e), fmt.Sprintf("%s...", msg), color.HiBlueString("%v", extra)))
+		fmt.Println(fmt.Sprintf("%s %s [%v]", emoji.Sprint(e), fmt.Sprintf("%s...", msg), color.HiBlueString("%v", extra)))
 	} else {
-		fmt.Println(fmt.Sprintf("%s%s", emoji.Sprint(e), fmt.Sprintf("%s...", msg)))
+		fmt.Println(fmt.Sprintf("%s %s", emoji.Sprint(e), fmt.Sprintf("%s...", msg)))
 	}
 }
 
