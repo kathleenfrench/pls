@@ -7,6 +7,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+// CURRENTLY UNUSED
+
 var tryCmd = &cobra.Command{
 	Use:     "try",
 	Short:   "try to do something",
@@ -17,4 +19,5 @@ var tryCmd = &cobra.Command{
 			utils.ExitWithError(err)
 		}
 	},
+	Hidden: true,
 }
