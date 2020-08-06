@@ -70,7 +70,7 @@ func UpdatePrompt(viperSettings map[string]interface{}) error {
 	v := viper.GetViper()
 	keys := viper.AllKeys()
 	uiKeys, uiKeyMap := genGuiKeyMap(keys)
-	choice := gui.SelectPromptWithResponse("which config value do you want to change?", uiKeys, false)
+	choice := gui.SelectPromptWithResponse("which config value do you want to change?", uiKeys, nil, false)
 	choiceKey := uiKeyMap[choice]
 
 	switch choiceKey {
@@ -88,7 +88,7 @@ func UpdatePrompt(viperSettings map[string]interface{}) error {
 		editExisting := gui.ConfirmPrompt("do you want to modify an existing url?", "", false, true)
 		if editExisting {
 			shortKeys := utils.GetKeysFromMapString(shorts)
-			editWhich := gui.SelectPromptWithResponse("which do you want to change?", shortKeys, false)
+			editWhich := gui.SelectPromptWithResponse("which do you want to change?", shortKeys, nil, false)
 			changedValue = gui.InputPromptWithResponse(fmt.Sprintf("what do you want to change %s to?", editWhich), "", true)
 			v.Set(fmt.Sprintf("webshort.%s", editWhich), changedValue)
 		} else {

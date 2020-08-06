@@ -12,9 +12,10 @@ import (
 	"github.vimeows.com/Vimeo/dex/pkg/utils"
 )
 
-// PullsGetterFlags are evaluated based off of flags/arguments set by the user when searching pull requests of the current user (author:@me)
+// IssueGetterFlags are evaluated based off of flags/arguments set by the user when searching pull requests of the current user (author:@me)
 // see: https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests
-type PullsGetterFlags struct {
+type IssueGetterFlags struct {
+	PROnly bool
 	// basics
 	Repository   string // repo:USERNAME/REPOSITORY || example: repo:mozilla/shumway matches issues from @mozilla's shumway project
 	Organization string // org:ORGNAME | example: org:github matches issues in repositories owned by the GitHub organization
@@ -51,9 +52,9 @@ type PullsGetterFlags struct {
 	*MetaGetterFlags
 }
 
-// FetchPullRequests search all of github for user's pull requests based on search criteria
-func FetchPullRequests(settings config.Settings, getterFlags *PullsGetterFlags) (*github.Client, []*github.Issue, error) {
-	var allPRs []*github.Issue
+// SearchIssues search all of github for user's pull requests based on search criteria
+func SearchIssues(settings config.Settings, getterFlags *IssueGetterFlags) (*github.Client, []*github.Issue, error) {
+	var all []*github.Issue
 	var gc *github.Client
 	var err error
 
@@ -74,15 +75,15 @@ func FetchPullRequests(settings config.Settings, getterFlags *PullsGetterFlags) 
 		gc = git.NewClient(ctx, settings.GitToken)
 	}
 
-	query := getterFlags.constructMyPRSearchQuery()
+	query := getterFlags.constructMyIssueSearchQuery(getterFlags.PROnly)
 
 	for {
-		prs, resp, err := gc.Search.Issues(ctx, query, &opts)
+		is, resp, err := gc.Search.Issues(ctx, query, &opts)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		allPRs = append(allPRs, prs.Issues...)
+		all = append(all, is.Issues...)
 		if resp.NextPage == 0 {
 			break
 		}
@@ -90,11 +91,17 @@ func FetchPullRequests(settings config.Settings, getterFlags *PullsGetterFlags) 
 		opts.Page = resp.NextPage
 	}
 
-	return gc, allPRs, nil
+	return gc, all, nil
 }
 
-func (g *PullsGetterFlags) constructMyPRSearchQuery() string {
-	query := fmt.Sprintf("type:pr state:%s", g.State)
+func (g *IssueGetterFlags) constructMyIssueSearchQuery(isPR bool) string {
+	query := fmt.Sprintf("state:%s", g.State)
+
+	if isPR {
+		query += fmt.Sprintf(" type:pr")
+	} else {
+		query += fmt.Sprintf(" type:issue")
+	}
 
 	if g.Author != "" {
 		query += fmt.Sprintf(" author:%s", g.Author)

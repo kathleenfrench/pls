@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/fatih/color"
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/gui"
@@ -35,7 +34,7 @@ func CreateGitIssuesDropdown(issues []*github.Issue) (*github.Issue, *IssueMeta)
 		}
 	}
 
-	choice := gui.SelectPromptWithResponse("select one", names, false)
+	choice := gui.SelectPromptWithResponse("select one", names, nil, false)
 	return nameMap[choice], metas[choice]
 }
 
@@ -54,14 +53,15 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		pr      *github.PullRequest
 		body    string
 		title   string
+		state   string
 	)
 
-	opts := []string{openInBrowser, readBodyText}
+	opts := []string{openInBrowser, readBodyText, editSelection}
 	ctx := context.Background()
 
 	isPullRequest := issue.IsPullRequest()
 	if isPullRequest {
-		opts = append(opts, openDiff, mergePullRequest, closePR)
+		opts = append(opts, openDiff, mergeSelection)
 		htmlURL = issue.GetPullRequestLinks().GetHTMLURL()
 		prFetch, _, err := gc.PullRequests.Get(context.Background(), meta.Owner, meta.Repo, meta.Number)
 		if err != nil {
@@ -71,29 +71,100 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		pr = prFetch
 		body = pr.GetBody()
 		title = pr.GetTitle()
+		state = pr.GetState()
 	} else {
-		opts = append(opts, closeIssue)
 		htmlURL = issue.GetHTMLURL()
 		body = issue.GetBody()
 		title = issue.GetTitle()
+		state = issue.GetState()
 	}
 
 	// add exit option last
 	opts = append(opts, exitSelections)
-	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", meta.DisplayName), opts, true)
+	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", meta.DisplayName), opts, nil, true)
 
 	switch selected {
 	case readBodyText:
 		render := fmt.Sprintf("# %s\n\n%s", title, body)
 		fmt.Println(gui.RenderMarkdown(render))
 		return nextOpts(gc, issue, meta, settings)
-	case mergePullRequest:
+	case editSelection:
+		editOpts := []string{editTitle, editBody, editState}
+		switch isPullRequest {
+		case true:
+			if pr.GetDraft() {
+				editOpts = append(editOpts, editReadyForReview)
+			}
+
+			prEditTarget := gui.SelectPromptWithResponse("what do you want to change?", editOpts, nil, true)
+			switch prEditTarget {
+			case editTitle:
+				updatedTitle := gui.InputPromptWithResponse("what do you want to call this PR?", title, true)
+				pr.Title = &updatedTitle
+			case editReadyForReview:
+				noDraft := false
+				pr.Draft = &noDraft
+			case editBody:
+				editorCmd := utils.EditorLaunchCommands[settings.DefaultEditor]
+				updatedBody := gui.TextEditorInputAndSave("make updates to your PR body", body, editorCmd)
+				pr.Body = &updatedBody
+			case editState:
+				changedState := changeState(state, issue.GetTitle())
+				if changedState == nil {
+					return nextOpts(gc, issue, meta, settings)
+				}
+
+				pr.State = changedState
+			}
+
+			gui.Spin.Start()
+			updatedPR, _, err := gc.PullRequests.Edit(ctx, meta.Owner, meta.Repo, pr.GetNumber(), pr)
+			gui.Spin.Stop()
+			if err != nil {
+				return err
+			}
+
+			gui.Log(":+1:", fmt.Sprintf("successfully updated your PR %q", updatedPR.GetTitle()), updatedPR.GetNumber())
+			pr = updatedPR
+		default:
+			ir := &github.IssueRequest{}
+			// edit issue
+			editTarget := gui.SelectPromptWithResponse("what do you want to change?", editOpts, nil, true)
+			switch editTarget {
+			case editTitle:
+				updatedTitle := gui.InputPromptWithResponse("what do you want to call this issue?", title, true)
+				ir.Title = &updatedTitle
+			case editBody:
+				editorCmd := utils.EditorLaunchCommands[settings.DefaultEditor]
+				updatedBody := gui.TextEditorInputAndSave("make updates to your issue body", body, editorCmd)
+				ir.Body = &updatedBody
+			case editState:
+				changedState := changeState(state, issue.GetTitle())
+				if changedState == nil {
+					return nextOpts(gc, issue, meta, settings)
+				}
+
+				ir.State = changedState
+			}
+
+			updatedIssue, _, err := gc.Issues.Edit(ctx, meta.Owner, meta.Repo, issue.GetNumber(), ir)
+			if err != nil {
+				return err
+			}
+
+			gui.Log(":+1:", fmt.Sprintf("successfully updated your issue %q", updatedIssue.GetTitle()), updatedIssue.GetNumber())
+			issue = updatedIssue
+		}
+	case mergeSelection:
 		if !pr.GetMergeable() || pr.GetMergeableState() != "clean" {
 			return errors.New("this PR is currently not in a mergeable state")
 		}
 
-		// TODO: add support for squash, rebase (default is straight merge)
-		opts := github.PullRequestOptions{}
+		methods := []string{mergeStraight, mergeSquash, mergeRebase}
+		mergeMethod := gui.SelectPromptWithResponse("what type of merge do you want to perform?", methods, mergeStraight, true)
+		opts := github.PullRequestOptions{
+			MergeMethod: mergeMethod,
+		}
 
 		result, _, err := gc.PullRequests.Merge(ctx, meta.Owner, meta.Repo, pr.GetNumber(), "", &opts)
 		if err != nil {
@@ -105,10 +176,6 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		}
 
 		gui.Log(":balloon:", result.GetMessage(), result.GetSHA())
-	case closePR:
-		color.HiRed("TODO")
-	case closeIssue:
-		color.HiRed("TODO")
 	case openInBrowser:
 		if isPullRequest {
 			utils.OpenURLInDefaultBrowser(htmlURL)
@@ -126,13 +193,35 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 
 func nextOpts(gc *github.Client, issue *github.Issue, meta *IssueMeta, settings config.Settings) error {
 	opts := []string{returnToMenu, exitSelections}
-	selected := gui.SelectPromptWithResponse("what now?", opts, true)
+	selected := gui.SelectPromptWithResponse("what now?", opts, nil, true)
 
 	switch selected {
 	case returnToMenu:
 		return ChooseWhatToDoWithIssue(gc, issue, meta, settings)
 	case exitSelections:
 		gui.Exit()
+	}
+
+	return nil
+}
+
+func changeState(state string, title string) *string {
+	var (
+		untypedClosed = "closed"
+		untypedOpen   = "open"
+	)
+
+	switch state {
+	case stateOpen:
+		closeIt := gui.ConfirmPrompt(fmt.Sprintf("are you sure you want to close %q?", title), "", false, true)
+		if closeIt {
+			return &untypedClosed
+		}
+	case stateClosed:
+		reOpenIt := gui.ConfirmPrompt(fmt.Sprintf("are you sure you want to re-open %q?", title), "", false, true)
+		if reOpenIt {
+			return &untypedOpen
+		}
 	}
 
 	return nil

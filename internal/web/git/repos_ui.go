@@ -22,7 +22,7 @@ func CreateGitRepoDropdown(repositories []*github.Repository) *github.Repository
 		nameMap[r.GetName()] = r
 	}
 
-	choice := gui.SelectPromptWithResponse("select a repository", names, false)
+	choice := gui.SelectPromptWithResponse("select a repository", names, nil, false)
 	return nameMap[choice]
 }
 
@@ -40,7 +40,7 @@ func ChooseWhatToDoWithRepo(repository *github.Repository, settings config.Setti
 	gui.SideBySideTable(rows)
 
 	opts := []string{openInBrowser, cloneRepo, exitSelections}
-	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", repository.GetName()), opts, true)
+	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", repository.GetName()), opts, nil, true)
 
 	switch selected {
 	case openInBrowser:
@@ -54,7 +54,7 @@ func ChooseWhatToDoWithRepo(repository *github.Repository, settings config.Setti
 			"Custom Directory",
 		}
 
-		selected := gui.SelectPromptWithResponse(fmt.Sprintf("where do you want to clone in %s?", repository.GetName()), pathChoices, false)
+		selected := gui.SelectPromptWithResponse(fmt.Sprintf("where do you want to clone in %s?", repository.GetName()), pathChoices, settings.DefaultCodeDir, false)
 
 		switch selected {
 		case settings.DefaultCodeDir:

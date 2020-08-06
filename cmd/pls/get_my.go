@@ -103,6 +103,158 @@ var gitMyRepos = &cobra.Command{
 	},
 }
 
+// --------------------------- ISSUES
+var gitMyIssues = &cobra.Command{
+	Use:     "issues",
+	Aliases: []string{"i", "issue"},
+	Short:   "interact with your issues",
+	Example: color.HiYellowString("\n[issues in current directory's repository]: pls get my issues\n[issues in a repository you own]: pls get my issues in myrepo\n[issues in another's repository]: pls get my issues in organization/repo\n[issues from all of github]: pls get my issues everywhere"),
+	Run: func(cmd *cobra.Command, args []string) {
+		getterFlags := &gitpls.IssueGetterFlags{
+			ClosedOnly:      closedOnly,
+			AssignedOnly:    assignedOnly,
+			Locked:          locked,
+			MetaGetterFlags: &gitpls.MetaGetterFlags{},
+			PROnly:          false,
+		}
+
+		if work {
+			getterFlags.MetaGetterFlags.UseEnterpriseAccount = true
+			getterFlags.Author = plsCfg.GitEnterpriseUsername
+		} else {
+			getterFlags.Author = "@me"
+		}
+
+		if !getterFlags.ClosedOnly && !getterFlags.MergedOnly {
+			getterFlags.State = "open"
+		} else {
+			getterFlags.State = "closed"
+		}
+
+		if getterFlags.AssignedOnly {
+			if getterFlags.MetaGetterFlags.UseEnterpriseAccount {
+				getterFlags.Assignee = plsCfg.GitEnterpriseUsername
+			} else {
+				getterFlags.Assignee = "@me"
+			}
+		}
+
+		switch len(args) {
+		case 0:
+			// fetch all check
+			if !fetchAll {
+				// get for whatever is in the current working directory's repo
+				org, err := git.CurrentRepositoryOrganization()
+				if err != nil {
+					utils.ExitWithError(err)
+				}
+
+				repo, err := git.CurrentRepositoryName()
+				if err != nil {
+					utils.ExitWithError(err)
+				}
+
+				getterFlags.Organization = org
+				getterFlags.Repository = repo
+
+				isEnterprise, err := git.IsEnterpriseGit()
+				if err != nil {
+					utils.ExitWithError(err)
+				}
+
+				src := "github"
+				if isEnterprise {
+					gui.PleaseHold("github enterprise repository detected...", nil)
+					getterFlags.MetaGetterFlags.UseEnterpriseAccount = true
+					getterFlags.Author = plsCfg.GitEnterpriseUsername
+
+					if getterFlags.AssignedOnly {
+						getterFlags.Assignee = plsCfg.GitEnterpriseUsername
+					}
+
+					src = "github enterprise"
+				}
+
+				gui.PleaseHold(fmt.Sprintf("searching %s/%s", org, repo), src)
+			}
+
+			gui.Spin.Start()
+			gc, issues, err := gitpls.SearchIssues(plsCfg, getterFlags)
+			gui.Spin.Stop()
+			if err != nil {
+				utils.ExitWithError(err)
+			}
+
+			if len(issues) == 0 {
+				gui.OhNo("no issues found matching that crtieria")
+				gui.Exit()
+			}
+
+			issue, issueMeta := gitpls.CreateGitIssuesDropdown(issues)
+			err = gitpls.ChooseWhatToDoWithIssue(gc, issue, issueMeta, plsCfg)
+			if err != nil {
+				utils.ExitWithError(err)
+			}
+
+			break
+		case 1:
+			utils.ExitWithError(fmt.Sprintf("%s is not a valid argument", args[0]))
+			break
+		case 2:
+			// pls get my issues in <repo> (owned)
+			// pls get my issues in <org>/<repo> (organization/another person's repo)
+			in := args[0]
+			target := args[1]
+
+			if in != "in" {
+				utils.ExitWithError(fmt.Sprintf("%s %s is not a valid input", in, target))
+			}
+
+			// determine whether we're searching their @username's repo or another
+			if strings.Contains(target, "/") {
+				sp := strings.Split(target, "/")
+				getterFlags.Organization = sp[0]
+				getterFlags.Repository = sp[1]
+			} else {
+				if work {
+					utils.ExitWithError("when working with git enterprise resources, an organization value must be specified")
+				}
+
+				getterFlags.Organization = plsCfg.GitUsername
+				getterFlags.Repository = target
+			}
+
+			src := "github"
+			if work {
+				src = "github enterprise"
+			}
+
+			gui.PleaseHold(fmt.Sprintf("searching %s/%s", getterFlags.Organization, getterFlags.Repository), src)
+			gui.Spin.Start()
+			gc, issues, err := gitpls.SearchIssues(plsCfg, getterFlags)
+			gui.Spin.Stop()
+			if err != nil {
+				utils.ExitWithError(err)
+			}
+
+			if len(issues) == 0 {
+				color.HiYellow("no issues found matching that criteria!")
+				gui.Exit()
+			}
+
+			issue, issueMeta := gitpls.CreateGitIssuesDropdown(issues)
+			err = gitpls.ChooseWhatToDoWithIssue(gc, issue, issueMeta, plsCfg)
+			if err != nil {
+				utils.ExitWithError(err)
+			}
+
+			break
+		default:
+			utils.ExitWithError("invalid input, try running `pls get my issues --help`")
+		}
+	},
+}
+
 // --------------------------- PULL REQUESTS
 var gitMyPRs = &cobra.Command{
 	Use:     "prs",
@@ -110,7 +262,7 @@ var gitMyPRs = &cobra.Command{
 	Short:   "interact with your pull requests",
 	Example: color.HiYellowString("\n[PRs in current directory's repository]: pls get my prs\n[PRs in a repository you own]: pls get my prs in myrepo\n[PRs in another's repository]: pls get my prs in organization/repo\n[PRs from all of github]: pls get my prs everywhere"),
 	Run: func(cmd *cobra.Command, args []string) {
-		getterFlags := &gitpls.PullsGetterFlags{
+		getterFlags := &gitpls.IssueGetterFlags{
 			MergedOnly:       mergedOnly,
 			ClosedOnly:       closedOnly,
 			DraftsOnly:       draftOnly,
@@ -121,6 +273,7 @@ var gitMyPRs = &cobra.Command{
 			ForCurrentBranch: forCurrentBranch,
 			Locked:           locked,
 			MetaGetterFlags:  &gitpls.MetaGetterFlags{},
+			PROnly:           true,
 		}
 
 		if work {
@@ -199,7 +352,7 @@ var gitMyPRs = &cobra.Command{
 			}
 
 			gui.Spin.Start()
-			gc, prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
+			gc, prs, err := gitpls.SearchIssues(plsCfg, getterFlags)
 			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
@@ -250,7 +403,7 @@ var gitMyPRs = &cobra.Command{
 			}
 			gui.PleaseHold(fmt.Sprintf("searching %s/%s", getterFlags.Organization, getterFlags.Repository), src)
 			gui.Spin.Start()
-			gc, prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
+			gc, prs, err := gitpls.SearchIssues(plsCfg, getterFlags)
 			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
@@ -294,19 +447,20 @@ func init() {
 	myGetSubCmd.AddCommand(gitMyOrgs)
 	myGetSubCmd.AddCommand(gitMyRepos)
 	myGetSubCmd.AddCommand(gitMyPRs)
+	myGetSubCmd.AddCommand(gitMyIssues)
 
 	// flags
-	myGetSubCmd.PersistentFlags().BoolVarP(&work, "work", "w", false, "fetch resources via your github enterprise account")
-	myGetSubCmd.PersistentFlags().BoolVarP(&mergedOnly, "merged", "m", false, "fetch only PRs that have been merged")
-	myGetSubCmd.PersistentFlags().BoolVarP(&closedOnly, "closed", "c", false, "fetch only closed PRs")
-	myGetSubCmd.PersistentFlags().BoolVarP(&pending, "pending", "p", false, "get only PRs that are pending approval")
-	myGetSubCmd.PersistentFlags().BoolVarP(&approved, "approved", "a", false, "fetch only PRs that have been approved")
-	myGetSubCmd.PersistentFlags().BoolVarP(&changesNeeded, "changesneeded", "x", false, "fetch only PRs where changes have been requested")
-	myGetSubCmd.PersistentFlags().BoolVar(&assignedOnly, "assigned", false, "fetch only PRs assigned to you")
-	myGetSubCmd.PersistentFlags().BoolVarP(&forCurrentBranch, "current", "b", false, "fetch the PR, if one exists, for your current working branch")
-	myGetSubCmd.PersistentFlags().BoolVarP(&locked, "locked", "l", false, "fetch only locked PRs")
-	myGetSubCmd.PersistentFlags().BoolVar(&mentionedMe, "mention", false, "fetch only PRs where i've been mentioned")
-	myGetSubCmd.PersistentFlags().BoolVarP(&draftOnly, "draft", "d", false, "fetch only draft PRs")
+	myGetSubCmd.PersistentFlags().BoolVarP(&work, "work", "w", false, "[ALL] fetch resources via your github enterprise account")
+	myGetSubCmd.PersistentFlags().BoolVarP(&mergedOnly, "merged", "m", false, "[PR] fetch only PRs that have been merged")
+	myGetSubCmd.PersistentFlags().BoolVarP(&closedOnly, "closed", "c", false, "[PR|ISSUE] fetch only closed prs or issues")
+	myGetSubCmd.PersistentFlags().BoolVarP(&pending, "pending", "p", false, "[PR] get only PRs that are pending approval")
+	myGetSubCmd.PersistentFlags().BoolVarP(&approved, "approved", "a", false, "[PR] fetch only PRs that have been approved")
+	myGetSubCmd.PersistentFlags().BoolVarP(&changesNeeded, "changesneeded", "x", false, "[PR] fetch only PRs where changes have been requested")
+	myGetSubCmd.PersistentFlags().BoolVar(&assignedOnly, "assigned", false, "[PR|ISSUE] fetch only PRs or issues assigned to you")
+	myGetSubCmd.PersistentFlags().BoolVarP(&forCurrentBranch, "current", "b", false, "[PR] fetch the PR, if one exists, for your current working branch")
+	myGetSubCmd.PersistentFlags().BoolVarP(&locked, "locked", "l", false, "[PR|ISSUE] fetch only locked PRs or issues")
+	myGetSubCmd.PersistentFlags().BoolVar(&mentionedMe, "mention", false, "[PR|ISSUE] fetch only PRs or issues where i've been mentioned")
+	myGetSubCmd.PersistentFlags().BoolVarP(&draftOnly, "draft", "d", false, "[PR] fetch only draft PRs")
 
 	gitMyPRs.AddCommand(myWherePRSubCmd)
 	// flags

@@ -1,31 +1,46 @@
 package gitpls
 
-// openInBrowser is a selection choice
-const openInBrowser = "Open in Browser"
+const (
+	// openInBrowser is a selection choice
+	openInBrowser = "Open in Browser"
 
-// cloneRepo is a selection choice
-const cloneRepo = "Clone Repo"
+	// cloneRepo is a selection choice
+	cloneRepo = "Clone Repo"
 
-// exitSelections is a selection choice
-const exitSelections = "Exit"
+	// exitSelections is a selection choice
+	exitSelections = "Exit"
 
-// getOrganizationRepos is a selection choice
-const getOrganizationRepos = "Get Organization Repositories"
+	// getOrganizationRepos is a selection choice
+	getOrganizationRepos = "Get Organization Repositories"
 
-// openDiff is a selection choice
-const openDiff = "Open Diff"
+	// openDiff is a selection choice
+	openDiff = "Open Diff"
 
-// readBodyText is a selection choice
-const readBodyText = "Read Body Text"
+	// readBodyText is a selection choice
+	readBodyText = "See Description"
 
-// returnToMenu is a selection choice
-const returnToMenu = "Return to Menu"
+	// returnToMenu is a selection choice
+	returnToMenu = "Return to Menu"
 
-// mergePullRequest is a selection choice
-const mergePullRequest = "Merge PR"
+	// ------------ editSelection is a selection choice
+	editSelection = "Edit"
+	// ---- subchoices
+	editTitle          = "Title"
+	editBody           = "Body"
+	editState          = "State"
+	editReadyForReview = "Mark as Ready for Review" // only applicable to 'draft' PRs
+	// ------------ closeSelection is a selection choice
+	closeSelection = "Close"
+	// ------------ openSelection is a selection choice
+	openSelection = "Re-Open"
+	// ------ state changes
+	stateOpen   = "open"
+	stateClosed = "closed"
 
-// closePR is a selection choice
-const closePR = "Close PR"
-
-// closeIssue is a selection choice
-const closeIssue = "Close Issue"
+	// ------------ mergeSelection is a selection choice
+	mergeSelection = "Merge"
+	// ------ merge options
+	mergeSquash   = "squash"
+	mergeRebase   = "rebase"
+	mergeStraight = "merge"
+)

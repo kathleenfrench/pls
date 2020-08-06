@@ -9,7 +9,7 @@ import (
 )
 
 // SelectPromptWithResponse creates a dropdown selection prompt and records the user's choice
-func SelectPromptWithResponse(label string, options []string, disableClear bool) string {
+func SelectPromptWithResponse(label string, options []string, defaultValue interface{}, disableClear bool) string {
 	if !disableClear {
 		clearScreen()
 	}
@@ -25,6 +25,10 @@ func SelectPromptWithResponse(label string, options []string, disableClear bool)
 		Message:  label,
 		Options:  options,
 		PageSize: pageSize,
+	}
+
+	if defaultValue != nil {
+		prompt.Default = defaultValue
 	}
 
 	// see: https://github.com/AlecAivazis/survey/issues/101
