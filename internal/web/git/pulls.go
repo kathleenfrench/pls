@@ -160,14 +160,6 @@ func CreatePullRequestFromCWD(settings config.Settings) error {
 		return err
 	}
 
-	if !remoteRefExists {
-		gui.PleaseHold("no remote ref for your branch exists, attempting to push it for you", nil)
-		err = git.PushBranchToOrigin("")
-		if err != nil {
-			return fmt.Errorf("could not push your branch - %s", err)
-		}
-	}
-
 	// verify that the current branch does not have changes that aren't commited
 	hasUnpushedChanges, err := git.HasUnpushedChangesOrCommits()
 	if err != nil {
@@ -176,6 +168,14 @@ func CreatePullRequestFromCWD(settings config.Settings) error {
 
 	if hasUnpushedChanges {
 		return errors.New("i can't open a PR when your local branch is out of sync with its remote iteration")
+	}
+
+	if !remoteRefExists {
+		gui.PleaseHold("no remote ref for your branch exists, attempting to push it for you", nil)
+		err = git.PushBranchToOrigin("")
+		if err != nil {
+			return fmt.Errorf("could not push your branch - %s", err)
+		}
 	}
 
 	ctx := context.Background()

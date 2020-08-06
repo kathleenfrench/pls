@@ -156,6 +156,16 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 			issue = updatedIssue
 		}
 	case mergeSelection:
+		// verify that the current branch does not have changes that aren't commited
+		hasUnpushedChanges, err := git.HasUnpushedChangesOrCommits()
+		if err != nil {
+			return err
+		}
+
+		if hasUnpushedChanges {
+			return errors.New("i can't merge a PR when your local branch is out of sync with its remote iteration")
+		}
+
 		mergeable := pollForMergeability(gc, pr, meta)
 		if mergeable {
 			gui.Log(":+1:", fmt.Sprintf("%q is mergeable!", pr.GetTitle()), nil)
