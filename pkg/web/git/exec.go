@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 )
 
@@ -184,6 +185,115 @@ func RemoteRefOfCurrentBranchExists() (bool, error) {
 	}
 
 	return RemoteRefExists(cb), nil
+}
+
+func getStatus() (string, error) {
+	status, err := utils.BashExec("git status")
+	if err != nil {
+		return status, err
+	}
+
+	return status, nil
+}
+
+func gitAddAll() error {
+	gui.PleaseHold("adding changes", nil)
+	_, err := utils.BashExec("git add .")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func gitCommit() error {
+	commitMessage := gui.InputPromptWithResponse("add a commit message", "", true)
+	if commitMessage == "" {
+		gui.OhNo("you must enter a commit message to proceed")
+		return gitCommit()
+	}
+
+	_, err := utils.BashExec(fmt.Sprintf("git commit -am %q", commitMessage))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+const (
+	notStaged      = "changes not staged for commit"
+	needCommitting = "changes to be committed"
+	branchAhead    = "your branch is ahead"
+)
+
+// HasUnpushedChangesOrCommits checks whether there are unpushed local commits
+func HasUnpushedChangesOrCommits() (bool, error) {
+	status, err := getStatus()
+	if err != nil {
+		return false, err
+	}
+
+	normalizeStatus := strings.ToLower(status)
+
+	if strings.Contains(normalizeStatus, notStaged) {
+		confirmAddCommitPush := gui.ConfirmPrompt("you have un-added changes - want me to add, commit, and push them?", "", true, true)
+		if !confirmAddCommitPush {
+			return true, nil
+		}
+
+		err = gitAddAll()
+		if err != nil {
+			return false, err
+		}
+
+		err = gitCommit()
+		if err != nil {
+			return false, err
+		}
+
+		err = PushBranchToOrigin("")
+		if err != nil {
+			return false, err
+		}
+
+		return HasUnpushedChangesOrCommits()
+	}
+
+	if strings.Contains(normalizeStatus, needCommitting) {
+		confirmCommitPush := gui.ConfirmPrompt("you have un-committed changes - want me to commit and push them?", "", true, true)
+		if !confirmCommitPush {
+			return true, nil
+		}
+
+		err = gitCommit()
+		if err != nil {
+			return false, err
+		}
+
+		err = PushBranchToOrigin("")
+		if err != nil {
+			return false, err
+		}
+
+		return HasUnpushedChangesOrCommits()
+	}
+
+	if strings.Contains(normalizeStatus, branchAhead) {
+		confirmPush := gui.ConfirmPrompt("you have un-pushed commits - want me to push them?", "", true, true)
+		if !confirmPush {
+			return true, nil
+		}
+
+		err = PushBranchToOrigin("")
+		if err != nil {
+			return false, err
+		}
+
+		return HasUnpushedChangesOrCommits()
+	}
+
+	return false, nil
 }
 
 // RemoteRefExists returns a bool for whether a remote reference to a pull request exists

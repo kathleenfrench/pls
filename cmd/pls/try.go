@@ -1,10 +1,10 @@
 package pls
 
 import (
-	"github.com/kathleenfrench/pls/internal/config"
+	"github.com/fatih/color"
 	"github.com/kathleenfrench/pls/pkg/utils"
+	"github.com/kathleenfrench/pls/pkg/web/git"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // CURRENTLY UNUSED
@@ -14,10 +14,12 @@ var tryCmd = &cobra.Command{
 	Short:   "try to do something",
 	Aliases: []string{"t"},
 	Run: func(cmd *cobra.Command, args []string) {
-		err := config.ParseAndUpdate(viper.GetViper())
+		unpushed, err := git.HasUnpushedChangesOrCommits()
 		if err != nil {
 			utils.ExitWithError(err)
 		}
+
+		color.HiGreen("has unpushed commits? %v", unpushed)
 	},
 	Hidden: true,
 }
