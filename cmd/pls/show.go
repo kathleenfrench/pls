@@ -12,7 +12,7 @@ import (
 var showCmd = &cobra.Command{
 	Use:     "show",
 	Short:   "show values for various resources",
-	Aliases: []string{"s", "print", "list"},
+	Aliases: []string{"s", "print", "list", "l"},
 }
 
 var showConfigsCmd = &cobra.Command{
