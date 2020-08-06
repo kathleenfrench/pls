@@ -1,19 +1,5 @@
 ## pls
 
-`pls` is a helpful little command line tool written in `go`
-
-### TODO:
-
-**functionality**:
-- `git`
-- opening webpages
-- code snippets
-- web search
-- fzf
-- jump directories
-- sys cleanup
-- sys info
-- writing interface
-- run simple server to perform various local tasks - cli GUI
+`pls` is a helpful little command line tool...if you ask real nice
 
 
