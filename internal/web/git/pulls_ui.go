@@ -144,7 +144,7 @@ func collectPullRequestResponses(settings config.Settings, isEnterprise bool) (*
 	editorCmd := utils.EditorLaunchCommands[settings.DefaultEditor]
 	body := gui.TextEditorInputAndSave("enter a description of this PR", "", editorCmd)
 
-	body += fmt.Sprintf("\n\n<sub>this PR was opened by saying [`pls`](https://github.com/kathleenfrench/pls)</sub>\n")
+	body += fmt.Sprintf("\n\n---\n<sub>:balloon: i opened this PR by saying [`pls`](https://github.com/kathleenfrench/pls)</sub>\n")
 
 	// set the values
 	pr.Title = &title
