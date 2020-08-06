@@ -20,3 +20,12 @@ const readBodyText = "Read Body Text"
 
 // returnToMenu is a selection choice
 const returnToMenu = "Return to Menu"
+
+// mergePullRequest is a selection choice
+const mergePullRequest = "Merge PR"
+
+// closePR is a selection choice
+const closePR = "Close PR"
+
+// closeIssue is a selection choice
+const closeIssue = "Close Issue"
