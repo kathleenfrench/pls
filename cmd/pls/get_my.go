@@ -18,6 +18,12 @@ import (
 
 // pls get prs to review (current) | (in <org/repo>) | <everywhere>
 
+// pls get --all my prs
+// pls get --all my --work prs
+
+// indicate enterprise by using the --work flag
+// pls get my --work prs
+
 // pls get my prs [default: all open prs, includes drafts]
 // pls get my --merged prs
 // pls get my --closed prs
