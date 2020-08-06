@@ -156,8 +156,12 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 			issue = updatedIssue
 		}
 	case mergeSelection:
-		if !pr.GetMergeable() || pr.GetMergeableState() != "clean" {
-			return errors.New("this PR is currently not in a mergeable state")
+		mergeable := pollForMergeability(gc, pr, meta)
+		if mergeable {
+			gui.Log(":+1:", fmt.Sprintf("%q is mergeable!", pr.GetTitle()), nil)
+		} else {
+			noMergeErr := fmt.Sprintf("%q is not mergeable - current state: %s", pr.GetTitle(), pr.GetMergeableState())
+			return errors.New(noMergeErr)
 		}
 
 		methods := []string{mergeStraight, mergeSquash, mergeRebase}

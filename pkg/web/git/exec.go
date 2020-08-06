@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 )
 
@@ -51,7 +50,6 @@ func PushBranchToOrigin(cb string) (err error) {
 
 // CheckoutMasterAndPull checks out the current branch to master and pulls down the latest
 func CheckoutMasterAndPull() error {
-	gui.PleaseHold("checking into master and pulling latest", nil)
 	cmd := exec.Command("bash", "-c", "git checkout master && git pull")
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin

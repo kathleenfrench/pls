@@ -21,7 +21,7 @@ type IssueGetterFlags struct {
 	User         string // user:USERNAME | example: user:defunkt ubuntu matches issues with the word "ubuntu" from repositories owned by @defunkt
 
 	// searching text
-	Match       bool   // pls get my prs --match <title|body|comments> [text to search for]
+	Match       bool   // pls get my prs|issues --match <title|body|comments> [text to search for]
 	InTitleText string // in:title | example: warning in:title matches issues with "warning" in their title.
 	InBodyText  string // in:body | example: error in:title,body matches issues with "error" in their title or body.
 	InComments  string // in:comments | shipit in:comments matches issues mentioning "shipit" in their comments.
@@ -210,4 +210,36 @@ func CreatePullRequestFromCWD(settings config.Settings) error {
 	}
 
 	return nil
+}
+
+// undocumented, but: mergeable state values: clean, dirty, blocked, unstable, or unknown
+func pollForMergeability(gc *github.Client, pr *github.PullRequest, meta *IssueMeta) bool {
+	if pr.GetMergeable() {
+		return true
+	}
+
+	var (
+		err     error
+		prCheck *github.PullRequest
+	)
+
+	if !pr.GetMergeable() && pr.GetMergeableState() == "unknown" {
+		// poll until we know
+		for {
+			prCheck, _, err = gc.PullRequests.Get(context.Background(), meta.Owner, meta.Repo, pr.GetNumber())
+			if err != nil {
+				return false
+			}
+
+			if prCheck.GetMergeable() {
+				break
+			}
+
+			if !prCheck.GetMergeable() && pr.GetMergeableState() != "unknown" {
+				break
+			}
+		}
+	}
+
+	return prCheck.GetMergeable()
 }
