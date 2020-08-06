@@ -306,7 +306,11 @@ var gitMyPRs = &cobra.Command{
 			// verify a remote ref exists first
 			branchHasPR := git.RemoteRefExists(cb)
 			if !branchHasPR {
-				utils.ExitWithError(fmt.Sprintf("your %s branch does not have an open PR", cb))
+				// push the branch
+				err = git.PushBranchToOrigin(cb)
+				if err != nil {
+					utils.ExitWithError(fmt.Sprintf("your %s branch does not have an open PR, and there was an error attempting to push it - %s", cb, err))
+				}
 			}
 
 			getterFlags.CurrentBranch = cb

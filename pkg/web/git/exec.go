@@ -26,6 +26,29 @@ func CheckForGitUsername() (string, error) {
 	return username, nil
 }
 
+// PushBranchToOrigin pushes the current working directory's branch to origin
+func PushBranchToOrigin(cb string) (err error) {
+	if cb == "" {
+		cb, err = CurrentBranch()
+		if err != nil {
+			return err
+		}
+	}
+
+	cmd := exec.Command("bash", "-c", fmt.Sprintf("git push -u origin %s", cb))
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
+	fmt.Fprintln(os.Stdout)
+	return nil
+
+}
+
 // CheckoutMasterAndPull checks out the current branch to master and pulls down the latest
 func CheckoutMasterAndPull() error {
 	gui.PleaseHold("checking into master and pulling latest", nil)
