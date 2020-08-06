@@ -46,7 +46,7 @@ type IssueMeta struct {
 }
 
 // ChooseWhatToDoWithIssue lets the user decide what to do with their chosen issue
-func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings config.Settings) error {
+func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *IssueMeta, settings config.Settings) error {
 	var (
 		htmlURL string
 		pr      *github.PullRequest
@@ -55,14 +55,12 @@ func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings conf
 	)
 
 	opts := []string{openInBrowser, readBodyText}
-	ctx := context.Background()
-	gc := git.NewClient(ctx, settings.GitToken)
 
 	isPullRequest := issue.IsPullRequest()
 	if isPullRequest {
 		opts = append(opts, openDiff)
 		htmlURL = issue.GetPullRequestLinks().GetHTMLURL()
-		prFetch, _, err := gc.PullRequests.Get(ctx, meta.Owner, meta.Repo, meta.Number)
+		prFetch, _, err := gc.PullRequests.Get(context.Background(), meta.Owner, meta.Repo, meta.Number)
 		if err != nil {
 			return err
 		}
@@ -84,7 +82,7 @@ func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings conf
 	case readBodyText:
 		render := fmt.Sprintf("# %s\n\n%s", title, body)
 		fmt.Println(gui.RenderMarkdown(render))
-		return nextOpts(issue, meta, settings)
+		return nextOpts(gc, issue, meta, settings)
 	case openInBrowser:
 		if isPullRequest {
 			utils.OpenURLInDefaultBrowser(htmlURL)
@@ -100,13 +98,13 @@ func ChooseWhatToDoWithIssue(issue *github.Issue, meta *IssueMeta, settings conf
 	return nil
 }
 
-func nextOpts(issue *github.Issue, meta *IssueMeta, settings config.Settings) error {
+func nextOpts(gc *github.Client, issue *github.Issue, meta *IssueMeta, settings config.Settings) error {
 	opts := []string{returnToMenu, exitSelections}
 	selected := gui.SelectPromptWithResponse("what now?", opts, true)
 
 	switch selected {
 	case returnToMenu:
-		return ChooseWhatToDoWithIssue(issue, meta, settings)
+		return ChooseWhatToDoWithIssue(gc, issue, meta, settings)
 	case exitSelections:
 		gui.Exit()
 	}

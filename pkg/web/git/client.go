@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/google/go-github/v32/github"
+	"github.com/kathleenfrench/pls/pkg/utils"
 	"golang.org/x/oauth2"
 )
 
@@ -22,7 +24,14 @@ func NewClient(ctx context.Context, token string) *github.Client {
 }
 
 // NewEnterpriseClient creates a new github enterprise client
-func NewEnterpriseClient(ctx context.Context, baseURL string, token string) (*github.Client, error) {
+func NewEnterpriseClient(ctx context.Context, hostname string, token string) (*github.Client, error) {
+	validBaseURL, err := utils.ValidateURL(hostname)
+	if err != nil {
+		return nil, err
+	}
+
+	color.HiGreen("initializing git enterprise client with base url: %s...", validBaseURL)
+
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{
 			AccessToken: token,
@@ -30,8 +39,8 @@ func NewEnterpriseClient(ctx context.Context, baseURL string, token string) (*gi
 	)
 
 	tc := oauth2.NewClient(ctx, ts)
-	uploadURL := fmt.Sprintf("https://%s/api/uploads/", baseURL)
-	client, err := github.NewEnterpriseClient(baseURL, uploadURL, tc)
+	uploadURL := fmt.Sprintf("https://%s/api/uploads/", hostname)
+	client, err := github.NewEnterpriseClient(validBaseURL, uploadURL, tc)
 	if err != nil {
 		return nil, err
 	}

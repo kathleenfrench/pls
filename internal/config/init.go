@@ -95,7 +95,7 @@ func checkForUnsetRequiredDefaults() bool {
 		viper.Set(webShortcutsKey, defaultWebShortcuts)
 	}
 
-	if viper.Get(githubEnterpriseHostKey) != notApplicable {
+	if viper.Get(githubEnterpriseHostKey) == nil {
 		unsetFound = true
 		useGitEnterprise := gui.ConfirmPrompt("do you want to configure pls to work with github enterprise?", "", false, true)
 		if useGitEnterprise {

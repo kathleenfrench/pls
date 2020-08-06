@@ -45,6 +45,7 @@ var (
 	locked           bool
 	mentionedMe      bool
 	searchTarget     []string // <title|body|comments>
+	work             bool
 )
 
 // ------------------------------------------------------
@@ -107,7 +108,14 @@ var gitMyPRs = &cobra.Command{
 			AssignedOnly:     assignedOnly,
 			ForCurrentBranch: forCurrentBranch,
 			Locked:           locked,
-			Author:           "@me",
+			MetaGetterFlags:  &gitpls.MetaGetterFlags{},
+		}
+
+		if work {
+			getterFlags.MetaGetterFlags.UseEnterpriseAccount = true
+			getterFlags.Author = plsCfg.GitEnterpriseUsername
+		} else {
+			getterFlags.Author = "@me"
 		}
 
 		if !getterFlags.ClosedOnly && !getterFlags.MergedOnly {
@@ -117,7 +125,11 @@ var gitMyPRs = &cobra.Command{
 		}
 
 		if getterFlags.AssignedOnly {
-			getterFlags.Assignee = "@me"
+			if getterFlags.MetaGetterFlags.UseEnterpriseAccount {
+				getterFlags.Assignee = plsCfg.GitEnterpriseUsername
+			} else {
+				getterFlags.Assignee = "@me"
+			}
 		}
 
 		if getterFlags.ForCurrentBranch {
@@ -153,7 +165,7 @@ var gitMyPRs = &cobra.Command{
 			getterFlags.Repository = repo
 
 			gui.Spin.Start()
-			prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
+			gc, prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
 			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
@@ -165,7 +177,7 @@ var gitMyPRs = &cobra.Command{
 			}
 
 			pr, prMeta := gitpls.CreateGitIssuesDropdown(prs)
-			_ = gitpls.ChooseWhatToDoWithIssue(pr, prMeta, plsCfg)
+			_ = gitpls.ChooseWhatToDoWithIssue(gc, pr, prMeta, plsCfg)
 		case 1:
 			// everywhere check
 			single := args[0]
@@ -174,7 +186,7 @@ var gitMyPRs = &cobra.Command{
 			}
 
 			gui.Spin.Start()
-			prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
+			gc, prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
 			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
@@ -186,7 +198,7 @@ var gitMyPRs = &cobra.Command{
 			}
 
 			pr, prMeta := gitpls.CreateGitIssuesDropdown(prs)
-			_ = gitpls.ChooseWhatToDoWithIssue(pr, prMeta, plsCfg)
+			_ = gitpls.ChooseWhatToDoWithIssue(gc, pr, prMeta, plsCfg)
 		case 2:
 			// pls get my prs in <repo> (owned)
 			// pls get my prs in <org>/<repo> (organization/another person's repo)
@@ -209,7 +221,7 @@ var gitMyPRs = &cobra.Command{
 
 			color.HiBlue("searching %s/%s...", getterFlags.Organization, getterFlags.Repository)
 			gui.Spin.Start()
-			prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
+			gc, prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
 			gui.Spin.Stop()
 			if err != nil {
 				utils.ExitWithError(err)
@@ -221,7 +233,7 @@ var gitMyPRs = &cobra.Command{
 			}
 
 			pr, prMeta := gitpls.CreateGitIssuesDropdown(prs)
-			_ = gitpls.ChooseWhatToDoWithIssue(pr, prMeta, plsCfg)
+			_ = gitpls.ChooseWhatToDoWithIssue(gc, pr, prMeta, plsCfg)
 		default:
 			utils.ExitWithError("invalid input, try running `pls get my prs --help`")
 		}
@@ -250,6 +262,7 @@ func init() {
 	myGetSubCmd.AddCommand(gitMyPRs)
 
 	// flags
+	myGetSubCmd.PersistentFlags().BoolVarP(&work, "work", "w", false, "fetch resources via your github enterprise account")
 	myGetSubCmd.PersistentFlags().BoolVarP(&mergedOnly, "merged", "m", false, "fetch only PRs that have been merged")
 	myGetSubCmd.PersistentFlags().BoolVarP(&closedOnly, "closed", "c", false, "fetch only closed PRs")
 	myGetSubCmd.PersistentFlags().BoolVarP(&pending, "pending", "p", false, "get only PRs that are pending approval")

@@ -49,8 +49,10 @@ type PullsGetterFlags struct {
 }
 
 // FetchPullRequests search all of github for user's pull requests based on search criteria
-func FetchPullRequests(settings config.Settings, getterFlags *PullsGetterFlags) ([]*github.Issue, error) {
+func FetchPullRequests(settings config.Settings, getterFlags *PullsGetterFlags) (*github.Client, []*github.Issue, error) {
 	var allPRs []*github.Issue
+	var gc *github.Client
+	var err error
 
 	opts := github.SearchOptions{
 		ListOptions: github.ListOptions{
@@ -59,13 +61,22 @@ func FetchPullRequests(settings config.Settings, getterFlags *PullsGetterFlags) 
 	}
 
 	ctx := context.Background()
-	gc := git.NewClient(ctx, settings.GitToken)
+
+	if getterFlags.UseEnterpriseAccount {
+		gc, err = git.NewEnterpriseClient(ctx, settings.GitEnterpriseHostname, settings.GitEnterpriseToken)
+		if err != nil {
+			return nil, nil, err
+		}
+	} else {
+		gc = git.NewClient(ctx, settings.GitToken)
+	}
+
 	query := getterFlags.constructMyPRSearchQuery()
 
 	for {
 		prs, resp, err := gc.Search.Issues(ctx, query, &opts)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		allPRs = append(allPRs, prs.Issues...)
@@ -76,7 +87,7 @@ func FetchPullRequests(settings config.Settings, getterFlags *PullsGetterFlags) 
 		opts.Page = resp.NextPage
 	}
 
-	return allPRs, nil
+	return gc, allPRs, nil
 }
 
 func (g *PullsGetterFlags) constructMyPRSearchQuery() string {
