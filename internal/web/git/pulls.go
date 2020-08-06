@@ -2,6 +2,7 @@ package gitpls
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/google/go-github/v32/github"
@@ -153,6 +154,7 @@ func (g *IssueGetterFlags) constructMyIssueSearchQuery(isPR bool) string {
 func CreatePullRequestFromCWD(settings config.Settings) error {
 	var gc *github.Client
 
+	// verify whether there is a remote ref for this branch
 	remoteRefExists, err := git.RemoteRefOfCurrentBranchExists()
 	if err != nil {
 		return err
@@ -164,6 +166,16 @@ func CreatePullRequestFromCWD(settings config.Settings) error {
 		if err != nil {
 			return fmt.Errorf("could not push your branch - %s", err)
 		}
+	}
+
+	// verify that the current branch does not have changes that aren't commited
+	hasUnpushedChanges, err := git.HasUnpushedChangesOrCommits()
+	if err != nil {
+		return err
+	}
+
+	if hasUnpushedChanges {
+		return errors.New("i can't open a PR when your local branch is out of sync with its remote iteration")
 	}
 
 	ctx := context.Background()

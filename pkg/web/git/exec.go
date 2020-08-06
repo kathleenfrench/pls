@@ -239,7 +239,7 @@ func HasUnpushedChangesOrCommits() (bool, error) {
 	if strings.Contains(normalizeStatus, notStaged) {
 		confirmAddCommitPush := gui.ConfirmPrompt("you have un-added changes - want me to add, commit, and push them?", "", true, true)
 		if !confirmAddCommitPush {
-			gui.Exit()
+			return true, nil
 		}
 
 		err = gitAddAll()
@@ -261,6 +261,11 @@ func HasUnpushedChangesOrCommits() (bool, error) {
 	}
 
 	if strings.Contains(normalizeStatus, needCommitting) {
+		confirmCommitPush := gui.ConfirmPrompt("you have un-committed changes - want me to commit and push them?", "", true, true)
+		if !confirmCommitPush {
+			return true, nil
+		}
+
 		err = gitCommit()
 		if err != nil {
 			return false, err
@@ -275,6 +280,11 @@ func HasUnpushedChangesOrCommits() (bool, error) {
 	}
 
 	if strings.Contains(normalizeStatus, branchAhead) {
+		confirmPush := gui.ConfirmPrompt("you have un-pushed commits - want me to push them?", "", true, true)
+		if !confirmPush {
+			return true, nil
+		}
+
 		err = PushBranchToOrigin("")
 		if err != nil {
 			return false, err
