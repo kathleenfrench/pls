@@ -14,6 +14,6 @@ var Spin = spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 
 // Exit says by and exits the program
 func Exit() {
-	color.HiCyan("\n%sbye", emoji.Sprint(":wave:"))
+	color.HiCyan("\nbye%s", emoji.Sprint(":wave:"))
 	os.Exit(0)
 }
