@@ -158,8 +158,12 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 			issue = updatedIssue
 		}
 	case mergeableStateTest:
-		color.HiBlue("mergeable: %v", pr.GetMergeable())
-		color.HiBlue("mergeable state: %v", pr.GetMergeableState())
+		mergeable := pollForMergeability(gc, pr, meta)
+		if mergeable {
+			color.HiBlue("mergeable!")
+		} else {
+			color.HiRed("not mergeable!")
+		}
 	case mergeSelection:
 		if !pr.GetMergeable() || pr.GetMergeableState() != "clean" {
 			return fmt.Errorf("this PR is currently not in a mergeable state - mergeable: %v, mergeable state: %v", pr.GetMergeable(), pr.GetMergeableState())
