@@ -22,15 +22,26 @@ const (
 	// returnToMenu is a selection choice
 	returnToMenu = "Return to Menu"
 
-	// closeIssue is a selection choice
-	closeIssue = "Close Issue"
-
-	// editSelection is a selection choice
+	// ------------ editSelection is a selection choice
 	editSelection = "Edit"
+	// ---- subchoices
+	editTitle = "Title"
+	editBody  = "Body"
+	editState = "State"
+	// ------ state changes
+	stateOpen   = "open"
+	stateClosed = "closed"
 
 	// closeSelection is a selection choice
 	closeSelection = "Close"
 
-	// mergeSelection is a selection choice
+	// openSelection is a selection choice
+	openSelection = "Open"
+
+	// ------------ mergeSelection is a selection choice
 	mergeSelection = "Merge"
+	// ------ merge options
+	mergeSquash   = "squash"
+	mergeRebase   = "rebase"
+	mergeStraight = "merge"
 )

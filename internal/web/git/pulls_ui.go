@@ -35,7 +35,7 @@ func CreateGitIssuesDropdown(issues []*github.Issue) (*github.Issue, *IssueMeta)
 		}
 	}
 
-	choice := gui.SelectPromptWithResponse("select one", names, false)
+	choice := gui.SelectPromptWithResponse("select one", names, nil, false)
 	return nameMap[choice], metas[choice]
 }
 
@@ -54,6 +54,7 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		pr      *github.PullRequest
 		body    string
 		title   string
+		state   string
 	)
 
 	opts := []string{openInBrowser, readBodyText, editSelection}
@@ -71,15 +72,23 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		pr = prFetch
 		body = pr.GetBody()
 		title = pr.GetTitle()
+		state = pr.GetState()
 	} else {
 		htmlURL = issue.GetHTMLURL()
 		body = issue.GetBody()
 		title = issue.GetTitle()
+		state = issue.GetState()
+	}
+
+	if state == stateClosed {
+		opts = append(opts, openSelection)
+	} else if state == stateOpen {
+		opts = append(opts, closeSelection)
 	}
 
 	// add exit and close options last
 	opts = append(opts, closeSelection, exitSelections)
-	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", meta.DisplayName), opts, true)
+	selected := gui.SelectPromptWithResponse(fmt.Sprintf("what would you like to do with %s?", meta.DisplayName), opts, nil, true)
 
 	switch selected {
 	case readBodyText:
@@ -87,14 +96,27 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		fmt.Println(gui.RenderMarkdown(render))
 		return nextOpts(gc, issue, meta, settings)
 	case editSelection:
-		color.HiRed("TODO")
+		if isPullRequest {
+			updatedPR, _, err := gc.PullRequests.Edit(ctx, meta.Owner, meta.Repo, pr.GetNumber(), pr)
+
+			if err != nil {
+				return err
+			}
+
+			pr = updatedPR
+		} else {
+			color.HiRed("TODO")
+		}
 	case mergeSelection:
 		if !pr.GetMergeable() || pr.GetMergeableState() != "clean" {
 			return errors.New("this PR is currently not in a mergeable state")
 		}
 
-		// TODO: add support for squash, rebase (default is straight merge)
-		opts := github.PullRequestOptions{}
+		methods := []string{mergeStraight, mergeSquash, mergeRebase}
+		mergeMethod := gui.SelectPromptWithResponse("what type of merge do you want to perform?", methods, mergeStraight, true)
+		opts := github.PullRequestOptions{
+			MergeMethod: mergeMethod,
+		}
 
 		result, _, err := gc.PullRequests.Merge(ctx, meta.Owner, meta.Repo, pr.GetNumber(), "", &opts)
 		if err != nil {
@@ -106,6 +128,8 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		}
 
 		gui.Log(":balloon:", result.GetMessage(), result.GetSHA())
+	case openSelection:
+		color.HiRed("TODO")
 	case closeSelection:
 		color.HiRed("TODO")
 	case openInBrowser:
@@ -125,7 +149,7 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 
 func nextOpts(gc *github.Client, issue *github.Issue, meta *IssueMeta, settings config.Settings) error {
 	opts := []string{returnToMenu, exitSelections}
-	selected := gui.SelectPromptWithResponse("what now?", opts, true)
+	selected := gui.SelectPromptWithResponse("what now?", opts, nil, true)
 
 	switch selected {
 	case returnToMenu:
