@@ -177,7 +177,10 @@ var gitMyPRs = &cobra.Command{
 			}
 
 			pr, prMeta := gitpls.CreateGitIssuesDropdown(prs)
-			_ = gitpls.ChooseWhatToDoWithIssue(gc, pr, prMeta, plsCfg)
+			err = gitpls.ChooseWhatToDoWithIssue(gc, pr, prMeta, plsCfg)
+			if err != nil {
+				utils.ExitWithError(err)
+			}
 		case 1:
 			// everywhere check
 			single := args[0]
@@ -198,7 +201,10 @@ var gitMyPRs = &cobra.Command{
 			}
 
 			pr, prMeta := gitpls.CreateGitIssuesDropdown(prs)
-			_ = gitpls.ChooseWhatToDoWithIssue(gc, pr, prMeta, plsCfg)
+			err = gitpls.ChooseWhatToDoWithIssue(gc, pr, prMeta, plsCfg)
+			if err != nil {
+				utils.ExitWithError(err)
+			}
 		case 2:
 			// pls get my prs in <repo> (owned)
 			// pls get my prs in <org>/<repo> (organization/another person's repo)
@@ -215,6 +221,10 @@ var gitMyPRs = &cobra.Command{
 				getterFlags.Organization = sp[0]
 				getterFlags.Repository = sp[1]
 			} else {
+				if work {
+					utils.ExitWithError("when working with git enterprise resources, an organization value must be specified")
+				}
+
 				getterFlags.Organization = plsCfg.GitUsername
 				getterFlags.Repository = target
 			}
@@ -233,7 +243,10 @@ var gitMyPRs = &cobra.Command{
 			}
 
 			pr, prMeta := gitpls.CreateGitIssuesDropdown(prs)
-			_ = gitpls.ChooseWhatToDoWithIssue(gc, pr, prMeta, plsCfg)
+			err = gitpls.ChooseWhatToDoWithIssue(gc, pr, prMeta, plsCfg)
+			if err != nil {
+				utils.ExitWithError(err)
+			}
 		default:
 			utils.ExitWithError("invalid input, try running `pls get my prs --help`")
 		}

@@ -17,24 +17,23 @@ func CreateGitIssuesDropdown(issues []*github.Issue) (*github.Issue, *IssueMeta)
 	var org string
 	var repo string
 	nameMap := make(map[string]*github.Issue)
+	metas := make(map[string]*IssueMeta)
 	for _, i := range issues {
 		r := i.GetRepositoryURL()
 		org, repo = git.ExtractOrganizationAndRepoNameFromRepoURL(r)
 		name := fmt.Sprintf("[%s/%s]: %s", org, repo, i.GetTitle())
 		names = append(names, name)
 		nameMap[name] = i
+		metas[name] = &IssueMeta{
+			DisplayName: name,
+			Owner:       org,
+			Repo:        repo,
+			Number:      i.GetNumber(),
+		}
 	}
 
 	choice := gui.SelectPromptWithResponse("select one", names, false)
-
-	meta := &IssueMeta{
-		DisplayName: choice,
-		Owner:       org,
-		Repo:        repo,
-		Number:      nameMap[choice].GetNumber(),
-	}
-
-	return nameMap[choice], meta
+	return nameMap[choice], metas[choice]
 }
 
 // IssueMeta is a helper for relevant info when making subsequent API calls from the GUI
