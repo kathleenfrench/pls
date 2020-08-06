@@ -149,20 +149,23 @@ var gitMyPRs = &cobra.Command{
 
 		switch len(args) {
 		case 0:
-			// get prs in the current repo
-			// get org
-			org, err := git.CurrentRepositoryOrganization()
-			if err != nil {
-				utils.ExitWithError(err)
-			}
+			// fetch all check
+			if !fetchAll {
+				// get prs in the current repo
+				// get org
+				org, err := git.CurrentRepositoryOrganization()
+				if err != nil {
+					utils.ExitWithError(err)
+				}
 
-			repo, err := git.CurrentRepositoryName()
-			if err != nil {
-				utils.ExitWithError(err)
-			}
+				repo, err := git.CurrentRepositoryName()
+				if err != nil {
+					utils.ExitWithError(err)
+				}
 
-			getterFlags.Organization = org
-			getterFlags.Repository = repo
+				getterFlags.Organization = org
+				getterFlags.Repository = repo
+			}
 
 			gui.Spin.Start()
 			gc, prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
@@ -182,29 +185,7 @@ var gitMyPRs = &cobra.Command{
 				utils.ExitWithError(err)
 			}
 		case 1:
-			// everywhere check
-			single := args[0]
-			if single != "everywhere" && single != "all" && single != "e" {
-				utils.ExitWithError(fmt.Sprintf("%s is not a valid argument", single))
-			}
-
-			gui.Spin.Start()
-			gc, prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
-			gui.Spin.Stop()
-			if err != nil {
-				utils.ExitWithError(err)
-			}
-
-			if len(prs) == 0 {
-				color.HiYellow("no PRs found matching that criteria!")
-				gui.Exit()
-			}
-
-			pr, prMeta := gitpls.CreateGitIssuesDropdown(prs)
-			err = gitpls.ChooseWhatToDoWithIssue(gc, pr, prMeta, plsCfg)
-			if err != nil {
-				utils.ExitWithError(err)
-			}
+			utils.ExitWithError(fmt.Sprintf("%s is not a valid argument", args[0]))
 		case 2:
 			// pls get my prs in <repo> (owned)
 			// pls get my prs in <org>/<repo> (organization/another person's repo)

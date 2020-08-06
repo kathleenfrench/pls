@@ -11,6 +11,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	fetchAll bool
+)
+
 // ------------------------------------------------------
 
 var getCmd = &cobra.Command{
@@ -108,6 +112,7 @@ var gitRepos = &cobra.Command{
 // ------------------------------------------------------
 
 func init() {
+	getCmd.PersistentFlags().BoolVar(&fetchAll, "all", false, "search all of github")
 	getCmd.AddCommand(gitOrgs)
 	getCmd.AddCommand(gitRepos)
 }

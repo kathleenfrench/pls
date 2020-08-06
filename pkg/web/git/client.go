@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/fatih/color"
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"golang.org/x/oauth2"
@@ -29,8 +28,6 @@ func NewEnterpriseClient(ctx context.Context, hostname string, token string) (*g
 	if err != nil {
 		return nil, err
 	}
-
-	color.HiGreen("initializing git enterprise client with base url: %s...", validBaseURL)
 
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{
