@@ -11,7 +11,7 @@ func PleaseHold(msg string, extra interface{}) {
 	if extra != nil {
 		fmt.Println(fmt.Sprintf("%s %s [%v]", color.HiYellowString("<pls hold>"), msg, color.HiBlueString("%v", extra)))
 	} else {
-		fmt.Println("%s %s", color.HiYellowString("<pls hold>"), msg)
+		fmt.Println(fmt.Sprintf("%s %s", color.HiYellowString("<pls hold>"), msg))
 	}
 }
 
