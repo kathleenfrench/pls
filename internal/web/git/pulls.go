@@ -168,12 +168,12 @@ func CreatePullRequestFromCWD(settings config.Settings) error {
 		return err
 	}
 
-	newPR, err := collectPullRequestResponses(settings)
+	isEnterprise, err := git.IsEnterpriseGit()
 	if err != nil {
 		return err
 	}
 
-	isEnterprise, err := git.IsEnterpriseGit()
+	newPR, err := collectPullRequestResponses(settings, isEnterprise)
 	if err != nil {
 		return err
 	}

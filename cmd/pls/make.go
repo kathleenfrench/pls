@@ -1,8 +1,8 @@
 package pls
 
 import (
-	"fmt"
-
+	gitpls "github.com/kathleenfrench/pls/internal/web/git"
+	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +21,10 @@ var makePRCmd = &cobra.Command{
 	Use:     "pullrequest",
 	Aliases: []string{"pr", "pull"},
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("make a PR?")
+		err := gitpls.CreatePullRequestFromCWD(plsCfg)
+		if err != nil {
+			utils.ExitWithError(err)
+		}
 	},
 }
 
