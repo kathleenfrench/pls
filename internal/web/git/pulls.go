@@ -139,3 +139,15 @@ func (g *PullsGetterFlags) constructMyPRSearchQuery() string {
 
 	return query
 }
+
+func collectPullRequestResponses(owner string, repo string) (*github.NewPullRequest, error) {
+	return nil, nil
+}
+
+// CreatePullRequestFromCWD creates a PR for the branch in your current working directory
+// func CreatePullRequestFromCWD() error {
+// 	// get current org and repo
+
+// 	pr, err := collectPullRequestResponses()
+// 	return nil
+// }

@@ -157,8 +157,7 @@ var gitMyPRs = &cobra.Command{
 		case 0:
 			// fetch all check
 			if !fetchAll {
-				// get prs in the current repo
-				// get org
+				// get for whatever is in the current working directory's repo
 				org, err := git.CurrentRepositoryOrganization()
 				if err != nil {
 					utils.ExitWithError(err)
@@ -171,6 +170,26 @@ var gitMyPRs = &cobra.Command{
 
 				getterFlags.Organization = org
 				getterFlags.Repository = repo
+
+				isEnterprise, err := git.IsEnterpriseGit()
+				if err != nil {
+					utils.ExitWithError(err)
+				}
+
+				src := "github"
+				if isEnterprise {
+					gui.PleaseHold("github enterprise repository detected...", nil)
+					getterFlags.MetaGetterFlags.UseEnterpriseAccount = true
+					getterFlags.Author = plsCfg.GitEnterpriseUsername
+
+					if getterFlags.AssignedOnly {
+						getterFlags.Assignee = plsCfg.GitEnterpriseUsername
+					}
+
+					src = "github enterprise"
+				}
+
+				gui.PleaseHold(fmt.Sprintf("searching %s/%s", org, repo), src)
 			}
 
 			gui.Spin.Start()
@@ -181,7 +200,7 @@ var gitMyPRs = &cobra.Command{
 			}
 
 			if len(prs) == 0 {
-				color.HiYellow("no PRs found matching that criteria!")
+				gui.OhNo("no PRs found matching that crtieria")
 				gui.Exit()
 			}
 
@@ -190,8 +209,11 @@ var gitMyPRs = &cobra.Command{
 			if err != nil {
 				utils.ExitWithError(err)
 			}
+
+			break
 		case 1:
 			utils.ExitWithError(fmt.Sprintf("%s is not a valid argument", args[0]))
+			break
 		case 2:
 			// pls get my prs in <repo> (owned)
 			// pls get my prs in <org>/<repo> (organization/another person's repo)
@@ -216,7 +238,11 @@ var gitMyPRs = &cobra.Command{
 				getterFlags.Repository = target
 			}
 
-			color.HiBlue("searching %s/%s...", getterFlags.Organization, getterFlags.Repository)
+			src := "github"
+			if work {
+				src = "github enterprise"
+			}
+			gui.PleaseHold(fmt.Sprintf("searching %s/%s", getterFlags.Organization, getterFlags.Repository), src)
 			gui.Spin.Start()
 			gc, prs, err := gitpls.FetchPullRequests(plsCfg, getterFlags)
 			gui.Spin.Stop()
@@ -234,6 +260,8 @@ var gitMyPRs = &cobra.Command{
 			if err != nil {
 				utils.ExitWithError(err)
 			}
+
+			break
 		default:
 			utils.ExitWithError("invalid input, try running `pls get my prs --help`")
 		}
