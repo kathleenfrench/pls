@@ -2,7 +2,6 @@ package gitpls
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/google/go-github/v32/github"
@@ -160,7 +159,11 @@ func CreatePullRequestFromCWD(settings config.Settings) error {
 	}
 
 	if !remoteRefExists {
-		return errors.New("no remote ref for your current branch exists - make sure to push it before attempting to create a PR")
+		gui.PleaseHold("no remote ref for your branch exists, attempting to push it for you", nil)
+		err = git.PushBranchToOrigin("")
+		if err != nil {
+			return fmt.Errorf("could not push your branch - %s", err)
+		}
 	}
 
 	ctx := context.Background()
