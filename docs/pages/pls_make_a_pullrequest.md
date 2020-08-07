@@ -1,7 +1,7 @@
 ---
 title: "pls make a pullrequest"
 permalink: pls_make_a_pullrequest
-url: /pages/pls_make_a_pullrequest/
+url: /pls_make_a_pullrequest/
 summary: ""
 layout: default
 ---

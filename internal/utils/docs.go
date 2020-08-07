@@ -29,7 +29,7 @@ layout: default
 
 	name := filepath.Base(filename)
 	base := strings.TrimSuffix(name, path.Ext(name))
-	url := "/pages/" + strings.ToLower(base) + "/"
+	url := "/" + strings.ToLower(base) + "/"
 	front := fmt.Sprintf(fmTemplate, strings.Replace(base, "_", " ", -1), base, url, summary)
 	return front
 }

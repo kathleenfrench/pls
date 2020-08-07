@@ -1,7 +1,7 @@
 ---
 title: "pls get my issues"
 permalink: pls_get_my_issues
-url: /pages/pls_get_my_issues/
+url: /pls_get_my_issues/
 summary: "interact with your issues"
 layout: default
 ---

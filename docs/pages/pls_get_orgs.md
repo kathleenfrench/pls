@@ -1,7 +1,7 @@
 ---
 title: "pls get orgs"
 permalink: pls_get_orgs
-url: /pages/pls_get_orgs/
+url: /pls_get_orgs/
 summary: "interact with someone else's github organizations"
 layout: default
 ---

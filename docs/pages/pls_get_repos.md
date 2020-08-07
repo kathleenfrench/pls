@@ -1,7 +1,7 @@
 ---
 title: "pls get repos"
 permalink: pls_get_repos
-url: /pages/pls_get_repos/
+url: /pls_get_repos/
 summary: "interact with someone else's github repositories"
 layout: default
 ---

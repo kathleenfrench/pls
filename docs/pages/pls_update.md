@@ -1,7 +1,7 @@
 ---
 title: "pls update"
 permalink: pls_update
-url: /pages/pls_update/
+url: /pls_update/
 summary: "update various resources like configs and pls itself"
 layout: default
 ---
@@ -28,9 +28,9 @@ update various resources like configs and pls itself
 ```
 ### Sub Commands
 
-* [pls update configs](/pages/pls_update_configs/)	 - update your pls configs
-* [pls update yourself](/pages/pls_update_yourself/)	 - check if pls has an available update and install it if so
+* [pls update configs](/pls_update_configs/)	 - update your pls configs
+* [pls update yourself](/pls_update_yourself/)	 - check if pls has an available update and install it if so
 
 ### See Also
 
-* [pls](/pages/pls/)	 - a helpful little CLI that does things for you when you ask nice...
+* [pls](/pls/)	 - a helpful little CLI that does things for you when you ask nice...

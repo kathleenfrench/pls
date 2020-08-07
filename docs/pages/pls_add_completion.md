@@ -1,7 +1,7 @@
 ---
 title: "pls add completion"
 permalink: pls_add_completion
-url: /pages/pls_add_completion/
+url: /pls_add_completion/
 summary: "add shell completion for pls"
 layout: default
 ---

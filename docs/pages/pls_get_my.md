@@ -1,7 +1,7 @@
 ---
 title: "pls get my"
 permalink: pls_get_my
-url: /pages/pls_get_my/
+url: /pls_get_my/
 summary: "fetch your stuff specifically"
 layout: default
 ---
@@ -40,8 +40,8 @@ fetch your stuff specifically
 ```
 ### Sub Commands
 
-* [pls get my issues](/pages/pls_get_my_issues/)	 - interact with your issues
-* [pls get my orgs](/pages/pls_get_my_orgs/)	 - interact with your github organizations
-* [pls get my prs](/pages/pls_get_my_prs/)	 - interact with your pull requests
-* [pls get my repos](/pages/pls_get_my_repos/)	 - interact with your github repositories
+* [pls get my issues](/pls_get_my_issues/)	 - interact with your issues
+* [pls get my orgs](/pls_get_my_orgs/)	 - interact with your github organizations
+* [pls get my prs](/pls_get_my_prs/)	 - interact with your pull requests
+* [pls get my repos](/pls_get_my_repos/)	 - interact with your github repositories
 

@@ -1,7 +1,7 @@
 ---
 title: "pls show configs"
 permalink: pls_show_configs
-url: /pages/pls_show_configs/
+url: /pls_show_configs/
 summary: "show config values"
 layout: default
 ---

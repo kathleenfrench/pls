@@ -1,7 +1,7 @@
 ---
 title: "pls show"
 permalink: pls_show
-url: /pages/pls_show/
+url: /pls_show/
 summary: "show values for various resources"
 layout: default
 ---
@@ -28,8 +28,8 @@ show values for various resources
 ```
 ### Sub Commands
 
-* [pls show configs](/pages/pls_show_configs/)	 - show config values
+* [pls show configs](/pls_show_configs/)	 - show config values
 
 ### See Also
 
-* [pls](/pages/pls/)	 - a helpful little CLI that does things for you when you ask nice...
+* [pls](/pls/)	 - a helpful little CLI that does things for you when you ask nice...

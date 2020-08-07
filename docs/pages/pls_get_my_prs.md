@@ -1,7 +1,7 @@
 ---
 title: "pls get my prs"
 permalink: pls_get_my_prs
-url: /pages/pls_get_my_prs/
+url: /pls_get_my_prs/
 summary: "interact with your pull requests"
 layout: default
 ---
@@ -52,5 +52,5 @@ interact with your pull requests
 ```
 ### Sub Commands
 
-* [pls get my prs where](/pages/pls_get_my_prs_where/)	 - 
+* [pls get my prs where](/pls_get_my_prs_where/)	 - 
 
