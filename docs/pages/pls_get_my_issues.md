@@ -12,6 +12,13 @@ layout: default
 
 **TL;DR:** interact with your issues
 
+## Description
+
+currently, `pls` has support for:
+- editing issues' titles, body text, and/or state
+- opening issues in the user's default browser
+- rendering the issue description markdown in the terminal
+
 ## Usage:
 
 ### Examples
