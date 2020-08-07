@@ -1,11 +1,15 @@
 package pls
 
 import (
+	"fmt"
+	"path"
+	"strings"
+
+	internalutils "github.com/kathleenfrench/pls/internal/utils"
 	gitpls "github.com/kathleenfrench/pls/internal/web/git"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/spf13/cobra"
-	"github.com/spf13/cobra/doc"
 )
 
 var makeCmd = &cobra.Command{
@@ -35,8 +39,20 @@ var makeDocsCmd = &cobra.Command{
 	Hidden: true,
 	Short:  "generate markdown documentation for pls commands",
 	Run: func(cmd *cobra.Command, args []string) {
+		outDir := "docs/content/commands"
+		err := utils.CreateDir(outDir)
+		if err != nil {
+			utils.ExitWithError(err)
+		}
+
+		fp := internalutils.FrontMatter
+		linkHandler := func(name string) string {
+			base := strings.TrimSuffix(name, path.Ext(name))
+			return "/commands/" + strings.ToLower(base) + "/"
+		}
+
 		topCmd := cmd.Root()
-		err := doc.GenMarkdownTree(topCmd, "./docs")
+		err = internalutils.GenMarkdownDocumentation(topCmd, fmt.Sprintf("./%s", outDir), fp, linkHandler)
 		if err != nil {
 			utils.ExitWithError(err)
 		}
