@@ -441,7 +441,7 @@ var myWherePRSubCmd = &cobra.Command{
 	Example: "pls get my prs where <text to search>",
 	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		// flags, search
+		color.HiRed("SORRY I HAVEN'T BEEN IMPLEMENTED YET BUT I WILL BE SOON")
 	},
 }
 
