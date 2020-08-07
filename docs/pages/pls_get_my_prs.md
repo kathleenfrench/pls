@@ -17,11 +17,11 @@ layout: default
 ### Examples
 
 ```
-
 [PRs in current directory's repository]: pls get my prs
 [PRs in a repository you own]: pls get my prs in myrepo
 [PRs in another's repository]: pls get my prs in organization/repo
 [PRs from all of github]: pls get --all my prs
+[PRs on my work account]: pls get my --work prs
 ```
 
 ### Local Flags

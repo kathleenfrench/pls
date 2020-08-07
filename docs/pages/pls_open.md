@@ -12,16 +12,18 @@ layout: default
 
 **TL;DR:** open any url in your default browser from the command line, or select from a set of common favorites
 
+## Description
+
+`pls` comes with a few pre-baked url shortcuts, but the rest is up to you. view your configs (`pls show configs`) to see what shortcuts have already been set to the `webshort` property. if you ever want to update these values - whether that be changing an existing url or adding a new shortcut - simply run `pls update configs` and follow the onscreen prompts.
+
 ## Usage:
 
 ### Examples
 
 ```
-
-[opens dropdown GUI of your url shortcuts]: pls open
+pls open [opens dropdown GUI of your url shortcuts]
 pls open https://google.com
 pls open google.com
-
 ```
 
 ### Local Flags

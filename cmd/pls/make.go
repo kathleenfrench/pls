@@ -26,6 +26,9 @@ var aCmd = &cobra.Command{
 var makePRCmd = &cobra.Command{
 	Use:     "pullrequest",
 	Aliases: []string{"pr", "pull"},
+	Short:   "let `pls` open a pull request for you based off of the branch in your current working directory",
+	Long:    "`pls` will open a pull request for you, but only after verifying that your current local branch is synced with its remote ref. if it isn't synced, then `pls` will confirm whether or not you want to let `pls` handle adding, committing, and/or pushing the branch for you. once that's done, `pls` will prompt you for various values:\n- title\n- PR description\n- whether to link it to an existing issue\n- whether to create it as a draft (if using an enterprise account)\n\n`pls` will even spawn a temporary file in your preferred text editor for composing the body of the pull request. once you finish adding values, `pls` handles creating the PR!",
+	Example: "pls make a pr",
 	Run: func(cmd *cobra.Command, args []string) {
 		err := gitpls.CreatePullRequestFromCWD(plsCfg)
 		if err != nil {

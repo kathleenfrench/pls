@@ -32,6 +32,7 @@ var completeMethodCmd = &cobra.Command{
 var completionCmd = &cobra.Command{
 	Use:       "completion [bash|zsh|fish]",
 	Short:     "add shell completion for pls",
+	Long:      "writes completion scripts to your local machine based off of your preferred shell. `pls` currently has support for: `bash`, `zsh`, and `fish`.",
 	ValidArgs: []string{"bash", "zsh", "fish"},
 	Args:      cobra.ExactValidArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {

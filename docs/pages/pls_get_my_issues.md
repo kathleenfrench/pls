@@ -17,11 +17,11 @@ layout: default
 ### Examples
 
 ```
-
 [issues in current directory's repository]: pls get my issues
 [issues in a repository you own]: pls get my issues in myrepo
 [issues in another's repository]: pls get my issues in organization/repo
 [issues from all of github]: pls get --all my issues
+[issues on my work account]: pls get my --work issues
 ```
 
 ### Local Flags
