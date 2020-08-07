@@ -43,6 +43,7 @@ build: ${BUILD_OUTPUT_DIR} vendor ## build the pls binary
 		export CGO_ENABLED=0 && \
 		$(GO) build $(GO_BUILD_FLAGS)
 	@echo "${NAME} bin compiled!"
+	@pls make docs
 
 .PHONY: install
 install: build ## install the pls binary to /usr/local/bin
