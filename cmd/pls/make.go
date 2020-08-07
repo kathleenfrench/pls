@@ -39,8 +39,9 @@ var makeDocsCmd = &cobra.Command{
 	Hidden: true,
 	Short:  "generate markdown documentation for pls commands",
 	Run: func(cmd *cobra.Command, args []string) {
-		outDir := "docs/content/commands"
-		err := utils.CreateDir(outDir)
+		gui.Log(":popcorn:", "generating pls documentation...", nil)
+
+		err := utils.CreateDir(internalutils.PublishDocsDirectory)
 		if err != nil {
 			utils.ExitWithError(err)
 		}
@@ -48,13 +49,10 @@ var makeDocsCmd = &cobra.Command{
 		fp := internalutils.FrontMatter
 		linkHandler := func(name string) string {
 			base := strings.TrimSuffix(name, path.Ext(name))
-			return "/commands/" + strings.ToLower(base) + "/"
+			return fmt.Sprintf("/pages/%s/", strings.ToLower(base))
 		}
 
-		topCmd := cmd.Root()
-		topCmd.DisableAutoGenTag = true
-
-		err = internalutils.GenMarkdownDocumentation(topCmd, fmt.Sprintf("./%s", outDir), fp, linkHandler)
+		err = internalutils.GenMarkdownDocumentation(cmd.Root(), fmt.Sprintf("./%s", internalutils.PublishDocsDirectory), fp, linkHandler)
 		if err != nil {
 			utils.ExitWithError(err)
 		}

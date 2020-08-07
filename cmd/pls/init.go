@@ -10,11 +10,11 @@ import (
 var (
 	// Verbose is whether to return a verbose output
 	Verbose bool
-	cfgFile string
+	// cfgFile string
 )
 
 func initGlobalFlags() {
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/pls/config.yaml)")
+	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/pls/config.yaml)")
 	rootCmd.PersistentFlags().Bool("viper", true, "use viper for configuration")
 	viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
 	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "V", false, "verbose output")

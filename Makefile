@@ -72,6 +72,14 @@ clean: ## delete the build binary
 	@rm -rf ${BUILD_OUTPUT_DIR}
 	@echo "removed ${BUILD_OUTPUT_DIR}..."
 
+.PHONY: pages
+pages: ## run pages site locally
+	@cd docs && \
+		bundle && \
+		bundle install && \
+		bundle exec jekyll serve && \
+		cd ..
+
 .PHONY: help
 help: ## lists some available makefile commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
