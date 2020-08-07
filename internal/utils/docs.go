@@ -142,7 +142,7 @@ func GenMarkdownExtraCustom(cmd *cobra.Command, w io.Writer, linkHandler func(st
 		if parent.Runnable() {
 			b.WriteString("### See Also\n\n")
 			parentName := parent.CommandPath()
-			parentLink := parentName + ".md"
+			parentLink := strings.Replace(fmt.Sprintf("%s.md", parentName), " ", "_", -1)
 			b.WriteString(fmt.Sprintf("* [%s](%s)\t - %s\n", parentName, linkHandler(parentLink), parent.Short))
 			cmd.VisitParents(func(c *cobra.Command) {
 				if c.DisableAutoGenTag {

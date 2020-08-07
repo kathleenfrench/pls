@@ -40,8 +40,8 @@ fetch your stuff specifically
 ```
 ### Sub Commands
 
-* [pls get my issues](/pls/pls_get_my_issues/)	 - interact with your issues
-* [pls get my orgs](/pls/pls_get_my_orgs/)	 - interact with your github organizations
-* [pls get my prs](/pls/pls_get_my_prs/)	 - interact with your pull requests
-* [pls get my repos](/pls/pls_get_my_repos/)	 - interact with your github repositories
+* [pls get my issues](/pls/pls_get_my_issues)	 - interact with your issues
+* [pls get my orgs](/pls/pls_get_my_orgs)	 - interact with your github organizations
+* [pls get my prs](/pls/pls_get_my_prs)	 - interact with your pull requests
+* [pls get my repos](/pls/pls_get_my_repos)	 - interact with your github repositories
 

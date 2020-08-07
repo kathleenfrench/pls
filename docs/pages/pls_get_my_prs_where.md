@@ -47,4 +47,4 @@ pls get my prs where <text to search>
 ```
 ### See Also
 
-* [pls get my prs](/pls/pls get my prs/)	 - interact with your pull requests
+* [pls get my prs](/pls/pls_get_my_prs)	 - interact with your pull requests

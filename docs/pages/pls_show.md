@@ -28,8 +28,8 @@ show values for various resources
 ```
 ### Sub Commands
 
-* [pls show configs](/pls/pls_show_configs/)	 - show config values
+* [pls show configs](/pls/pls_show_configs)	 - show config values
 
 ### See Also
 
-* [pls](/pls/pls/)	 - a helpful little CLI that does things for you when you ask nice...
+* [pls](/pls/pls)	 - a helpful little CLI that does things for you when you ask nice...

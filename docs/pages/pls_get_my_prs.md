@@ -52,5 +52,5 @@ interact with your pull requests
 ```
 ### Sub Commands
 
-* [pls get my prs where](/pls/pls_get_my_prs_where/)	 - 
+* [pls get my prs where](/pls/pls_get_my_prs_where)	 - 
 

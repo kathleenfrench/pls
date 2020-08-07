@@ -28,9 +28,9 @@ update various resources like configs and pls itself
 ```
 ### Sub Commands
 
-* [pls update configs](/pls/pls_update_configs/)	 - update your pls configs
-* [pls update yourself](/pls/pls_update_yourself/)	 - check if pls has an available update and install it if so
+* [pls update configs](/pls/pls_update_configs)	 - update your pls configs
+* [pls update yourself](/pls/pls_update_yourself)	 - check if pls has an available update and install it if so
 
 ### See Also
 
-* [pls](/pls/pls/)	 - a helpful little CLI that does things for you when you ask nice...
+* [pls](/pls/pls)	 - a helpful little CLI that does things for you when you ask nice...

@@ -28,8 +28,8 @@ let pls create something for you
 ```
 ### Sub Commands
 
-* [pls make a](/pls/pls_make_a/)	 - make a single one of a given resource
+* [pls make a](/pls/pls_make_a)	 - make a single one of a given resource
 
 ### See Also
 
-* [pls](/pls/pls/)	 - a helpful little CLI that does things for you when you ask nice...
+* [pls](/pls/pls)	 - a helpful little CLI that does things for you when you ask nice...
