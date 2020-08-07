@@ -2,8 +2,9 @@ name: pls
 email: kfrench09@gmail.com
 description: |
   pls is a command line too that will do things for you...if you ask nicely
-baseurl: "/pls/pages"
-url: "https://kathleenfrench.github.io"
+baseurl: "/pls"
+url: https://kathleenfrench.github.io
+repository: kathleenfrench/pls
 permalink: pretty
 remote_theme: pmarsceill/just-the-docs
 search_enabled: true
