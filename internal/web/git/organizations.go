@@ -42,8 +42,6 @@ func ChooseWithToDoWithOrganization(organization *github.Organization, settings 
 	// 	gc = git.NewClient(ctx, settings.GitToken)
 	// }
 
-	// TODO: REMOVE
-
 	login := organization.GetLogin()
 	if login == "" {
 		login = organization.GetName()
