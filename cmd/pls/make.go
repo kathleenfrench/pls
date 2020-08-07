@@ -52,6 +52,8 @@ var makeDocsCmd = &cobra.Command{
 		}
 
 		topCmd := cmd.Root()
+		topCmd.DisableAutoGenTag = true
+
 		err = internalutils.GenMarkdownDocumentation(topCmd, fmt.Sprintf("./%s", outDir), fp, linkHandler)
 		if err != nil {
 			utils.ExitWithError(err)
