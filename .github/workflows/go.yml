@@ -1,0 +1,39 @@
+name: pls
+on: push
+env:
+  GO111MODULE: on
+jobs:
+  lint:
+    name: lint
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+        goversion: [1.13, 1.14]
+    steps:
+      - uses: actions/setup-go@v1
+        with:
+          go-version: ${{matrix.goversion}}
+      - uses: actions/checkout@v2
+      - name: lint go code
+        run: make lint
+  build:
+    name: build
+    needs: lint
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+        goversion: [1.13, 1.14]
+    steps:
+    - name: setup go ${{matrix.goversion}} on ${{matrix.os}}
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{matrix.goversion}}
+      id: go
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: fetch dependencies
+      run: go mod download
+    - name: build binary
+      run: make build
