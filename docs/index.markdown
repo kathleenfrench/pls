@@ -18,7 +18,8 @@ permalink: /
 ## Quick Start
 
 ```
-go get -u github.com/kathleenfrench/pls
+git clone git@github.com:kathleenfrench/pls.git
+cd pls
 make install
 ```
 
