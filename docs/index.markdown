@@ -11,4 +11,21 @@ permalink: /
 
 # About
 
-`pls` is a command line tool for automating everday dev things if you exercise some manners
+`pls` is a command line tool for automating everday dev things...if you ask nicely.
+
+![](./assets/pls_main.png)
+
+## Quick Start
+
+```
+go get -u github.com/kathleenfrench/pls
+make install
+```
+
+### Configs
+
+When you run `pls` for the first time, you will be propmted to set config values `pls` requires to be of much use to you.
+
+If at any point you want to update your configuration values, simply run: `pls update configs`.
+
+You can view which configs are currently set by running `pls show configs`.
