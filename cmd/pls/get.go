@@ -48,7 +48,7 @@ var gitRepos = &cobra.Command{
 	Use:     "repos",
 	Aliases: []string{"r", "repositories", "repo", "repository"},
 	Short:   "interact with someone else's github repositories",
-	Example: fmt.Sprintf("\npls get repos for <username>\npls get repos by <username>\npls get repos in <organization>"),
+	Example: fmt.Sprintf("pls get repos for <username>\npls get repos by <username>\npls get repos in <organization>"),
 	Args:    cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		gui.Spin.Start()

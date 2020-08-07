@@ -17,7 +17,6 @@ layout: default
 ### Examples
 
 ```
-
 pls get repos for <username>
 pls get repos by <username>
 pls get repos in <organization>
