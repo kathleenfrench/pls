@@ -322,6 +322,16 @@ var gitMyPRs = &cobra.Command{
 
 		switch len(args) {
 		case 0:
+			currentRepoEnterprise, err := git.IsEnterpriseGit()
+			if err != nil {
+				utils.ExitWithError(err)
+			}
+
+			if work && !currentRepoEnterprise {
+				gui.Log(":police_car_light:", "it looks like you're trying to fetch prs for a work repo when you're not in one - going to search your work git as a fallback...", nil)
+				fetchAll = true
+			}
+
 			// fetch all check
 			if !fetchAll {
 				// get for whatever is in the current working directory's repo
