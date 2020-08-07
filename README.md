@@ -6,4 +6,4 @@
 
 ### usage
 
-visit the `pls` documentation [here](https://github.com/kathleenfrench/pls/tree/master/docs).
+visit the `pls` documentation site [here](https://kathleenfrench.github.io/pls/)!
