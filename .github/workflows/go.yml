@@ -1,5 +1,10 @@
 name: pls
-on: push
+on:
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'LICENSE'
 env:
   GO111MODULE: on
 jobs:
