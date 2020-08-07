@@ -49,7 +49,7 @@ var makeDocsCmd = &cobra.Command{
 		fp := internalutils.FrontMatter
 		linkHandler := func(name string) string {
 			base := strings.TrimSuffix(name, path.Ext(name))
-			return fmt.Sprintf("/%s/", strings.ToLower(base))
+			return fmt.Sprintf("/pls/%s/", strings.ToLower(base))
 		}
 
 		err = internalutils.GenMarkdownDocumentation(cmd.Root(), fmt.Sprintf("./%s", internalutils.PublishDocsDirectory), fp, linkHandler)
