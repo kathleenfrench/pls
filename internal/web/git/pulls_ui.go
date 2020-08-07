@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/internal/config"
+	"github.com/kathleenfrench/pls/pkg/clean"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/kathleenfrench/pls/pkg/web/git"
@@ -197,7 +198,7 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		}
 
 		gui.PleaseHold("removing merged branches", nil)
-		err = git.CleanupCurrentBranches()
+		err = clean.CurrentRepoGitBranches()
 		if err != nil {
 			return err
 		}
