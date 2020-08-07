@@ -24,7 +24,7 @@ make install
 
 ### Configs
 
-When you run `pls` for the first time, you will be propmted to set config values `pls` requires to be of much use to you.
+When you run `pls` for the first time, you will be prompted to set config values `pls` requires to be of much use to you.
 
 If at any point you want to update your configuration values, simply run: `pls update configs`.
 
