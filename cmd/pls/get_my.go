@@ -68,7 +68,7 @@ var gitMyOrgs = &cobra.Command{
 	Use:     "orgs",
 	Aliases: []string{"o", "org", "organization", "organizations"},
 	Short:   "interact with your github organizations",
-	Example: color.HiYellowString("pls get my orgs"),
+	Example: "pls get my orgs",
 	Run: func(cmd *cobra.Command, args []string) {
 		orgs, err := gitpls.FetchOrganizations("", plsCfg, work)
 		if err != nil {
@@ -88,7 +88,7 @@ var gitMyRepos = &cobra.Command{
 	Use:     "repos",
 	Aliases: []string{"r", "repositories", "repo", "repository"},
 	Short:   "interact with your github repositories",
-	Example: color.HiYellowString("pls get my repos"),
+	Example: "pls get my repos",
 	Run: func(cmd *cobra.Command, args []string) {
 		repos, err := gitpls.FetchUserRepos("", plsCfg, work)
 		if err != nil {
@@ -108,7 +108,7 @@ var gitMyIssues = &cobra.Command{
 	Use:     "issues",
 	Aliases: []string{"i", "issue"},
 	Short:   "interact with your issues",
-	Example: color.HiYellowString("\n[issues in current directory's repository]: pls get my issues\n[issues in a repository you own]: pls get my issues in myrepo\n[issues in another's repository]: pls get my issues in organization/repo\n[issues from all of github]: pls get my issues everywhere"),
+	Example: fmt.Sprintf("\n[issues in current directory's repository]: pls get my issues\n[issues in a repository you own]: pls get my issues in myrepo\n[issues in another's repository]: pls get my issues in organization/repo\n[issues from all of github]: pls get --all my issues"),
 	Run: func(cmd *cobra.Command, args []string) {
 		getterFlags := &gitpls.IssueGetterFlags{
 			ClosedOnly:      closedOnly,
@@ -260,7 +260,7 @@ var gitMyPRs = &cobra.Command{
 	Use:     "prs",
 	Aliases: []string{"pulls", "pull", "pr"},
 	Short:   "interact with your pull requests",
-	Example: color.HiYellowString("\n[PRs in current directory's repository]: pls get my prs\n[PRs in a repository you own]: pls get my prs in myrepo\n[PRs in another's repository]: pls get my prs in organization/repo\n[PRs from all of github]: pls get my prs everywhere"),
+	Example: fmt.Sprintf("\n[PRs in current directory's repository]: pls get my prs\n[PRs in a repository you own]: pls get my prs in myrepo\n[PRs in another's repository]: pls get my prs in organization/repo\n[PRs from all of github]: pls get --all my prs"),
 	Run: func(cmd *cobra.Command, args []string) {
 		getterFlags := &gitpls.IssueGetterFlags{
 			MergedOnly:       mergedOnly,

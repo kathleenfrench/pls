@@ -12,7 +12,7 @@ import (
 var openCmd = &cobra.Command{
 	Use:     "open",
 	Short:   "open any url in your default browser from the command line, or select from a set of common favorites",
-	Example: color.HiYellowString(fmt.Sprintf("\n[opens dropdown GUI of your url shortcuts]: pls open\npls open https://google.com\npls open google.com\n")),
+	Example: fmt.Sprintf("\n[opens dropdown GUI of your url shortcuts]: pls open\npls open https://google.com\npls open google.com\n"),
 	Aliases: []string{"o"},
 	Args:    cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {

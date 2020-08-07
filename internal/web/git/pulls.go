@@ -8,8 +8,8 @@ import (
 	"github.com/google/go-github/v32/github"
 	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/gui"
+	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/kathleenfrench/pls/pkg/web/git"
-	"github.vimeows.com/Vimeo/dex/pkg/utils"
 )
 
 // IssueGetterFlags are evaluated based off of flags/arguments set by the user when searching pull requests of the current user (author:@me)
@@ -203,7 +203,7 @@ func CreatePullRequestFromCWD(settings config.Settings) error {
 
 	openNow := gui.ConfirmPrompt("do you want to open your PR in the browser?", "", true, true)
 	if openNow {
-		utils.LaunchInBrowser(pr.GetHTMLURL())
+		utils.OpenURLInDefaultBrowser(pr.GetHTMLURL())
 	}
 
 	return nil

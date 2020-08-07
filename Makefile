@@ -43,7 +43,6 @@ build: ${BUILD_OUTPUT_DIR} vendor ## build the pls binary
 		export CGO_ENABLED=0 && \
 		$(GO) build $(GO_BUILD_FLAGS)
 	@echo "${NAME} bin compiled!"
-	@pls make docs
 
 .PHONY: install
 install: build ## install the pls binary to /usr/local/bin
@@ -72,6 +71,14 @@ test: lint ## run linter and unit tests
 clean: ## delete the build binary
 	@rm -rf ${BUILD_OUTPUT_DIR}
 	@echo "removed ${BUILD_OUTPUT_DIR}..."
+
+.PHONY: pages
+pages: ## run pages site locally
+	@cd docs && \
+		bundle && \
+		bundle install && \
+		bundle exec jekyll serve && \
+		cd ..
 
 .PHONY: help
 help: ## lists some available makefile commands

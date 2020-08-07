@@ -1,0 +1,14 @@
+name: pls
+email: kfrench09@gmail.com
+description: |
+  pls is a command line too that will do things for you...if you ask nicely
+baseurl: "/pages"
+url: "https://github.com"
+permalink: pretty
+remote_theme: pmarsceill/just-the-docs
+search_enabled: true
+search_tokenizer_separator: /[\s/]+/
+heading_anchors: true
+color_scheme: dark
+plugins:
+  - jekyll-feed
