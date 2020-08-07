@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: o
 
-**Purpose:**
-
-open any url in your default browser from the command line, or select from a set of common favorites
+**TL;DR:** open any url in your default browser from the command line, or select from a set of common favorites
 
 ## Usage:
 

@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: u
 
-**Purpose:**
-
-update various resources like configs and pls itself
+**TL;DR:** update various resources like configs and pls itself
 
 ### Local Flags
 

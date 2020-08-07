@@ -97,17 +97,16 @@ func GenMarkdownExtraCustom(cmd *cobra.Command, w io.Writer, linkHandler func(st
 	}
 
 	if shortDesc != "" {
-		b.WriteString("**Purpose:**\n\n")
-		b.WriteString(fmt.Sprintf("%s\n\n", shortDesc))
+		b.WriteString(fmt.Sprintf("**TL;DR:** %s\n\n", shortDesc))
+	}
+
+	if longDesc != "" {
+		b.WriteString("## Description\n\n")
+		b.WriteString(fmt.Sprintf("%s\n\n", longDesc))
 	}
 
 	if cmd.Runnable() {
 		b.WriteString("## Usage:\n\n")
-
-		if longDesc != "" {
-			b.WriteString("### Description\n\n")
-			b.WriteString(fmt.Sprintf("%s\n\n", longDesc))
-		}
 
 		if example != "" {
 			b.WriteString("### Examples\n\n")

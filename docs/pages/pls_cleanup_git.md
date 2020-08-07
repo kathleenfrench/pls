@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: g
 
-**Purpose:**
-
-remove git branches that have already been merged into master - defaults to just within the current working directory
+**TL;DR:** remove git branches that have already been merged into master - defaults to just within the current working directory
 
 ## Usage:
 

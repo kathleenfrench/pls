@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: a
 
-**Purpose:**
-
-add various resources
+**TL;DR:** add various resources
 
 ### Local Flags
 

@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: i,issue
 
-**Purpose:**
-
-interact with your issues
+**TL;DR:** interact with your issues
 
 ## Usage:
 

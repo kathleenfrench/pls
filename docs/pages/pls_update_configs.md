@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: config,cnf,cnfs
 
-**Purpose:**
-
-update your pls configs
+**TL;DR:** update your pls configs
 
 ## Usage:
 

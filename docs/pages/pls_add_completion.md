@@ -8,9 +8,7 @@ layout: default
 # pls add completion 
 
 ---
-**Purpose:**
-
-add shell completion for pls
+**TL;DR:** add shell completion for pls
 
 ## Usage:
 

@@ -8,9 +8,7 @@ layout: default
 # pls make a 
 
 ---
-**Purpose:**
-
-make a single one of a given resource
+**TL;DR:** make a single one of a given resource
 
 ### Local Flags
 

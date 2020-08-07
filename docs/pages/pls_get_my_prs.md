@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: pulls,pull,pr
 
-**Purpose:**
-
-interact with your pull requests
+**TL;DR:** interact with your pull requests
 
 ## Usage:
 

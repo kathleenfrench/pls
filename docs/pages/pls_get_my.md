@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: m
 
-**Purpose:**
-
-fetch your stuff specifically
+**TL;DR:** fetch your stuff specifically
 
 ### Local Flags
 

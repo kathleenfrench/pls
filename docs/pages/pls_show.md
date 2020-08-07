@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: s,print,list,l
 
-**Purpose:**
-
-show values for various resources
+**TL;DR:** show values for various resources
 
 ### Local Flags
 

@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: yrself
 
-**Purpose:**
-
-check if pls has an available update and install it if so
+**TL;DR:** check if pls has an available update and install it if so
 
 ## Usage:
 

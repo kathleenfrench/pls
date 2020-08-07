@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: c
 
-**Purpose:**
-
-show config values
+**TL;DR:** show config values
 
 ## Usage:
 

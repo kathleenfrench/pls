@@ -8,9 +8,7 @@ layout: default
 # pls 
 
 ---
-**Purpose:**
-
-a helpful little CLI that does things for you when you ask nice...
+**TL;DR:** a helpful little CLI that does things for you when you ask nice...
 
 ## Usage:
 

@@ -10,9 +10,11 @@ layout: default
 ---
 **Aliases**: c,clean
 
-**Purpose:**
+**TL;DR:** cleanup subcommands
 
-cleanup subcommands
+## Description
+
+cleanup is used for auditing various local resources and determining what artifacts, if any, are eliglble for removal so as to free up more space on your machine
 
 ### Local Flags
 
