@@ -1,7 +1,7 @@
 ---
 title: "pls cleanup docker"
 permalink: pls_cleanup_docker
-url: /pls_cleanup_docker/
+url: /pls/pls_cleanup_docker/
 summary: "prune local docker resources to free up space"
 layout: default
 ---

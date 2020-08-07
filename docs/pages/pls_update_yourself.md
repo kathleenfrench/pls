@@ -1,7 +1,7 @@
 ---
 title: "pls update yourself"
 permalink: pls_update_yourself
-url: /pls_update_yourself/
+url: /pls/pls_update_yourself/
 summary: "check if pls has an available update and install it if so"
 layout: default
 ---

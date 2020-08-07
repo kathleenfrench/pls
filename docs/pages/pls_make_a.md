@@ -1,7 +1,7 @@
 ---
 title: "pls make a"
 permalink: pls_make_a
-url: /pls_make_a/
+url: /pls/pls_make_a/
 summary: "make a single one of a given resource"
 layout: default
 ---
@@ -26,5 +26,5 @@ make a single one of a given resource
 ```
 ### Sub Commands
 
-* [pls make a pullrequest](/pls_make_a_pullrequest/)	 - 
+* [pls make a pullrequest](/pls/pls_make_a_pullrequest/)	 - 
 

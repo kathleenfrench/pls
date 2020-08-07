@@ -1,7 +1,7 @@
 ---
 title: "pls update configs"
 permalink: pls_update_configs
-url: /pls_update_configs/
+url: /pls/pls_update_configs/
 summary: "update your pls configs"
 layout: default
 ---

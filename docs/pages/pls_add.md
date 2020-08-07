@@ -1,7 +1,7 @@
 ---
 title: "pls add"
 permalink: pls_add
-url: /pls_add/
+url: /pls/pls_add/
 summary: "add various resources"
 layout: default
 ---
@@ -28,8 +28,8 @@ add various resources
 ```
 ### Sub Commands
 
-* [pls add completion](/pls_add_completion/)	 - add shell completion for pls
+* [pls add completion](/pls/pls_add_completion/)	 - add shell completion for pls
 
 ### See Also
 
-* [pls](/pls/)	 - a helpful little CLI that does things for you when you ask nice...
+* [pls](/pls/pls/)	 - a helpful little CLI that does things for you when you ask nice...

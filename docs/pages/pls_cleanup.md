@@ -1,7 +1,7 @@
 ---
 title: "pls cleanup"
 permalink: pls_cleanup
-url: /pls_cleanup/
+url: /pls/pls_cleanup/
 summary: "cleanup subcommands"
 layout: default
 ---
@@ -28,9 +28,9 @@ cleanup subcommands
 ```
 ### Sub Commands
 
-* [pls cleanup docker](/pls_cleanup_docker/)	 - prune local docker resources to free up space
-* [pls cleanup git](/pls_cleanup_git/)	 - remove git branches that have already been merged into master - defaults to just within the current working directory
+* [pls cleanup docker](/pls/pls_cleanup_docker/)	 - prune local docker resources to free up space
+* [pls cleanup git](/pls/pls_cleanup_git/)	 - remove git branches that have already been merged into master - defaults to just within the current working directory
 
 ### See Also
 
-* [pls](/pls/)	 - a helpful little CLI that does things for you when you ask nice...
+* [pls](/pls/pls/)	 - a helpful little CLI that does things for you when you ask nice...

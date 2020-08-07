@@ -1,7 +1,7 @@
 ---
 title: "pls get my prs where"
 permalink: pls_get_my_prs_where
-url: /pls_get_my_prs_where/
+url: /pls/pls_get_my_prs_where/
 summary: ""
 layout: default
 ---
@@ -47,4 +47,4 @@ pls get my prs where <text to search>
 ```
 ### See Also
 
-* [pls get my prs](/pls get my prs/)	 - interact with your pull requests
+* [pls get my prs](/pls/pls get my prs/)	 - interact with your pull requests

@@ -1,7 +1,7 @@
 ---
 title: "pls make"
 permalink: pls_make
-url: /pls_make/
+url: /pls/pls_make/
 summary: "let pls create something for you"
 layout: default
 ---
@@ -28,8 +28,8 @@ let pls create something for you
 ```
 ### Sub Commands
 
-* [pls make a](/pls_make_a/)	 - make a single one of a given resource
+* [pls make a](/pls/pls_make_a/)	 - make a single one of a given resource
 
 ### See Also
 
-* [pls](/pls/)	 - a helpful little CLI that does things for you when you ask nice...
+* [pls](/pls/pls/)	 - a helpful little CLI that does things for you when you ask nice...

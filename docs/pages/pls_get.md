@@ -1,7 +1,7 @@
 ---
 title: "pls get"
 permalink: pls_get
-url: /pls_get/
+url: /pls/pls_get/
 summary: "shorthand for `git` in most cases, but can also get you other stuff"
 layout: default
 ---
@@ -29,10 +29,10 @@ shorthand for `git` in most cases, but can also get you other stuff
 ```
 ### Sub Commands
 
-* [pls get my](/pls_get_my/)	 - fetch your stuff specifically
-* [pls get orgs](/pls_get_orgs/)	 - interact with someone else's github organizations
-* [pls get repos](/pls_get_repos/)	 - interact with someone else's github repositories
+* [pls get my](/pls/pls_get_my/)	 - fetch your stuff specifically
+* [pls get orgs](/pls/pls_get_orgs/)	 - interact with someone else's github organizations
+* [pls get repos](/pls/pls_get_repos/)	 - interact with someone else's github repositories
 
 ### See Also
 
-* [pls](/pls/)	 - a helpful little CLI that does things for you when you ask nice...
+* [pls](/pls/pls/)	 - a helpful little CLI that does things for you when you ask nice...

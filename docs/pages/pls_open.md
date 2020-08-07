@@ -1,7 +1,7 @@
 ---
 title: "pls open"
 permalink: pls_open
-url: /pls_open/
+url: /pls/pls_open/
 summary: "open any url in your default browser from the command line, or select from a set of common favorites"
 layout: default
 ---
@@ -40,4 +40,4 @@ pls open google.com
 ```
 ### See Also
 
-* [pls](/pls/)	 - a helpful little CLI that does things for you when you ask nice...
+* [pls](/pls/pls/)	 - a helpful little CLI that does things for you when you ask nice...

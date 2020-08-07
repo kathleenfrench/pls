@@ -1,7 +1,7 @@
 ---
 title: "pls"
 permalink: pls
-url: /pls/
+url: /pls/pls/
 summary: "a helpful little CLI that does things for you when you ask nice..."
 layout: default
 ---
@@ -25,11 +25,11 @@ a helpful little CLI that does things for you when you ask nice...
 
 ### Sub Commands
 
-* [pls add](/pls_add/)	 - add various resources
-* [pls cleanup](/pls_cleanup/)	 - cleanup subcommands
-* [pls get](/pls_get/)	 - shorthand for `git` in most cases, but can also get you other stuff
-* [pls make](/pls_make/)	 - let pls create something for you
-* [pls open](/pls_open/)	 - open any url in your default browser from the command line, or select from a set of common favorites
-* [pls show](/pls_show/)	 - show values for various resources
-* [pls update](/pls_update/)	 - update various resources like configs and pls itself
+* [pls add](/pls/pls_add/)	 - add various resources
+* [pls cleanup](/pls/pls_cleanup/)	 - cleanup subcommands
+* [pls get](/pls/pls_get/)	 - shorthand for `git` in most cases, but can also get you other stuff
+* [pls make](/pls/pls_make/)	 - let pls create something for you
+* [pls open](/pls/pls_open/)	 - open any url in your default browser from the command line, or select from a set of common favorites
+* [pls show](/pls/pls_show/)	 - show values for various resources
+* [pls update](/pls/pls_update/)	 - update various resources like configs and pls itself
 
