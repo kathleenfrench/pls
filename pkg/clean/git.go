@@ -1,4 +1,4 @@
-package git
+package clean
 
 import (
 	"fmt"
@@ -7,10 +7,9 @@ import (
 	"github.com/kathleenfrench/pls/pkg/utils"
 )
 
-// CleanupCurrentBranches culls branches that have already been merged from the local working environment
-func CleanupCurrentBranches() error {
+// CurrentRepoGitBranches culls branches that have already been merged from the local working environment
+func CurrentRepoGitBranches() error {
 	cmd := fmt.Sprintf("git branch --merged | grep -v '%s' | grep -v '%s' | grep -v '%s' | xargs -n 1 git branch -d", "\\master", "\\development", "\\*")
-
 	eligible, err := utils.BashExec(cmd)
 	if err != nil {
 		alreadyMergedList, _ := utils.BashExec("git branch --merged | grep -v master")
@@ -20,7 +19,7 @@ func CleanupCurrentBranches() error {
 	}
 
 	if len(string(eligible)) == 0 {
-		color.HiBlue("No unmerged local branches found!")
+		color.HiBlue("no unmerged local branches found!")
 
 	} else {
 		color.HiGreen(string(eligible))

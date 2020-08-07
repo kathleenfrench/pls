@@ -2,8 +2,8 @@ package pls
 
 import (
 	"github.com/fatih/color"
+	"github.com/kathleenfrench/pls/pkg/clean"
 	"github.com/kathleenfrench/pls/pkg/utils"
-	"github.com/kathleenfrench/pls/pkg/web/git"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +26,7 @@ var cleanGitSubCmd = &cobra.Command{
 		if AllGitRepositories {
 			color.HiRed("TO DO")
 		} else {
-			err := git.CleanupCurrentBranches()
+			err := clean.CurrentRepoGitBranches()
 			if err != nil {
 				utils.ExitWithError(err)
 			}
@@ -34,8 +34,22 @@ var cleanGitSubCmd = &cobra.Command{
 	},
 }
 
+var cleanDockerSubCmd = &cobra.Command{
+	Use:     "docker",
+	Aliases: []string{"d", "dk"},
+	Example: "pls cleanup docker",
+	Short:   "prune local docker resources to free up space",
+	Run: func(cmd *cobra.Command, args []string) {
+		err := clean.SystemPrune()
+		if err != nil {
+			utils.ExitWithError(err)
+		}
+	},
+}
+
 func init() {
 	cleanCmd.AddCommand(cleanGitSubCmd)
+	cleanCmd.AddCommand(cleanDockerSubCmd)
 
 	// clean branches
 	cleanGitSubCmd.Flags().BoolVarP(&AllGitRepositories, "all", "a", false, "cleanup branches in all git repository folders on your machine")
