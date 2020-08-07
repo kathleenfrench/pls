@@ -2,6 +2,8 @@
 
 `pls` is a helpful little command line tool...if you ask real nice
 
+![](docs/assets/pls_main.png)
+
 ### usage
 
-read documentation on how to use `pls` [here](https://github.com/kathleenfrench/pls/tree/master/docs)
+visit the `pls` documentation [here](https://github.com/kathleenfrench/pls/tree/master/docs).
