@@ -25,15 +25,13 @@ require (
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.4.0
-	github.vimeows.com/Vimeo/dex v0.0.91 // indirect
 	go.mongodb.org/mongo-driver v1.4.0 // indirect
 	golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de // indirect
 	golang.org/x/image v0.0.0-20200801110659-972c09e46d76 // indirect
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
 	golang.org/x/sys v0.0.0-20200805065543-0cf7623e9dbd // indirect
-	golang.org/x/tools v0.0.0-20200805155214-75c71030ab24 // indirect
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	google.golang.org/appengine v1.4.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 )
