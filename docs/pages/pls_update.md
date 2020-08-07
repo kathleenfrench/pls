@@ -2,7 +2,7 @@
 title: "pls update"
 permalink: pls_update
 url: /pls/pls_update/
-summary: "update various resources like configs and pls itself"
+summary: "update various resources"
 layout: default
 ---
 # pls update 
@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: u
 
-**Purpose:**
-
-update various resources like configs and pls itself
+**TL;DR:** update various resources
 
 ### Local Flags
 
@@ -29,7 +27,6 @@ update various resources like configs and pls itself
 ### Sub Commands
 
 * [pls update configs](/pls/pls_update_configs)	 - update your pls configs
-* [pls update yourself](/pls/pls_update_yourself)	 - check if pls has an available update and install it if so
 
 ### See Also
 

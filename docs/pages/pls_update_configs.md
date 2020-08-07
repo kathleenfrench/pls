@@ -10,9 +10,11 @@ layout: default
 ---
 **Aliases**: config,cnf,cnfs
 
-**Purpose:**
+**TL;DR:** update your pls configs
 
-update your pls configs
+## Description
+
+`pls` was written to make life easier, and flexibility to change configuration valus is a key component of that. you can either change a value through the interactive GUI (via `pls update configs`), or if you already know the key and value to set, you can invoke it directly (via `pls update configs --raw <key> <value>`)
 
 ## Usage:
 

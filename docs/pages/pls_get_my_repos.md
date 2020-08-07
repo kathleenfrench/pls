@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: r,repositories,repo,repository
 
-**Purpose:**
-
-interact with your github repositories
+**TL;DR:** interact with your github repositories
 
 ## Usage:
 

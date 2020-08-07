@@ -15,12 +15,13 @@ var noUI bool
 var updateCmd = &cobra.Command{
 	Use:     "update",
 	Aliases: []string{"u"},
-	Short:   "update various resources like configs and pls itself",
+	Short:   "update various resources",
 }
 
 var updateCfgSubCmd = &cobra.Command{
 	Use:     "configs",
 	Short:   "update your pls configs",
+	Long:    "`pls` was written to make life easier, and flexibility to change configuration valus is a key component of that. you can either change a value through the interactive GUI (via `pls update configs`), or if you already know the key and value to set, you can invoke it directly (via `pls update configs --raw <key> <value>`)",
 	Aliases: []string{"config", "cnf", "cnfs"},
 	Run: func(cmd *cobra.Command, args []string) {
 		if noUI {
@@ -46,6 +47,7 @@ var updateCfgSubCmd = &cobra.Command{
 	},
 }
 
+// TODO
 var updateSelfSubCmd = &cobra.Command{
 	Use:     "yourself",
 	Aliases: []string{"yrself"},
@@ -53,6 +55,7 @@ var updateSelfSubCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("checking if i have any updates...")
 	},
+	Hidden: true,
 }
 
 func init() {

@@ -8,9 +8,11 @@ layout: default
 # pls add completion 
 
 ---
-**Purpose:**
+**TL;DR:** add shell completion for pls
 
-add shell completion for pls
+## Description
+
+writes completion scripts to your local machine based off of your preferred shell. `pls` currently has support for: `bash`, `zsh`, and `fish`.
 
 ## Usage:
 

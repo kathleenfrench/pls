@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: mk
 
-**Purpose:**
-
-let pls create something for you
+**TL;DR:** let pls create something for you
 
 ### Local Flags
 

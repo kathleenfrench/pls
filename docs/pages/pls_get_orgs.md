@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: o,org,organization,organizations
 
-**Purpose:**
-
-interact with someone else's github organizations
+**TL;DR:** interact with someone else's github organizations
 
 ## Usage:
 

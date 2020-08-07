@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: git
 
-**Purpose:**
-
-shorthand for `git` in most cases, but can also get you other stuff
+**TL;DR:** shorthand for `git` in most cases, but can also get you other stuff
 
 ### Local Flags
 

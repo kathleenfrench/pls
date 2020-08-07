@@ -209,7 +209,7 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 			utils.OpenURLInDefaultBrowser(htmlURL)
 		}
 	case openDiff:
-		utils.OpenURLInDefaultBrowser(fmt.Sprintf("%s/files", issue.PullRequestLinks.GetDiffURL()))
+		utils.OpenURLInDefaultBrowser(fmt.Sprintf("%s/files", issue.PullRequestLinks.GetHTMLURL()))
 	case exitSelections:
 		gui.Exit()
 	}

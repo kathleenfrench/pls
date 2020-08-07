@@ -10,9 +10,7 @@ layout: default
 ---
 **Aliases**: d,dk
 
-**Purpose:**
-
-prune local docker resources to free up space
+**TL;DR:** prune local docker resources to free up space
 
 ## Usage:
 

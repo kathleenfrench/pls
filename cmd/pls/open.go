@@ -12,7 +12,8 @@ import (
 var openCmd = &cobra.Command{
 	Use:     "open",
 	Short:   "open any url in your default browser from the command line, or select from a set of common favorites",
-	Example: fmt.Sprintf("\n[opens dropdown GUI of your url shortcuts]: pls open\npls open https://google.com\npls open google.com\n"),
+	Example: fmt.Sprintf("pls open [opens dropdown GUI of your url shortcuts]\npls open https://google.com\npls open google.com"),
+	Long:    "`pls` comes with a few pre-baked url shortcuts, but the rest is up to you. view your configs (`pls show configs`) to see what shortcuts have already been set to the `webshort` property. if you ever want to update these values - whether that be changing an existing url or adding a new shortcut - simply run `pls update configs` and follow the onscreen prompts.",
 	Aliases: []string{"o"},
 	Args:    cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {

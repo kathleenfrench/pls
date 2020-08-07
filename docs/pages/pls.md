@@ -8,9 +8,7 @@ layout: default
 # pls 
 
 ---
-**Purpose:**
-
-a helpful little CLI that does things for you when you ask nice...
+**TL;DR:** a helpful little CLI that does things for you when you ask nice...
 
 ## Usage:
 
@@ -31,5 +29,5 @@ a helpful little CLI that does things for you when you ask nice...
 * [pls make](/pls/pls_make)	 - let pls create something for you
 * [pls open](/pls/pls_open)	 - open any url in your default browser from the command line, or select from a set of common favorites
 * [pls show](/pls/pls_show)	 - show values for various resources
-* [pls update](/pls/pls_update)	 - update various resources like configs and pls itself
+* [pls update](/pls/pls_update)	 - update various resources
 

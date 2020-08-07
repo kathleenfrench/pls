@@ -108,7 +108,7 @@ var gitMyIssues = &cobra.Command{
 	Use:     "issues",
 	Aliases: []string{"i", "issue"},
 	Short:   "interact with your issues",
-	Example: fmt.Sprintf("\n[issues in current directory's repository]: pls get my issues\n[issues in a repository you own]: pls get my issues in myrepo\n[issues in another's repository]: pls get my issues in organization/repo\n[issues from all of github]: pls get --all my issues"),
+	Example: fmt.Sprintf("[issues in current directory's repository]: pls get my issues\n[issues in a repository you own]: pls get my issues in myrepo\n[issues in another's repository]: pls get my issues in organization/repo\n[issues from all of github]: pls get --all my issues\n[issues on my work account]: pls get my --work issues"),
 	Run: func(cmd *cobra.Command, args []string) {
 		getterFlags := &gitpls.IssueGetterFlags{
 			ClosedOnly:      closedOnly,
@@ -260,7 +260,8 @@ var gitMyPRs = &cobra.Command{
 	Use:     "prs",
 	Aliases: []string{"pulls", "pull", "pr"},
 	Short:   "interact with your pull requests",
-	Example: fmt.Sprintf("\n[PRs in current directory's repository]: pls get my prs\n[PRs in a repository you own]: pls get my prs in myrepo\n[PRs in another's repository]: pls get my prs in organization/repo\n[PRs from all of github]: pls get --all my prs"),
+	Example: fmt.Sprintf("[PRs in current directory's repository]: pls get my prs\n[PRs in a repository you own]: pls get my prs in myrepo\n[PRs in another's repository]: pls get my prs in organization/repo\n[PRs from all of github]: pls get --all my prs\n[PRs on my work account]: pls get my --work prs"),
+	Long:    fmt.Sprintf("when `pls` fetches your PRs, you will be greeted with a straightforward dropdown to select the one you want to do something with. currently, `pls` supports viewing the PR description in the terminal with rendered markdown, editing the PR title, body, and/or state, merging a PR, and opening it in your default browser.\n\n**on merging:** `pls` makes merging a breeze, precisely because you can trust you're not forgetting anything. `pls` makes sure you don't have any unstage, uncommitted, and/or unpushed code to your remote branch before initiating a merge. after your code is merged successfully, `pls` checks you back into `master`, pulls down the latest code, and removes already-merged branches from your local machine. easy!"),
 	Run: func(cmd *cobra.Command, args []string) {
 		getterFlags := &gitpls.IssueGetterFlags{
 			MergedOnly:       mergedOnly,

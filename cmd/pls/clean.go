@@ -13,6 +13,7 @@ var AllGitRepositories bool
 var cleanCmd = &cobra.Command{
 	Use:     "cleanup",
 	Short:   "cleanup subcommands",
+	Long:    "cleanup is used for auditing various local resources and determining what artifacts, if any, are eliglble for removal so as to free up more space on your machine",
 	Aliases: []string{"c", "clean"},
 }
 
