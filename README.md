@@ -4,4 +4,4 @@
 
 ### usage
 
-read documentation on how to use `pls` [here](https://github.com/kathleenfrench/pls/docs)
+read documentation on how to use `pls` [here](https://github.com/kathleenfrench/pls/tree/master/docs)
