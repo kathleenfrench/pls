@@ -28,22 +28,19 @@ func CreateGitOrganizationsDropdown(organizations []*github.Organization) *githu
 
 // ChooseWithToDoWithOrganization lets the user decide with to do with their chosen organization
 func ChooseWithToDoWithOrganization(organization *github.Organization, settings config.Settings, useEnterprise bool) error {
-	var gc *github.Client
-	var err error
+	// var gc *github.Client
+	// var err error
 
-	ctx := context.Background()
+	// ctx := context.Background()
 
-	if useEnterprise {
-		gc, err = git.NewEnterpriseClient(ctx, settings.GitEnterpriseHostname, settings.GitEnterpriseToken)
-		if err != nil {
-			return err
-		}
-	} else {
-		gc = git.NewClient(ctx, settings.GitToken)
-	}
-
-	// TODO: REMOVE
-	fmt.Println(gc)
+	// if useEnterprise {
+	// 	gc, err = git.NewEnterpriseClient(ctx, settings.GitEnterpriseHostname, settings.GitEnterpriseToken)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// } else {
+	// 	gc = git.NewClient(ctx, settings.GitToken)
+	// }
 
 	login := organization.GetLogin()
 	if login == "" {

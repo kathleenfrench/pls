@@ -30,7 +30,7 @@ var gitOrgs = &cobra.Command{
 	Aliases: []string{"o", "org", "organization", "organizations"},
 	Short:   "interact with someone else's github organizations",
 	Run: func(cmd *cobra.Command, args []string) {
-		color.HiRed("TODO")
+		color.HiRed("REALLY SORRY BUT I'M NOT AVAILABLE YET")
 	},
 }
 

@@ -12,6 +12,12 @@ layout: default
 
 **TL;DR:** interact with your github organizations
 
+## Description
+
+`pls` will fetch your organizations and sort them into a friendly GUI dropdown from which you can select the org you want to do something with. currently, `pls` supports:
+- viewing an organizations repositories (which in turn supports all functionality available in `pls get my repos`)
+- opening the organization page in the user's default browser
+
 ## Usage:
 
 ### Examples

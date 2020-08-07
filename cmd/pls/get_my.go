@@ -69,6 +69,7 @@ var gitMyOrgs = &cobra.Command{
 	Aliases: []string{"o", "org", "organization", "organizations"},
 	Short:   "interact with your github organizations",
 	Example: "pls get my orgs",
+	Long:    fmt.Sprintf("`pls` will fetch your organizations and sort them into a friendly GUI dropdown from which you can select the org you want to do something with. currently, `pls` supports:\n- viewing an organizations repositories (which in turn supports all functionality available in `pls get my repos`)\n- opening the organization page in the user's default browser"),
 	Run: func(cmd *cobra.Command, args []string) {
 		orgs, err := gitpls.FetchOrganizations("", plsCfg, work)
 		if err != nil {
@@ -88,6 +89,7 @@ var gitMyRepos = &cobra.Command{
 	Use:     "repos",
 	Aliases: []string{"r", "repositories", "repo", "repository"},
 	Short:   "interact with your github repositories",
+	Long:    "`pls` makes it easy to interact with your github repositories. after fetching your repos and sorting them into a dropdown GUI for you to select from, `pls` currently supports:\n- opening your default browser to the repository page in github\n- cloning the repository to your chosen default codebase directory (as set in your config file), cloning it into the current directory, or choosing a custom directory\n- prints a table with relevant metadata about a repository (like description, default branch, when it was created, when it was last updated, language)",
 	Example: "pls get my repos",
 	Run: func(cmd *cobra.Command, args []string) {
 		repos, err := gitpls.FetchUserRepos("", plsCfg, work)
@@ -109,6 +111,7 @@ var gitMyIssues = &cobra.Command{
 	Aliases: []string{"i", "issue"},
 	Short:   "interact with your issues",
 	Example: fmt.Sprintf("[issues in current directory's repository]: pls get my issues\n[issues in a repository you own]: pls get my issues in myrepo\n[issues in another's repository]: pls get my issues in organization/repo\n[issues from all of github]: pls get --all my issues\n[issues on my work account]: pls get my --work issues"),
+	Long:    "currently, `pls` has support for:\n- editing issues' titles, body text, and/or state\n- opening issues in the user's default browser\n- rendering the issue description markdown in the terminal",
 	Run: func(cmd *cobra.Command, args []string) {
 		getterFlags := &gitpls.IssueGetterFlags{
 			ClosedOnly:      closedOnly,

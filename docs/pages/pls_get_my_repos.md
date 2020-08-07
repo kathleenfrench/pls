@@ -12,6 +12,13 @@ layout: default
 
 **TL;DR:** interact with your github repositories
 
+## Description
+
+`pls` makes it easy to interact with your github repositories. after fetching your repos and sorting them into a dropdown GUI for you to select from, `pls` currently supports:
+- opening your default browser to the repository page in github
+- cloning the repository to your chosen default codebase directory (as set in your config file), cloning it into the current directory, or choosing a custom directory
+- prints a table with relevant metadata about a repository (like description, default branch, when it was created, when it was last updated, language)
+
 ## Usage:
 
 ### Examples
