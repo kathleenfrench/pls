@@ -115,7 +115,7 @@ func GetCurrentGitBaseURL() string {
 		return ""
 	}
 
-	gitBaseCheck := regexp.MustCompile(`github.*.com`)
+	gitBaseCheck := regexp.MustCompile(`((github\.com))|((github\.[a-z]+\.com))`)
 	val := gitBaseCheck.FindString(currentRemoteOriginURL)
 	return strings.TrimSpace(val)
 }
@@ -151,6 +151,7 @@ func CurrentRepositoryOrganization() (string, error) {
 
 	gitBaseCheck := regexp.MustCompile(`github.*.com`)
 	val := gitBaseCheck.FindString(currentRemoteOriginURL)
+	color.Green("val: %s", val)
 
 	switch strings.Contains(currentRemoteOriginURL, "https") {
 	case true:

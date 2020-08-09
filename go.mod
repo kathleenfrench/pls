@@ -3,7 +3,7 @@ module github.com/kathleenfrench/pls
 go 1.12
 
 require (
-	github.com/AlecAivazis/survey/v2 v2.0.8
+	github.com/AlecAivazis/survey/v2 v2.1.0
 	github.com/MichaelMure/go-term-markdown v0.1.3
 	github.com/MichaelMure/go-term-text v0.2.9 // indirect
 	github.com/alecthomas/chroma v0.8.0 // indirect
@@ -18,6 +18,7 @@ require (
 	github.com/gomarkdown/markdown v0.0.0-20200609195525-3f9352745725 // indirect
 	github.com/google/go-github/v32 v32.1.0
 	github.com/jedib0t/go-pretty v4.3.0+incompatible
+	github.com/kathleenfrench/common v0.0.0-20200809070048-d22362e69517 // indirect
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
