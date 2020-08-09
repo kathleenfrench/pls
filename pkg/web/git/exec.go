@@ -117,7 +117,6 @@ func GetCurrentGitBaseURL() string {
 
 	gitBaseCheck := regexp.MustCompile(`((github\.com))|((github\.[a-z]+\.com))`)
 	val := gitBaseCheck.FindString(currentRemoteOriginURL)
-	color.Green("CHECK: %s", val)
 	return strings.TrimSpace(val)
 }
 
