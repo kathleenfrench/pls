@@ -18,7 +18,6 @@ require (
 	github.com/gomarkdown/markdown v0.0.0-20200609195525-3f9352745725 // indirect
 	github.com/google/go-github/v32 v32.1.0
 	github.com/jedib0t/go-pretty v4.3.0+incompatible
-	github.com/kathleenfrench/common v0.0.0-20200809070048-d22362e69517 // indirect
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
