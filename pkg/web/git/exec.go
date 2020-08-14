@@ -149,9 +149,10 @@ func CurrentRepositoryOrganization() (string, error) {
 		return "", errors.New("could not fetch the remote origin URL of your current working directory's repository")
 	}
 
-	gitBaseCheck := regexp.MustCompile(`github.*.com`)
-	val := gitBaseCheck.FindString(currentRemoteOriginURL)
-	color.Green("val: %s", val)
+	val := GetCurrentGitBaseURL()
+	if val == "" {
+		return "", errors.New("could not fetch the remote origin URL of your current working directory's repository")
+	}
 
 	switch strings.Contains(currentRemoteOriginURL, "https") {
 	case true:
