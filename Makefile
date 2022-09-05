@@ -26,20 +26,16 @@ endif
 endif
 
 GOOS = $(PLATFORM)
-GOARCH ?= amd64
+GOARCH ?= arm64
 
 GO := $(shell command -v go 2>/dev/null)
 GO_LINKER_FLAGS = -X $(CMD_MODULE).Builder=$(WHOAMI) -X $(CMD_MODULE).Version=$(VERSION) -X $(CMD_MODULE).Commit=$(COMMIT) -X $(CMD_MODULE).Date=$(TODAY)
-GO_BUILD_FLAGS = -mod=vendor -a --installsuffix cgo -ldflags "$(GO_LINKER_FLAGS)" -o $(BINARY_LOCATION)
-
-vendor: go.sum
-	@GO111MODULE=on $(GO) mod vendor
+GO_BUILD_FLAGS = -trimpath -tags 'osusergo netgo' -ldflags "$(GO_LINKER_FLAGS)" -o $(BINARY_LOCATION)
 
 .PHONY: build
-build: ${BUILD_OUTPUT_DIR} vendor ## build the pls binary
+build: ${BUILD_OUTPUT_DIR} ## build the pls binary
 	@echo "compiling ${NAME}..."
 	@export GOOS=$(GOOS) GOARCH=$(GOARCH) && \
-		export GO111MODULE=on && \
 		export CGO_ENABLED=0 && \
 		$(GO) build $(GO_BUILD_FLAGS)
 	@echo "${NAME} bin compiled!"
@@ -53,13 +49,13 @@ install: build ## install the pls binary to /usr/local/bin
 
 .PHONY: tidy
 tidy:
-	@GO111MODULE=on go mod tidy
+	@go mod tidy
 
 .PHONY: lint
 lint: ## go linter and shadow tool
 	@$(GO) get -u golang.org/x/lint/golint
 	@$(GO) get -u golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow
-	@$(GO) vet $(shell go list ./... | grep -v 'vendor')
+	@$(GO) vet $(shell go list ./...)
 	@$(GO) vet -vettool=$(shell which shadow) ./...
 
 .PHONY: test

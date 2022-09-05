@@ -5,7 +5,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/google/go-github/v32/github"
-	"github.com/jedib0t/go-pretty/table"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
