@@ -5,8 +5,6 @@ on:
       - 'docs/**'
       - 'README.md'
       - 'LICENSE'
-env:
-  GO111MODULE: on
 jobs:
   lint:
     name: lint
@@ -14,7 +12,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest]
-        goversion: [1.13, 1.14]
+        goversion: [1.17, 1.18]
     steps:
       - uses: actions/setup-go@v1
         with:
@@ -29,7 +27,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest]
-        goversion: [1.13, 1.14]
+        goversion: [1.17, 1.18]
     steps:
     - name: setup go ${{matrix.goversion}} on ${{matrix.os}}
       uses: actions/setup-go@v1
