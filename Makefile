@@ -26,8 +26,7 @@ endif
 endif
 
 GOOS = $(PLATFORM)
-GOARCH := amd64
-# GOARCH ?= arm64
+GOARCH ?= amd64
 
 GO := $(shell command -v go 2>/dev/null)
 GO_LINKER_FLAGS = -X $(CMD_MODULE).Builder=$(WHOAMI) -X $(CMD_MODULE).Version=$(VERSION) -X $(CMD_MODULE).Commit=$(COMMIT) -X $(CMD_MODULE).Date=$(TODAY)
