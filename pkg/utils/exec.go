@@ -82,6 +82,7 @@ func OpenURLInDefaultBrowser(url string) error {
 // EditorLaunchCommands are the commands used to open a file in a specified text editor and wait for the file to be saved to close
 var EditorLaunchCommands = map[string]string{
 	"vim":      "vim",
+	"nvim":     "nvim",
 	"emacs":    "emacs",
 	"vscode":   "code --wait",
 	"atom":     "atom --wait",

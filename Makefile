@@ -26,7 +26,7 @@ endif
 endif
 
 GOOS = $(PLATFORM)
-GOARCH ?= arm64
+GOARCH ?= amd64
 
 GO := $(shell command -v go 2>/dev/null)
 GO_LINKER_FLAGS = -X $(CMD_MODULE).Builder=$(WHOAMI) -X $(CMD_MODULE).Version=$(VERSION) -X $(CMD_MODULE).Commit=$(COMMIT) -X $(CMD_MODULE).Date=$(TODAY)
@@ -59,7 +59,7 @@ lint: ## go linter and shadow tool
 	@$(GO) vet -vettool=$(shell which shadow) ./...
 
 .PHONY: test
-test: lint ## run linter and unit tests 
+test: lint ## run linter and unit tests
 	@echo "running tests..."
 	@$(GO) test ./...
 
