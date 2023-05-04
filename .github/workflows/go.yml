@@ -13,13 +13,14 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest]
         goversion: [1.19, 1.20]
+        cache: false
     steps:
       - uses: actions/setup-go@v1
         with:
           go-version: ${{matrix.goversion}}
-      - uses: actions/checkout@v2
-      - name: lint go code
-        run: make lint
+      - uses: actions/checkout@v3
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
   build:
     name: build
     needs: lint
@@ -35,7 +36,7 @@ jobs:
         go-version: ${{matrix.goversion}}
       id: go
     - name: checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: fetch dependencies
       run: go mod download
     - name: build binary
