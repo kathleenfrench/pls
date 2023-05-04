@@ -5,11 +5,12 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/spf13/cobra"
+
 	gitpls "github.com/kathleenfrench/pls/internal/web/git"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/kathleenfrench/pls/pkg/web/git"
-	"github.com/spf13/cobra"
 )
 
 // FOCUS ON IDIOMATIC COMMANDS
@@ -69,7 +70,7 @@ var gitMyOrgs = &cobra.Command{
 	Aliases: []string{"o", "org", "organization", "organizations"},
 	Short:   "interact with your github organizations",
 	Example: "pls get my orgs",
-	Long:    fmt.Sprintf("`pls` will fetch your organizations and sort them into a friendly GUI dropdown from which you can select the org you want to do something with. currently, `pls` supports:\n- viewing an organizations repositories (which in turn supports all functionality available in `pls get my repos`)\n- opening the organization page in the user's default browser"),
+	Long:    "`pls` will fetch your organizations and sort them into a friendly GUI dropdown from which you can select the org you want to do something with. currently, `pls` supports:\n- viewing an organizations repositories (which in turn supports all functionality available in `pls get my repos`)\n- opening the organization page in the user's default browser",
 	Run: func(cmd *cobra.Command, args []string) {
 		orgs, err := gitpls.FetchOrganizations("", plsCfg, work)
 		if err != nil {
@@ -110,7 +111,7 @@ var gitMyIssues = &cobra.Command{
 	Use:     "issues",
 	Aliases: []string{"i", "issue"},
 	Short:   "interact with your issues",
-	Example: fmt.Sprintf("[issues in current directory's repository]: pls get my issues\n[issues in a repository you own]: pls get my issues in myrepo\n[issues in another's repository]: pls get my issues in organization/repo\n[issues from all of github]: pls get --all my issues\n[issues on my work account]: pls get my --work issues"),
+	Example: "[issues in current directory's repository]: pls get my issues\n[issues in a repository you own]: pls get my issues in myrepo\n[issues in another's repository]: pls get my issues in organization/repo\n[issues from all of github]: pls get --all my issues\n[issues on my work account]: pls get my --work issues",
 	Long:    "currently, `pls` has support for:\n- editing issues' titles, body text, and/or state\n- opening issues in the user's default browser\n- rendering the issue description markdown in the terminal",
 	Run: func(cmd *cobra.Command, args []string) {
 		getterFlags := &gitpls.IssueGetterFlags{
@@ -198,11 +199,8 @@ var gitMyIssues = &cobra.Command{
 			if err != nil {
 				utils.ExitWithError(err)
 			}
-
-			break
 		case 1:
 			utils.ExitWithError(fmt.Sprintf("%s is not a valid argument", args[0]))
-			break
 		case 2:
 			// pls get my issues in <repo> (owned)
 			// pls get my issues in <org>/<repo> (organization/another person's repo)
@@ -250,8 +248,6 @@ var gitMyIssues = &cobra.Command{
 			if err != nil {
 				utils.ExitWithError(err)
 			}
-
-			break
 		default:
 			utils.ExitWithError("invalid input, try running `pls get my issues --help`")
 		}
@@ -263,8 +259,8 @@ var gitMyPRs = &cobra.Command{
 	Use:     "prs",
 	Aliases: []string{"pulls", "pull", "pr"},
 	Short:   "interact with your pull requests",
-	Example: fmt.Sprintf("[PRs in current directory's repository]: pls get my prs\n[PRs in a repository you own]: pls get my prs in myrepo\n[PRs in another's repository]: pls get my prs in organization/repo\n[PRs from all of github]: pls get --all my prs\n[PRs on my work account]: pls get my --work prs"),
-	Long:    fmt.Sprintf("when `pls` fetches your PRs, you will be greeted with a straightforward dropdown to select the one you want to do something with. currently, `pls` supports viewing the PR description in the terminal with rendered markdown, editing the PR title, body, and/or state, merging a PR, and opening it in your default browser.\n\n**on merging:** `pls` makes merging a breeze, precisely because you can trust you're not forgetting anything. `pls` makes sure you don't have any unstage, uncommitted, and/or unpushed code to your remote branch before initiating a merge. after your code is merged successfully, `pls` checks you back into `master`, pulls down the latest code, and removes already-merged branches from your local machine. easy!"),
+	Example: "[PRs in current directory's repository]: pls get my prs\n[PRs in a repository you own]: pls get my prs in myrepo\n[PRs in another's repository]: pls get my prs in organization/repo\n[PRs from all of github]: pls get --all my prs\n[PRs on my work account]: pls get my --work prs",
+	Long:    "when `pls` fetches your PRs, you will be greeted with a straightforward dropdown to select the one you want to do something with. currently, `pls` supports viewing the PR description in the terminal with rendered markdown, editing the PR title, body, and/or state, merging a PR, and opening it in your default browser.\n\n**on merging:** `pls` makes merging a breeze, precisely because you can trust you're not forgetting anything. `pls` makes sure you don't have any unstage, uncommitted, and/or unpushed code to your remote branch before initiating a merge. after your code is merged successfully, `pls` checks you back into `master`, pulls down the latest code, and removes already-merged branches from your local machine. easy!",
 	Run: func(cmd *cobra.Command, args []string) {
 		getterFlags := &gitpls.IssueGetterFlags{
 			MergedOnly:       mergedOnly,
@@ -386,11 +382,8 @@ var gitMyPRs = &cobra.Command{
 			if err != nil {
 				utils.ExitWithError(err)
 			}
-
-			break
 		case 1:
 			utils.ExitWithError(fmt.Sprintf("%s is not a valid argument", args[0]))
-			break
 		case 2:
 			// pls get my prs in <repo> (owned)
 			// pls get my prs in <org>/<repo> (organization/another person's repo)
@@ -437,8 +430,6 @@ var gitMyPRs = &cobra.Command{
 			if err != nil {
 				utils.ExitWithError(err)
 			}
-
-			break
 		default:
 			utils.ExitWithError("invalid input, try running `pls get my prs --help`")
 		}
@@ -482,5 +473,5 @@ func init() {
 
 	gitMyPRs.AddCommand(myWherePRSubCmd)
 	// flags
-	myWherePRSubCmd.Flags().StringArrayVarP(&searchTarget, "in", "n", []string{}, fmt.Sprintf("search PRs by text\npls get my prs where add git integration --isin title\n--isin values are title, body, or comments"))
+	myWherePRSubCmd.Flags().StringArrayVarP(&searchTarget, "in", "n", []string{}, "search PRs by text\npls get my prs where add git integration --isin title\n--isin values are title, body, or comments")
 }

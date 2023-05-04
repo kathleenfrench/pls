@@ -3,7 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -31,7 +31,7 @@ func ExecuteCommand(cmd *exec.Cmd) string {
 		return out
 	}
 
-	res, err := ioutil.ReadAll(stdout)
+	res, err := io.ReadAll(stdout)
 	if err != nil {
 		out = color.HiRedString(fmt.Sprintf("[ERROR]: %s", err))
 		return out

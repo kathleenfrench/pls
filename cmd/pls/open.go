@@ -4,15 +4,16 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
+	"github.com/spf13/cobra"
+
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
-	"github.com/spf13/cobra"
 )
 
 var openCmd = &cobra.Command{
 	Use:     "open",
 	Short:   "open any url in your default browser from the command line, or select from a set of common favorites",
-	Example: fmt.Sprintf("pls open [opens dropdown GUI of your url shortcuts]\npls open https://google.com\npls open google.com"),
+	Example: "pls open [opens dropdown GUI of your url shortcuts]\npls open https://google.com\npls open google.com",
 	Long:    "`pls` comes with a few pre-baked url shortcuts, but the rest is up to you. view your configs (`pls show configs`) to see what shortcuts have already been set to the `webshort` property. if you ever want to update these values - whether that be changing an existing url or adding a new shortcut - simply run `pls update configs` and follow the onscreen prompts.",
 	Aliases: []string{"o"},
 	Args:    cobra.MaximumNArgs(1),
@@ -21,7 +22,7 @@ var openCmd = &cobra.Command{
 			faveKeys := utils.GetKeysFromMapString(plsCfg.WebShortcuts)
 			choice := gui.SelectPromptWithResponse("select a target URL from your shortcuts", faveKeys, nil, false)
 			color.Blue(fmt.Sprintf("opening %s...", choice))
-			utils.OpenURLInDefaultBrowser(plsCfg.WebShortcuts[choice])
+			_ = utils.OpenURLInDefaultBrowser(plsCfg.WebShortcuts[choice])
 			gui.Exit()
 		}
 
@@ -45,7 +46,7 @@ var openCmd = &cobra.Command{
 		}
 
 		color.Blue(fmt.Sprintf("opening %s...", validatedURL))
-		utils.OpenURLInDefaultBrowser(validatedURL)
+		_ = utils.OpenURLInDefaultBrowser(validatedURL)
 
 	},
 }

@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/internal/style"
 	"github.com/kathleenfrench/pls/pkg/utils"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // variables injected during build
@@ -35,7 +36,7 @@ var rootCmd = &cobra.Command{
 			style.PrintBanner()
 			printVersion()
 		} else {
-			cmd.Usage()
+			_ = cmd.Usage()
 		}
 	},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {

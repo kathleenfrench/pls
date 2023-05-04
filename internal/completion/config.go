@@ -19,7 +19,7 @@ var (
 	fishConfigPath           = "~/.config/fish/completions/pls.fish"
 	linuxBashPath            = "/etc/bash_completion.d/pls"
 	macBashPath              = "/usr/local/etc/bash_completion.d/pls"
-	zshConfigPath            = "~/.zshrc"
+	// zshConfigPath            = "~/.zshrc"
 	zshSessionCompletionPath = "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions/_pls"
 )
 

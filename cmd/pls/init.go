@@ -1,10 +1,11 @@
 package pls
 
 import (
-	"github.com/kathleenfrench/pls/internal/config"
-	"github.com/kathleenfrench/pls/internal/style"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/kathleenfrench/pls/internal/config"
+	"github.com/kathleenfrench/pls/internal/style"
 )
 
 var (
@@ -16,7 +17,7 @@ var (
 func initGlobalFlags() {
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/pls/config.yaml)")
 	rootCmd.PersistentFlags().Bool("viper", true, "use viper for configuration")
-	viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
+	_ = viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
 	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "V", false, "verbose output")
 	rootCmd.Flags().BoolVarP(&versionFlag, "version", "v", false, "see the current version of pls")
 }

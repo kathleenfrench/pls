@@ -2,7 +2,6 @@ package completion
 
 import (
 	"fmt"
-	"os/exec"
 
 	"github.com/kathleenfrench/pls/pkg/utils"
 )
@@ -17,7 +16,7 @@ $ pls add complete fish | source
 $ pls add complete fish > ~/.config/fish/completions/pls.fish
 `
 
-var fishInit = exec.Command("pls", "add", "complete", "fish", "|", "source")
+// var fishInit = exec.Command("pls", "add", "complete", "fish", "|", "source")
 
 // FishInstall handles installing the fish completion scripts on the user's host machine
 func FishInstall(path string) error {

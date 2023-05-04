@@ -4,10 +4,11 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
-	"github.com/kathleenfrench/pls/internal/config"
-	"github.com/kathleenfrench/pls/pkg/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/kathleenfrench/pls/internal/config"
+	"github.com/kathleenfrench/pls/pkg/utils"
 )
 
 var noUI bool
@@ -42,7 +43,7 @@ var updateCfgSubCmd = &cobra.Command{
 				color.HiGreen(fmt.Sprintf("successfully updated %s to %s!", key, val))
 			}
 		} else {
-			config.UpdatePrompt(viper.AllSettings())
+			_ = config.UpdatePrompt(viper.AllSettings())
 		}
 	},
 }

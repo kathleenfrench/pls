@@ -6,6 +6,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/google/go-github/v32/github"
 	"github.com/jedib0t/go-pretty/v6/table"
+
 	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
@@ -44,7 +45,7 @@ func ChooseWhatToDoWithRepo(repository *github.Repository, settings config.Setti
 
 	switch selected {
 	case openInBrowser:
-		utils.OpenURLInDefaultBrowser(repository.GetHTMLURL())
+		_ = utils.OpenURLInDefaultBrowser(repository.GetHTMLURL())
 	case cloneRepo:
 		var clonePath string
 		// give user choice between current directory, default codebase path, specify a custom path
@@ -62,7 +63,7 @@ func ChooseWhatToDoWithRepo(repository *github.Repository, settings config.Setti
 		case "Current Directory":
 			clonePath = ""
 		case "Custom Directory":
-			clonePath = gui.InputPromptWithResponse(fmt.Sprintf("what is the *full* path to the directory?"), "", true)
+			clonePath = gui.InputPromptWithResponse("what is the *full* path to the directory?", "", true)
 		}
 
 		err := git.CloneRepository(repository.GetName(), repository.GetCloneURL(), clonePath)

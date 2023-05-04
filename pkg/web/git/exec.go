@@ -9,9 +9,10 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/kyokomi/emoji"
+
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
-	"github.com/kyokomi/emoji"
 )
 
 // CheckForGitUsername checks for a git username set in the expected location
@@ -218,7 +219,7 @@ func printCodeChanges() (err error) {
 		return err
 	}
 
-	fmt.Println(fmt.Sprintf("%s\n%s", color.HiRedString("%s UNTRACKED CHANGES FOUND %s", emoji.Sprint(":police_car_light:"), emoji.Sprint(":police_car_light:")), changes))
+	fmt.Printf("%s\n%s\n", color.HiRedString("%s UNTRACKED CHANGES FOUND %s", emoji.Sprint(":police_car_light:"), emoji.Sprint(":police_car_light:")), changes)
 	return nil
 }
 

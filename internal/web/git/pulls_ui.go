@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/google/go-github/v32/github"
+
 	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/clean"
 	"github.com/kathleenfrench/pls/pkg/gui"
@@ -204,12 +205,12 @@ func ChooseWhatToDoWithIssue(gc *github.Client, issue *github.Issue, meta *Issue
 		}
 	case openInBrowser:
 		if isPullRequest {
-			utils.OpenURLInDefaultBrowser(htmlURL)
+			_ = utils.OpenURLInDefaultBrowser(htmlURL)
 		} else {
-			utils.OpenURLInDefaultBrowser(htmlURL)
+			_ = utils.OpenURLInDefaultBrowser(htmlURL)
 		}
 	case openDiff:
-		utils.OpenURLInDefaultBrowser(fmt.Sprintf("%s/files", issue.PullRequestLinks.GetHTMLURL()))
+		_ = utils.OpenURLInDefaultBrowser(fmt.Sprintf("%s/files", issue.PullRequestLinks.GetHTMLURL()))
 	case exitSelections:
 		gui.Exit()
 	}
@@ -285,7 +286,7 @@ func collectPullRequestResponses(settings config.Settings, isEnterprise bool) (*
 	editorCmd := utils.EditorLaunchCommands[settings.DefaultEditor]
 	body := gui.TextEditorInputAndSave("enter a description of this PR", "", editorCmd)
 
-	body += fmt.Sprintf("\n\n---\n<sub>:balloon: i opened this PR by saying [`pls`](https://github.com/kathleenfrench/pls)</sub>\n")
+	body += "\n\n---\n<sub>:balloon: i opened this PR by saying [`pls`](https://github.com/kathleenfrench/pls)</sub>\n"
 
 	// set the values
 	pr.Title = &title

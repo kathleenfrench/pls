@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/google/go-github/v32/github"
+
 	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
@@ -55,7 +56,7 @@ func ChooseWithToDoWithOrganization(organization *github.Organization, settings 
 
 	switch selected {
 	case openInBrowser:
-		utils.OpenURLInDefaultBrowser(organization.GetHTMLURL())
+		_ = utils.OpenURLInDefaultBrowser(organization.GetHTMLURL())
 	case getOrganizationRepos:
 		gui.Spin.Start()
 		repos, err := FetchReposInOrganization(organization.GetLogin(), settings, useEnterprise)

@@ -34,11 +34,6 @@ layout: default
 	return front
 }
 
-// command paths not warranting their own documentation page
-var excludedCommandPaths = []string{
-	"pls make a",
-}
-
 // GenMarkdownDocumentation generates markdown of pls commands into a chosen directory
 func GenMarkdownDocumentation(cmd *cobra.Command, dir string, filePrefix func(string, string) string, linkHandler func(string) string) error {
 	for _, c := range cmd.Commands() {
@@ -156,19 +151,11 @@ func GenMarkdownExtraCustom(cmd *cobra.Command, w io.Writer, linkHandler func(st
 }
 
 func hasSubCommands(cmd *cobra.Command) bool {
-	if cmd.HasSubCommands() {
-		return true
-	}
-
-	return false
+	return cmd.HasSubCommands()
 }
 
 func hasParentCommand(cmd *cobra.Command) bool {
-	if cmd.HasParent() {
-		return true
-	}
-
-	return false
+	return cmd.HasParent()
 }
 
 func printOptions(b *bytes.Buffer, cmd *cobra.Command, name string) error {
