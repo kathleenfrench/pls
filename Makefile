@@ -51,12 +51,15 @@ install: build ## install the pls binary to /usr/local/bin
 tidy:
 	@go mod tidy
 
+.PHONY: lint-fix
+lint-fix: ## run linter and fix issues if possible
+	@echo "running golangci-lint with --fix enabled..."
+	@golangci-lint run --fix
+
 .PHONY: lint
-lint: ## go linter and shadow tool
-	@$(GO) get -u golang.org/x/lint/golint
-	@$(GO) get -u golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow
-	@$(GO) vet $(shell go list ./...)
-	@$(GO) vet -vettool=$(shell which shadow) ./...
+lint: ## run golangci-lint checks
+	@echo "running golangci-lint"
+	@golangci-lint run
 
 .PHONY: test
 test: lint ## run linter and unit tests

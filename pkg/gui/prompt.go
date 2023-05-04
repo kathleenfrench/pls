@@ -33,7 +33,7 @@ func SelectPromptWithResponse(label string, options []string, defaultValue inter
 
 	// see: https://github.com/AlecAivazis/survey/issues/101
 	fmt.Printf("\x1b[?7l")
-	survey.AskOne(prompt, &selection)
+	_ = survey.AskOne(prompt, &selection)
 	defer fmt.Printf("\x1b[?7h")
 
 	return selection
@@ -52,7 +52,7 @@ func ConfirmPrompt(label string, helpMessage string, defaultVal bool, disableCle
 		Help:    helpMessage,
 	}
 
-	survey.AskOne(prompt, &response)
+	_ = survey.AskOne(prompt, &response)
 	return response
 }
 
@@ -69,7 +69,7 @@ func TextEditorInputAndSave(label string, defaultText string, editor string) str
 		Help:          "enter text, save it, and pls will handle the rest!",
 	}
 
-	survey.AskOne(prompt, &content)
+	_ = survey.AskOne(prompt, &content)
 	return content
 }
 
@@ -88,7 +88,7 @@ func InputPromptWithResponse(label string, defaultVal string, disableClear bool)
 
 	// see: https://github.com/AlecAivazis/survey/issues/101
 	fmt.Printf("\x1b[?7l")
-	survey.AskOne(prompt, &response)
+	_ = survey.AskOne(prompt, &response)
 	defer fmt.Printf("\x1b[?7h")
 
 	response = strings.TrimSpace(response)

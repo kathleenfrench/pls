@@ -6,10 +6,11 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/kathleenfrench/pls/pkg/gui"
-	"github.com/kathleenfrench/pls/pkg/utils"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
+
+	"github.com/kathleenfrench/pls/pkg/gui"
+	"github.com/kathleenfrench/pls/pkg/utils"
 )
 
 // UpdateSettings checks for pls config values that have already been set and ensures they're preserved when updating configs
@@ -52,7 +53,7 @@ func (s *Settings) UpdateSettings() error {
 		s.viper.Set(githubEnterpriseTokenKey, s.GitEnterpriseToken)
 	}
 
-	s.viper.MergeInConfig()
+	_ = s.viper.MergeInConfig()
 	s.viper.SetConfigFile(cfgFile)
 	s.viper.SetConfigType(filepath.Ext(cfgFile))
 	err := s.viper.WriteConfig()
@@ -121,7 +122,7 @@ func UpdatePrompt(viperSettings map[string]interface{}) error {
 		utils.ExitWithError(err)
 	}
 
-	parsed.UpdateSettings()
+	_ = parsed.UpdateSettings()
 	color.HiGreen(fmt.Sprintf("successfully updated %s to equal %s!", choice, changedValue))
 	return nil
 }

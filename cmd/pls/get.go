@@ -5,10 +5,11 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/google/go-github/v32/github"
+	"github.com/spf13/cobra"
+
 	gitpls "github.com/kathleenfrench/pls/internal/web/git"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
-	"github.com/spf13/cobra"
 )
 
 var (
@@ -48,7 +49,7 @@ var gitRepos = &cobra.Command{
 	Use:     "repos",
 	Aliases: []string{"r", "repositories", "repo", "repository"},
 	Short:   "interact with someone else's github repositories",
-	Example: fmt.Sprintf("pls get repos for <username>\npls get repos by <username>\npls get repos in <organization>"),
+	Example: "pls get repos for <username>\npls get repos by <username>\npls get repos in <organization>",
 	Args:    cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		gui.Spin.Start()

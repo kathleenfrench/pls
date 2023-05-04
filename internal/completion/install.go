@@ -14,13 +14,13 @@ func PrintInstallationInstructionsToStdout(cmd *cobra.Command, shellChoice strin
 
 	switch shellChoice {
 	case "bash":
-		cmd.Root().GenBashCompletion(os.Stdout)
+		_ = cmd.Root().GenBashCompletion(os.Stdout)
 		color.HiGreen(fmt.Sprintf("\n%s\n", BashHelp))
 	case "zsh":
-		cmd.Root().GenZshCompletion(os.Stdout)
+		_ = cmd.Root().GenZshCompletion(os.Stdout)
 		color.HiGreen(fmt.Sprintf("\n%s\n", ZshHelp))
 	case "fish":
-		cmd.Root().GenFishCompletion(os.Stdout, true)
+		_ = cmd.Root().GenFishCompletion(os.Stdout, true)
 		color.HiGreen(fmt.Sprintf("\n%s\n", FishHelp))
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/google/go-github/v32/github"
+
 	"github.com/kathleenfrench/pls/internal/config"
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
@@ -98,9 +99,9 @@ func (g *IssueGetterFlags) constructMyIssueSearchQuery(isPR bool) string {
 	query := fmt.Sprintf("state:%s", g.State)
 
 	if isPR {
-		query += fmt.Sprintf(" type:pr")
+		query += " type:pr"
 	} else {
-		query += fmt.Sprintf(" type:issue")
+		query += " type:issue"
 	}
 
 	if g.Author != "" {
@@ -216,7 +217,7 @@ func CreatePullRequestFromCWD(settings config.Settings) error {
 
 	openNow := gui.ConfirmPrompt("do you want to open your PR in the browser?", "", true, true)
 	if openNow {
-		utils.OpenURLInDefaultBrowser(pr.GetHTMLURL())
+		_ = utils.OpenURLInDefaultBrowser(pr.GetHTMLURL())
 	}
 
 	return nil

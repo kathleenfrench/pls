@@ -5,9 +5,10 @@ import (
 	"os"
 
 	"github.com/fatih/color"
+	"github.com/spf13/cobra"
+
 	"github.com/kathleenfrench/pls/internal/completion"
 	"github.com/kathleenfrench/pls/pkg/utils"
-	"github.com/spf13/cobra"
 )
 
 var completeMethodCmd = &cobra.Command{
@@ -19,11 +20,11 @@ var completeMethodCmd = &cobra.Command{
 		shellChoice := args[0]
 		switch shellChoice {
 		case "bash":
-			cmd.Root().GenBashCompletion(os.Stdout)
+			_ = cmd.Root().GenBashCompletion(os.Stdout)
 		case "zsh":
-			cmd.Root().GenZshCompletion(os.Stdout)
+			_ = cmd.Root().GenZshCompletion(os.Stdout)
 		case "fish":
-			cmd.Root().GenFishCompletion(os.Stdout, true)
+			_ = cmd.Root().GenFishCompletion(os.Stdout, true)
 		}
 	},
 }
@@ -34,7 +35,7 @@ var completionCmd = &cobra.Command{
 	Short:     "add shell completion for pls",
 	Long:      "writes completion scripts to your local machine based off of your preferred shell. `pls` currently has support for: `bash`, `zsh`, and `fish`.",
 	ValidArgs: []string{"bash", "zsh", "fish"},
-	Args:      cobra.ExactValidArgs(1),
+	Args:      cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		shellChoice := args[0]
 

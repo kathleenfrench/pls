@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/fatih/color"
+
 	"github.com/kathleenfrench/pls/pkg/gui"
 	"github.com/kathleenfrench/pls/pkg/utils"
 )
@@ -28,7 +29,7 @@ $ pls add complete zsh > "${fpath[1]}/_pls"
 func ZshInstall(path string) error {
 	// verify auto update is enabled
 	if !confirmZshShellCompletionEnabled() {
-		color.HiYellow(fmt.Sprintf(`before adding zsh completion scripts, you must enable the feature, run:\necho "autoload -U compinit; compinit" >> ~/.zshrc\n\nnow, try installing through pls again!`))
+		color.HiYellow(`before adding zsh completion scripts, you must enable the feature, run:\necho "autoload -U compinit; compinit" >> ~/.zshrc\n\nnow, try installing through pls again!`)
 		os.Exit(1)
 	}
 
